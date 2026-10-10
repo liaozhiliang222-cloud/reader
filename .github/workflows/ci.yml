@@ -81,7 +81,8 @@ jobs:
         run: |
           test -d "$JAVA_HOME_21_X64"
           echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          test -f "$ANDROID_HOME/platforms/android-36/android.jar"
+          test -x "$ANDROID_HOME/build-tools/36.0.0/aapt2"
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:android
       - name: Android unit tests, lint and debug package (no release keys)

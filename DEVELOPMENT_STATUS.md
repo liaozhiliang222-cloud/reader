@@ -2,6 +2,8 @@
 
 更新日期：2026-10-10。
 
+发布进行中补充：源码已推送 main `6120947`，尚未公开 Release 的 `android-v1.0.0` 已建立。首次 Android CI 38047257314 因 Ubuntu runner 的 sdkmanager 不在 PATH 而失败；依据 GitHub runner 官方清单，改为校验已预装的 SDK 36 / Build-tools 36.0.0，保留 JDK 21，待新 CI 实际验证。APK 网页上传需要临时本地文件访问权限，用户已授权开启后恢复；浏览器工具禁止访问 chrome://extensions，已请用户手动开启，附件未上传、Release 未发布。
+
 当前任务检查点（2026-10-10，Android 源码与 APK 发布复核）：用户授权上传最新源码和 1.0.0 APK。已修复超过 512 KB 的原生 Base64 分块导入、音量键开关备份丢失、退出阅读页未恢复系统栏、原生常亮申请失败、导入停滞/大小限制和异步监听清理；关闭系统云备份/自动换机，收窄 FileProvider，补 MD 图文 ZIP 的打开方式。发布签名缺失时只生成未签名包，禁止回退调试证书；移除未调用的 Filesystem/Share 插件、模板空测试，补齐 Capacitor 原生许可、Gradle 官方 SHA 和独立 Android CI。
 
 当前自动检查：lint、87 文件/380 单测、网页与 Android strict 构建、安全 104 URL/PWA 资源检查通过。完整本地浏览器 102 通过/1 已知 Windows WebKit 离线 skip（10.0 分钟），随后原生分支小修由专项单测覆盖，最终代码完整浏览器还将由本次 GitHub CI 验证。Android Java 3 项、lintRelease（0 错误/10 个模板或依赖提示）、assembleRelease 通过；中文路径导致的 Gradle 类加载故障经临时 J: 映射解决并撤销，本机 SDK 路径转义已修正。并未提高截图容忍度、重试或用模拟器冒充真机。
