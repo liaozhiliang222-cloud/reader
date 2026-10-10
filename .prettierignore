@@ -18,6 +18,7 @@ PRD.md
 DEV_PLAN.md
 public/licenses.txt
 artifacts/pagination-mutation-report.json
+artifacts/pagination-restored-report.json
 artifacts/dependency-audit.json
 artifacts/deployment-update-results.json
 artifacts/preferences-browser/

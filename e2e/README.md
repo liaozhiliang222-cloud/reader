@@ -2,7 +2,7 @@
 
 `pnpm check:experience` 运行 17 项独立用例：两个引擎各七项引导/环境检查，Chromium 另三项通过 CDP 发送可信触摸，覆盖慢拖、取消、竖向滑动和选区/菜单冲突。没有 CDP 能力的 WebKit 不执行触摸拖动。三屏键盘操作、Tab/Shift+Tab 循环、Escape/浏览器返回、触发按钮焦点恢复、历史记录撤回、320px 布局与重载均有原生检查。模拟 UA、受控安装事件及 IDB 写入故障各有明确标记，不能记为系统浏览器、真实安装或手机系统故障验收。生产 HTML SHA、页面错误与外部请求附在每项原始结果中；结果保存在忽略的 `artifacts/experience-browser-results.json`，测试截图另行查看。
 
-GitHub CI 使用 Windows 2025 与现有六张 Windows 像素基线运行默认完整套件，报告作为对应 Actions 运行的附件保留，不提交本机报告。完整套件要求全部 spec 和两个引擎（触摸仅 Chromium）齐备；不得在 CI 自动生成基线、使用重试掩盖失败或引用上次成功报告。字体或运行器差异导致的失败需独立调查。
+GitHub CI 使用 Windows Server 2025 与默认系统字体运行完整套件，通过 `JINGYE_PIXEL_BASELINE=windows-2025` 选择该环境独立的六张基线。本机原六张基线保持不变；首次 CI 的布局/换行一致但字形绘制不同，已确认两端 SimSun 文件 SHA 完全一致。按 [Playwright 环境要求](https://playwright.dev/docs/test-snapshots)，在独立诊断分支采集运行器图像并逐张查看后纳入 `pagination.spec.ts-snapshots/windows-2025/`，来源、环境、几何和六张 SHA 见 `review.json`；采集运行不计完整 CI 通过。报告作为对应 Actions 附件保留，不提交本机报告。完整套件要求全部 spec 和两个引擎（触摸仅 Chromium）齐备；不得自动更新基线、使用重试掩盖失败或引用上次成功报告。未知基线环境会立即报错。
 
 运行 `pnpm exec playwright install chromium webkit`，再运行 `pnpm e2e`。使用独立生产预览端口4180和隔离会话；默认套件使用原创生成样本，真实来源书籍由独立兼容配置验收。
 
@@ -10,11 +10,11 @@ GitHub CI 使用 Windows 2025 与现有六张 Windows 像素基线运行默认�
 - `reading.spec.ts`：两个格式、两个引擎的实际文件导入、Worker解析、IndexedDB、翻页、重载进度、DOM Range选区划线、书签、ZIP下载、清空与恢复。
 - `pnpm check:markdown` / `markdown.spec.ts`：MD/MARKDOWN 文件与显式粘贴格式，原生 Worker/IDB、表格标签、代码折行、目录和标题链接、外链地址弹窗及键盘操作、零远程图片请求、夜间主题、长链接跨页/分块、进度重载、划线/书签和完整 ZIP 往返的原始字节。HTML/公式/Mermaid 只显示源码。移动视口截图需人工查看，不能替代物理手机验收。
 - `backup-staging.spec.ts`：十三本原创TXT/文稿（含1200118字节长文）ZIP实际Worker预览/恢复。Worker构造代理只转发到原生构造器并监听原始回复，不替换解析/RPC；核对预览仅含13本元数据、零Blob，逐书回复各有一本和对应原文。观察并转发原生IDB put事件，确认全部逐书暂存先于主库写入，恢复后暂存清除、原文SHA/书签/笔记/重载保留；导出时观察并转发原生Worker.postMessage与IDB get，确认初始入参没有原文Blob、此前未取原文，之后13份原文按files顺序读取；重新生成并实际下载ZIP，核对全部原文和CRC，导出元数据不带目录/章节摘要或本机Blob键。另验证最后一本位置校验失败时整库回滚、清理暂存并可重新恢复。报告与下载路径在artifacts/backup-export-browser；随后运行`.\scripts\check-backup-desktop.ps1`，只读取最近30分钟两份报告，以Windows Expand-Archive独立解压并核对26份原文大小/SHA，输出backup-desktop-extraction.json。不会向主库写测试夹具，不以此推断大型书库峰值RAM。正常取消、晚到RPC/字节/最终校验和活跃锁保护由定向单测补充，手机杀进程仍需独立验证。
-- `pagination.spec.ts`：固定原创EPUB与默认排版前三页，6张Windows系统字体基线已查看；等待短暂阅读提示消失，零像素差异。查看截图后才可运行 `pnpm e2e:update`。其他OS/字体需独立基线。
+- `pagination.spec.ts`：固定原创 EPUB 与默认排版前三页，本机/Windows Server 各六张系统字体基线已查看；等待短暂阅读提示消失，`maxDiffPixels: 0`。查看截图并核对环境后才可更新基线；其他 OS/字体须独立核验，不能将新截图直接当作验收成功。
 - `image-layout.spec.ts`：原创图文EPUB，图片套在链接/span内，前三页、28px字号和横屏的实际图片边界检查。Android模拟在改变窗口大小前通过应用入口退出全屏；这不是手机传感器旋转验收。
 - `pnpm check:interactions`：四个场景×两个引擎，使用真实touchscreen点按和no-preference动态媒体。单手两侧下一页/左上返回、正文点按只关闭菜单、正常模式方向、横竖窗口/重载位置；DOM Range选区期间可信点按返回被阻挡，笔记输入框中的方向键不翻页，退出后继续。观察原生Web Animations的关键帧/时长/中间绘制/finish/cancel，检查平移220ms、淡入160ms、无动效及实时reduce取消和恢复；观察菜单180ms与抽屉240ms真实CSS退出时inert、aria-hidden和pointer-events，reduce时无CSS动画。Element.animate包装只转发和记录，不替换动画、时钟或媒体。六张选定截图另行查看，不能从DOM/几何断言推断视觉通过。
 - `pnpm check:long-chapters`：原创120001个UTF-16单位的单段TXT和1000段/157000单位长章，双引擎六项真实Worker/IDB验收，包括十二万字原创EPUB的注音/行内与空段图片/跨段笔记及ZIP恢复。第12000单位处跨块前后翻页、块内文本和原段落编号与源文核对；保存书签/笔记，字号28px、横竖窗口变化、重载后核对定位、标注与原文件SHA。实际Range行框位于正文列内，MutationObserver记录当前/邻块和临时空闲测量的DOM峰值≤4。进度跳转通过实际range输入/提交事件，选区使用DOM Range；不写测试数据库、不替换分页，不等同于手机拖动/系统长按。
-- `pnpm check:pagination`：临时把行高乘1.15，两个引擎必须因截图差异失败，再恢复源码原字节、构建并验证通过。单独运行，避免与源码编辑/E2E并发；报告在 `artifacts/pagination-regression.json`。
+- `pnpm check:pagination`：临时把行高乘 1.15，两个引擎必须因截图差异失败，再恢复源码原字节、构建并验证通过。使用 `playwright.pagination.config.ts`，不重建完整套件的更新/性能等运行清单，不覆盖完整 JSON/HTML；三份独立报告在 `artifacts/pagination-*.json`，包括所选基线环境。单独运行，避免与源码编辑/E2E并发；CI 在完整报告核验后也执行本项。
 - `storage-layout.spec.ts`：24本书/60章目录的真实几何、虚拟窗口、End键导航，以及Chromium离线重载/Worker导入。
 - `pnpm check:performance-browser`：同一原创千章样本（≥10MiB）与100份独立TXT经真实文件选择、生产Worker和原生IDB导入。每引擎三次千章开书/三次百书书架首屏，用捕获阶段实际click的浏览器时钟开始，等待真实排版与两次RAF；记录正文就绪和帧等待分段，分别检查1500ms、500ms、千章目录300ms。检查原文件SHA、末章重载、九处原生脚本滚动后的可见行覆盖、DOM上限与Home/End导航。原始报告包含成功/失败状态，汇总只接受本轮UUID的四份passed报告；阈值失败不生成通过汇总。结果是未限速的Windows引擎/移动视口局部证据，不等同于Android/iOS性能、首次4G加载、触摸流畅度、55fps或30分钟内存。
 - `font.spec.ts`：点击前零字体请求、同源下载/校验、缓存重载、删除、错误字节及重试。故障注入用例关闭SW以可靠拦截网络；正常字体/PWA用例保留SW。

@@ -6,9 +6,9 @@
 
 使用 Node 24.17.0、pnpm 11.21.0；运行 `pnpm install --frozen-lockfile`、`pnpm dev`。变更完成后运行 `pnpm lint`、`pnpm test`、`pnpm build`。解析、定位和备份合并等纯逻辑需有针对性测试，涉及阅读界面的变更需执行相应浏览器套件。
 
-`pnpm exec playwright install chromium webkit` 安装测试引擎；`pnpm e2e` 使用生产预览与原创样本。分页像素基线采用 Windows 系统字体，不能在 CI 中自动重建或提高差异容忍度来掩盖失败。其他系统/字体须单独核验，细节见 [浏览器验收](./e2e/README.md)。
+`pnpm exec playwright install chromium webkit` 安装测试引擎；`pnpm e2e` 使用生产预览与原创样本。分页使用默认系统字体：本机六张原始基线保持不变，Windows Server 2025 的六张基线在独立采集后逐张查看，来源与 SHA 见 `e2e/pagination.spec.ts-snapshots/windows-2025/review.json`。CI 通过 `JINGYE_PIXEL_BASELINE=windows-2025` 选择运行器基线；不能自动重建或提高差异容忍度来掩盖失败。其他系统/字体须单独核验，细节见 [浏览器验收](./e2e/README.md)。
 
-GitHub Actions 在 push、PR 与手动触发时运行 lint、单测、构建、安全/PWA 检查及完整浏览器套件。工作流采用 Windows 2025，固定 Node 与 Action 提交；保留原生报告、失败截图和 trace。它不等同于 Android/iOS 真机验收。
+GitHub Actions 在 push、PR 与手动触发时运行 lint、单测、构建、安全/PWA 检查及完整浏览器套件。工作流采用 Windows 2025，固定 Node 与 Action 提交；保留原生报告、失败截图和 trace。完整报告检查后，另将行高故意改变，要求两个引擎检出像素差异，再恢复源码与构建并通过比较；专项使用独立配置和 JSON，保留完整套件的报告及运行清单。它不等同于 Android/iOS 真机验收。
 
 同一工作流预留 Cloudflare 部署 job，只有检查成功的 main push 且仓库变量 `CLOUDFLARE_DEPLOY_ENABLED=true` 才会执行。需要在仓库 Actions secrets 配置 `CLOUDFLARE_ACCOUNT_ID` 与 `CLOUDFLARE_API_TOKEN`，令牌仅授予现有账号的 Cloudflare Pages 编辑权限；步骤见 [Cloudflare 官方说明](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/)。现有项目固定为 `jingye-reader`，不是新建托管项目；上传前核对清单，上传后检查全部资源 SHA/CSP/缓存头。当前尚未配置这些 secrets，自动发布未启用。
 

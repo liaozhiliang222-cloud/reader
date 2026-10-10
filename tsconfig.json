@@ -38,6 +38,7 @@
     "playwright.markdown.config.ts",
     "playwright.markdown-v2.config.ts",
     "playwright.markdown-deployment.config.ts",
-    "playwright.experience.config.ts"
+    "playwright.experience.config.ts",
+    "playwright.pagination.config.ts"
   ]
 }

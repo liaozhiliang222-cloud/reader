@@ -1,0 +1,195 @@
+{
+  "reviewedAt": "2026-10-10T03:10:14.010Z",
+  "review": "All six original screenshots viewed individually: default typography, matching line wrapping and margins, intact page transitions, no half-line clipping. No screenshot masks or tolerance increase.",
+  "physicalDeviceAcceptance": false,
+  "sourceRun": "https://github.com/liaozhiliang222-cloud/reader/actions/runs/38019268102",
+  "artifactId": 11658030302,
+  "artifactSha256": "b44ec3dfde4c9fc18c1b530406dce5a87e422801eb67af1773bd4ac2ad2d461b",
+  "systemFontSha256": "1526ac24375f51f6eb73bc2d3f8072dbe4a80a3a65217677c9d9a84f67dab2ab",
+  "fontBytesMatchLocalWindows": true,
+  "reason": "Windows Server 2025 and the local Windows host render glyphs differently despite identical SimSun bytes. Keep separate reviewed baselines for each environment.",
+  "captures": [
+    {
+      "purpose": "reference capture only; requires visual review and subsequent strict full CI",
+      "checkedAt": "2026-10-10T03:07:16.574Z",
+      "engine": "Pixel-7",
+      "platform": "win32",
+      "osRelease": "10.0.26100",
+      "osVersion": "Windows Server 2025 Datacenter",
+      "commit": "cef372e833cc078228349efa2fdf6c1b9068c402",
+      "indexSha256": "be46d328050c05edd2ea2dd980be36ccb074632e7f514ef0cfe6db110e24be09",
+      "pages": [
+        {
+          "number": 1,
+          "file": "windows-2025/page-1-Pixel-7-win32.png",
+          "bytes": 89491,
+          "sha256": "4197afea48f63ddd4fd623bc4fccc823dc1e428843f5b51ad006ce2076fc5909",
+          "geometry": {
+            "viewport": {
+              "width": 412,
+              "height": 839
+            },
+            "contentStyle": {
+              "font": "\"Songti SC\", STSong, \"Noto Serif CJK SC\", \"Noto Serif SC\", SimSun, serif",
+              "fontSize": "18px",
+              "lineHeight": "32.4px",
+              "marginTop": "63.1px",
+              "height": "712.797px",
+              "columnWidth": "364px"
+            },
+            "footer": "1 / 31 · 0.0%"
+          }
+        },
+        {
+          "number": 2,
+          "file": "windows-2025/page-2-Pixel-7-win32.png",
+          "bytes": 136824,
+          "sha256": "b9dbd6d063f595ba94d5c5661a0a88cf03f553afa50e35c0a8e4b5ff5a692b67",
+          "geometry": {
+            "viewport": {
+              "width": 412,
+              "height": 839
+            },
+            "contentStyle": {
+              "font": "\"Songti SC\", STSong, \"Noto Serif CJK SC\", \"Noto Serif SC\", SimSun, serif",
+              "fontSize": "18px",
+              "lineHeight": "32.4px",
+              "marginTop": "63.1px",
+              "height": "712.797px",
+              "columnWidth": "364px"
+            },
+            "footer": "2 / 31 · 2.1%"
+          }
+        },
+        {
+          "number": 3,
+          "file": "windows-2025/page-3-Pixel-7-win32.png",
+          "bytes": 136837,
+          "sha256": "e0476126656915007b5b56349fd8f0ec25e692a1092d8ed05723814f08f19eeb",
+          "geometry": {
+            "viewport": {
+              "width": 412,
+              "height": 839
+            },
+            "contentStyle": {
+              "font": "\"Songti SC\", STSong, \"Noto Serif CJK SC\", \"Noto Serif SC\", SimSun, serif",
+              "fontSize": "18px",
+              "lineHeight": "32.4px",
+              "marginTop": "63.1px",
+              "height": "712.797px",
+              "columnWidth": "364px"
+            },
+            "footer": "3 / 31 · 5.4%"
+          }
+        }
+      ]
+    },
+    {
+      "purpose": "reference capture only; requires visual review and subsequent strict full CI",
+      "checkedAt": "2026-10-10T03:07:26.340Z",
+      "engine": "iPhone-14",
+      "platform": "win32",
+      "osRelease": "10.0.26100",
+      "osVersion": "Windows Server 2025 Datacenter",
+      "commit": "cef372e833cc078228349efa2fdf6c1b9068c402",
+      "indexSha256": "be46d328050c05edd2ea2dd980be36ccb074632e7f514ef0cfe6db110e24be09",
+      "pages": [
+        {
+          "number": 1,
+          "file": "windows-2025/page-1-iPhone-14-win32.png",
+          "bytes": 39813,
+          "sha256": "4ee43886a9e934917234ec76a03c372476bba9290227eccd0bcca819d67c609e",
+          "geometry": {
+            "viewport": {
+              "width": 390,
+              "height": 664
+            },
+            "contentStyle": {
+              "font": "Songti SC, STSong, Noto Serif CJK SC, Noto Serif SC, SimSun, serif",
+              "fontSize": "18px",
+              "lineHeight": "32.400002px",
+              "marginTop": "56.59375px",
+              "height": "550.796875px",
+              "columnWidth": "342px"
+            },
+            "footer": "1 / 46 · 0.0%"
+          }
+        },
+        {
+          "number": 2,
+          "file": "windows-2025/page-2-iPhone-14-win32.png",
+          "bytes": 57100,
+          "sha256": "82f1e4ceaf0fed8f43fb52fb1dbda862db944095a41af3068b0fe2ad5fe97088",
+          "geometry": {
+            "viewport": {
+              "width": 390,
+              "height": 664
+            },
+            "contentStyle": {
+              "font": "Songti SC, STSong, Noto Serif CJK SC, Noto Serif SC, SimSun, serif",
+              "fontSize": "18px",
+              "lineHeight": "32.400002px",
+              "marginTop": "56.59375px",
+              "height": "550.796875px",
+              "columnWidth": "342px"
+            },
+            "footer": "2 / 46 · 1.4%"
+          }
+        },
+        {
+          "number": 3,
+          "file": "windows-2025/page-3-iPhone-14-win32.png",
+          "bytes": 57206,
+          "sha256": "aebac5ae93476756455b46868e5f27bf5068fdaeeff7da221c42eb94474217ac",
+          "geometry": {
+            "viewport": {
+              "width": 390,
+              "height": 664
+            },
+            "contentStyle": {
+              "font": "Songti SC, STSong, Noto Serif CJK SC, Noto Serif SC, SimSun, serif",
+              "fontSize": "18px",
+              "lineHeight": "32.400002px",
+              "marginTop": "56.59375px",
+              "height": "550.796875px",
+              "columnWidth": "342px"
+            },
+            "footer": "3 / 46 · 3.6%"
+          }
+        }
+      ]
+    }
+  ],
+  "unchangedLocalBaselines": [
+    {
+      "file": "page-1-Pixel-7-win32.png",
+      "sha256": "038ec6d35e78a15b71669686f90edff93a45dcbd35e6f729532c0b8bd0fcf832",
+      "bytes": 57325
+    },
+    {
+      "file": "page-2-Pixel-7-win32.png",
+      "sha256": "47d6f738a608df063600df3ea63c66aa1b128e5257a017a6b4b5c92a35a89a75",
+      "bytes": 84574
+    },
+    {
+      "file": "page-3-Pixel-7-win32.png",
+      "sha256": "821f173f506dd46f38b05693783bc5a43e04cd3ccab7c243083a283807b74070",
+      "bytes": 84574
+    },
+    {
+      "file": "page-1-iPhone-14-win32.png",
+      "sha256": "4ffdd6c4bd68f8f89cc555ba02b346026d69007fa8e011027330ec559fa5e087",
+      "bytes": 31612
+    },
+    {
+      "file": "page-2-iPhone-14-win32.png",
+      "sha256": "0c997bec781554c12a03604d83a731f201911b4d4ba902e30d6057b384be1a0a",
+      "bytes": 44023
+    },
+    {
+      "file": "page-3-iPhone-14-win32.png",
+      "sha256": "0dcccaf4aeb6b15f9e75317b35925a36ae44d422df7cb06f3ba17c8570088f03",
+      "bytes": 44145
+    }
+  ]
+}

@@ -44,6 +44,8 @@ try {
       'exec',
       'playwright',
       'test',
+      '--config',
+      'playwright.pagination.config.ts',
       'pagination.spec.ts',
       '--update-snapshots=none',
       '--reporter=list,json',
@@ -73,19 +75,28 @@ try {
   await restoreSource();
 }
 const restoredPassed =
-  run([
-    'exec',
-    'playwright',
-    'test',
-    'pagination.spec.ts',
-    '--update-snapshots=none',
-  ]) === 0;
+  run(
+    [
+      'exec',
+      'playwright',
+      'test',
+      '--config',
+      'playwright.pagination.config.ts',
+      'pagination.spec.ts',
+      '--update-snapshots=none',
+      '--reporter=list,json',
+    ],
+    {
+      PLAYWRIGHT_JSON_OUTPUT_NAME: 'artifacts/pagination-restored-report.json',
+    },
+  ) === 0;
 await writeFile(
   'artifacts/pagination-regression.json',
   JSON.stringify(
     {
       checkedAt: new Date().toISOString(),
       platform: process.platform,
+      baseline: process.env.JINGYE_PIXEL_BASELINE ?? 'local-windows',
       mutation: 'lineHeight × 1.15',
       mutationDetected,
       restoredPassed,
