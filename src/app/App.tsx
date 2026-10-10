@@ -20,10 +20,16 @@ import { restoreOptionalFont } from './optionalFont';
 import { AboutPage } from '@/pages/About/AboutPage';
 import { isNativeApp, nativeApp } from './platform';
 import type { IncomingData } from './incomingData';
+import { validIncomingId } from './incomingData';
+import type { NativeImportProgress } from './platform/native';
+import { BookLoading } from '@/components/BookLoading';
+import { Modal } from '@/components/Modal';
 
 export function App() {
   const route = useRoute();
   const [ready, setReady] = useState(false);
+  const [nativeLaunching, setNativeLaunching] = useState(isNativeApp);
+  const [receiving, setReceiving] = useState<NativeImportProgress>();
   const [guide, setGuide] = useState(false);
   const globalReading = settings.value.reading;
   const followSystemTheme = settings.value.followSystemTheme;
@@ -41,8 +47,13 @@ export function App() {
       await incomingStore().put(id, data);
       incomingChanged();
       const current = parseRoute(location.hash);
-      if (current.page !== 'incoming' && current.page !== 'paste')
-        navigate('#/incoming/' + id);
+      if (
+        current.page !== 'paste' &&
+        (current.page !== 'incoming' ||
+          !current.id ||
+          !validIncomingId(current.id))
+      )
+        navigate('#/incoming/' + id, current.page === 'incoming');
     };
     installFileConsumer(window as Window & LaunchHost, deliver, () =>
       setError('未能接收系统打开的文件，请从书架重新选择。'),
@@ -51,18 +62,25 @@ export function App() {
     // App：接管返回键、处理冷启动/热启动传入的文件。
     let disposeIncoming: (() => void) | undefined;
     let cancelled = false;
-    void nativeApp().then((native) => {
-      if (cancelled) return;
-      void native.cleanupServiceWorkers();
-      native.installBackButton();
-      disposeIncoming = native.listenIncoming(deliver, () =>
-        setError('未能接收系统打开的文件，请从书架重新选择。'),
-      );
-      void native
-        .launchIncoming()
-        .then((data) => (data ? deliver(data) : undefined))
-        .catch(() => setError('未能接收系统打开的文件，请从书架重新选择。'));
-    });
+    const fail = () => {
+      if (!cancelled) setError('未能接收系统打开的文件，请从书架重新选择。');
+    };
+    const progress = (value: NativeImportProgress | undefined) => {
+      if (!cancelled) setReceiving(value);
+    };
+    void nativeApp()
+      .then(async (native) => {
+        if (cancelled) return;
+        void native.cleanupServiceWorkers();
+        native.installBackButton();
+        disposeIncoming = native.listenIncoming(deliver, fail, progress);
+        const data = await native.launchIncoming(progress);
+        if (data && !cancelled) await deliver(data);
+      })
+      .catch(fail)
+      .finally(() => {
+        if (!cancelled) setNativeLaunching(false);
+      });
     return () => {
       cancelled = true;
       disposeIncoming?.();
@@ -73,7 +91,7 @@ export function App() {
     const hash = location.hash;
     if (!isNativeApp) void requestPersistence();
     void restoreOptionalFont();
-    void loadStartup(hash)
+    void loadStartup(hash, isNativeApp)
       .then((value) => {
         if (cancelled) return;
         settings.value = value.settings;
@@ -139,51 +157,76 @@ export function App() {
     if (route.page !== 'reader' || guide)
       return watchAppearance(globalReading, followSystemTheme);
   }, [globalReading, followSystemTheme, route.page, guide]);
-  if (!ready)
+  const receiveLoading = receiving && (
+    <BookLoading
+      title="正在读取书籍"
+      fileName={receiving.fileName}
+      detail={`第 ${receiving.index} / ${receiving.total} 本 · 已读取 ${(receiving.bytes / (1024 * 1024)).toFixed(1)} MB`}
+    />
+  );
+  if (!ready || nativeLaunching)
     return (
       <main class="welcome">
-        <p role="status">正在打开书架…</p>
+        <section class="welcome-body">
+          {receiveLoading || (
+            <BookLoading title="正在打开静页" detail="留一点时间，给阅读。" />
+          )}
+        </section>
       </main>
     );
-  if (guide)
-    return (
-      <main class="guide-shell">
-        <Onboarding first onDone={() => setGuide(false)} />
-      </main>
-    );
-  if (route.page === 'settings')
-    return <SettingsPage initialSection={route.section} />;
-  if (route.page === 'about') return <AboutPage />;
-  if (route.page === 'paste')
-    return (
-      <PastePage
-        key={route.incomingId ?? route.bookId ?? 'new'}
-        bookId={route.bookId}
-        incomingId={route.incomingId}
-      />
-    );
-  if (route.page === 'incoming')
-    return <IncomingPage key={route.id ?? 'new'} id={route.id} />;
-  if (route.page === 'reader' && !active)
-    return (
-      <main class="welcome">
-        <p role="status">正在打开书籍…</p>
-      </main>
-    );
-  if (route.page === 'reader' && active)
-    return (
-      <ReaderView
-        key={`${active.id}:${active.contentRevision ?? 0}`}
-        book={active}
-        onBookChanged={(book) => {
-          const current = parseRoute(location.hash);
-          if (current.page === 'reader' && current.bookId === book.id)
-            setActive(book);
-        }}
-        onBack={() => {
-          navigate('#/');
-        }}
-      />
-    );
-  return <BookshelfPage notice={error} />;
+  const content = () => {
+    if (guide)
+      return (
+        <main class="guide-shell">
+          <Onboarding first onDone={() => setGuide(false)} />
+        </main>
+      );
+    if (route.page === 'settings')
+      return <SettingsPage initialSection={route.section} />;
+    if (route.page === 'about') return <AboutPage />;
+    if (route.page === 'paste')
+      return (
+        <PastePage
+          key={route.incomingId ?? route.bookId ?? 'new'}
+          bookId={route.bookId}
+          incomingId={route.incomingId}
+        />
+      );
+    if (route.page === 'incoming')
+      return <IncomingPage key={route.id ?? 'new'} id={route.id} />;
+    if (route.page === 'reader' && !active)
+      return (
+        <main class="welcome">
+          <section class="welcome-body">
+            <BookLoading title="正在打开书籍" />
+          </section>
+        </main>
+      );
+    if (route.page === 'reader' && active)
+      return (
+        <ReaderView
+          key={`${active.id}:${active.contentRevision ?? 0}`}
+          book={active}
+          onBookChanged={(book) => {
+            const current = parseRoute(location.hash);
+            if (current.page === 'reader' && current.bookId === book.id)
+              setActive(book);
+          }}
+          onBack={() => {
+            navigate('#/');
+          }}
+        />
+      );
+    return <BookshelfPage notice={error} />;
+  };
+  return (
+    <>
+      {content()}
+      {receiveLoading && (
+        <Modal title="正在读取书籍" onDismiss={() => {}}>
+          {receiveLoading}
+        </Modal>
+      )}
+    </>
+  );
 }

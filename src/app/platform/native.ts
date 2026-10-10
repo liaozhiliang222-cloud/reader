@@ -50,6 +50,14 @@ interface IncomingPayload {
   text?: string;
 }
 
+export interface NativeImportProgress {
+  fileName: string;
+  index: number;
+  total: number;
+  bytes: number;
+}
+type ImportProgress = (progress: NativeImportProgress | undefined) => void;
+
 const Jy = registerPlugin<JyNativePlugin>('JyNative');
 
 const CHUNK = 512 * 1024;
@@ -202,6 +210,7 @@ async function readUriFile(
   uri: string,
   name: string,
   limit: number,
+  progress: (bytes: number) => void,
 ): Promise<File> {
   const parts: Uint8Array<ArrayBuffer>[] = [];
   let offset = 0;
@@ -216,6 +225,7 @@ async function readUriFile(
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     parts.push(bytes);
     offset += bytes.length;
+    progress(offset);
     if (chunk.eof) break;
   }
   return new File(parts, name, { type: guessType(name) });
@@ -232,18 +242,29 @@ function guessType(name: string): string {
 /** Intent 里的 URI 逐个读成 File；读失败的文件记入 errors，不阻断其余文件。 */
 async function payloadToIncoming(
   payload: IncomingPayload,
+  progress?: ImportProgress,
 ): Promise<IncomingData | undefined> {
   const files: File[] = [];
   const errors: string[] = [];
   const text = payload.text?.trim() ?? '';
   let used = new Blob([text]).size;
   if (used > 50 * 1024 * 1024) throw new RangeError('分享文字超过 50 MB');
-  for (const item of payload.items ?? []) {
+  const items = payload.items ?? [];
+  for (const [index, item] of items.entries()) {
     try {
+      const update = (bytes: number) =>
+        progress?.({
+          fileName: item.name || '导入文件',
+          index: index + 1,
+          total: items.length,
+          bytes,
+        });
+      update(0);
       const file = await readUriFile(
         item.uri,
         item.name || '导入文件',
         Math.min(50 * 1024 * 1024, incomingLimit - used),
+        update,
       );
       files.push(file);
       used += file.size;
@@ -257,19 +278,29 @@ async function payloadToIncoming(
   return incomingData(incomingForm({ files, title: '', text, errors }));
 }
 
-export async function launchIncoming(): Promise<IncomingData | undefined> {
-  const pending = await Jy.consumeLaunchFile();
-  return payloadToIncoming(pending);
+export async function launchIncoming(
+  progress?: ImportProgress,
+): Promise<IncomingData | undefined> {
+  try {
+    const pending = await Jy.consumeLaunchFile();
+    return await payloadToIncoming(pending, progress);
+  } finally {
+    progress?.(undefined);
+  }
 }
 
 export function listenIncoming(
   handler: (data: IncomingData) => Promise<void>,
   onError: () => void,
+  progress?: ImportProgress,
 ) {
+  let queue = Promise.resolve();
   const sub = Jy.addListener('incomingFile', (payload) => {
-    void payloadToIncoming(payload)
+    queue = queue
+      .then(() => payloadToIncoming(payload, progress))
       .then((data) => (data ? handler(data) : undefined))
-      .catch(onError);
+      .catch(onError)
+      .finally(() => progress?.(undefined));
   });
   return () => {
     void sub.then((listener) => listener.remove());

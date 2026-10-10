@@ -2,8 +2,13 @@
 
 更新日期：2026-10-10。
 
-当前任务（2026-10-10，恢复 Android 1.0.1 发布）：用户已明确要求“发布吧”，暂停上传的指示已撤销。最终运行代码为 `7b48bdb`（原生大文件修复 + 四主题按钮反馈），APK SHA 为 `9ee00b45c966618a4de26a33d0f23ba5a8fd35f1a8f375eac2ffc34d31a88c06`、6393139 字节。已确认旧 1.0.1 草稿仍存在，包含按钮修改前的两个附件；准备替换旧附件、将未发布标签对齐最终源码、核对 CI 并公开发布。发布成功与公开下载校验尚未完成，不能视为已发布。
+当前任务（2026-10-10，追加启动闪现修复并继续 Android 1.0.1 发布）：用户在发布等待期间要求修复每次启动短暂显示导入失败，并增加导入加载动效；此前“发布吧”授权继续有效。原生启动检查完成前不挂载旧分享页；原生重开清理错误/已消费分享路由，仍在本机的失败原文件保留。新分享可替换旧错误路由；热分享串行读取，加载层保留当前页面。BookLoading 翻页动效用于启动、开书、分享和导入面板，显示文件名/实际读取 MB/批次，跟随四主题并复用减少动态效果规则，无新依赖。
 
+本轮验证：旧代码两项回归均失败（旧错误页提前挂载、旧路由未清理），修复后启动/原生/分享专项 20/20、完整 88 文件 388 单测、lint、strict 网页/Android 构建、安全 104 惰性 URL/PWA 资源检查通过。Gradle testDebugUnitTest / lintRelease / assembleRelease 通过；未修改 Java，原 6 项测试任务复用已通过的结果，lint 0 错误/11 条既有 Warning。Chrome 390×844 四主题、读取/解析状态与无横向溢出已复核；截图为本地正式组件预览，未冒充物理手机启动 UI 验收。
+
+最终本地 APK：release/jingye-reader-1.0.1.apk，6394187 字节，SHA db3ebbc910f3114530b39c904d2d0045cb3b0f8e04bc13aae825cd16785c8d2c；原证书、code 4 / 1.0.1、无 INTERNET / SW / 私钥 / 用户书籍，116 资源 SHA 与本轮同步构建一致、ZIP CRC 通过。同签名 install -r 成功，手机 base.apk SHA 一致，未卸载主 App 或清数据。此前按钮版 9ee00b45 包另存 artifacts/jingye-reader-1.0.1-before-loading.apk。日志为 artifacts/import-loading-*；视觉证据在本机 visualizations/import-loading-night.png 与 import-loading-themes.json。
+
+发布检查点：上一版源码 8f376bf 的真实 main CI 38050508447 已全部成功（Android/checks success、deploy skipped），该结果只覆盖旧修复；新代码需提交并等待对应 CI，不能借用旧 CI 结论。草稿 ID 408916430 / untagged-8de4656d331e0b9c647c 仍未 Publish，现有附件仍为 9ee00b45 旧包。下一步推送最终源码，对齐尚未公开的 android-v1.0.1 标签（当前注解对象 20ccc6e12be6cf2f60fcca169bb74a3e63bcb356），替换草稿 APK/SHA、更新说明，最终 CI 通过后发布并公开下载核验。只发布 Android，本轮不自动部署网页。
 当前任务（2026-10-10，暂停发布并优化按钮反馈）：用户明确要求先别上传。`src/styles/base.css` 已关闭按钮、链接、summary 与输入控件的 WebView 默认蓝色触摸高亮；启用按钮仅在 `:active` 时使用正文色 8% 与背景色的混色，无额外动画，保留原 `:focus-visible` 与正文选择。Chrome 390×844 实际按住按钮确认 paper/eink/green/night 四主题底色、透明触摸高亮、松开后恢复及导入面板操作；Shift+Tab 的 2px 主题色焦点仍有效。纯样式没有新增镜像单测或依赖。证据截图与计算样式 JSON 保存在本机 visualizations，手机触摸观感未代替用户验收。
 
 本轮检查：pnpm lint、87 文件 / 380 单测、pnpm build、pnpm build:android 均通过；Android lintRelease / assembleRelease 通过（0 错误 / 11 条既有依赖和模板 Warning）。重打包为 `release/jingye-reader-1.0.1.apk`，6393139 字节，SHA `9ee00b45c966618a4de26a33d0f23ba5a8fd35f1a8f375eac2ffc34d31a88c06`；116 个内嵌资源与本轮构建 SHA 一致、ZIP CRC 通过、无 INTERNET / SW / 私钥 / 用户书籍。原证书、code 4；已 adb install -r 覆盖连接手机，安装成功且设备 base.apk SHA 完全一致，未卸载主 App 或清数据。本轮未重跑原生 IO 专项，上一轮红绿验证仍适用于未变化的 Java 代码。日志为 `artifacts/button-feedback-*.log`，包核验报告为 `artifacts/android-package-jingye-reader-1.0.1.apk.json`。

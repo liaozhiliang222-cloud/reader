@@ -5,6 +5,7 @@ import type { IncomingData } from '@/app/incomingData';
 import type { ImportItem } from '@/parsers/batch';
 import { processIncoming } from '@/app/incomingJobs';
 import { navigate } from '@/app/router';
+import { BookLoading } from '@/components/BookLoading';
 
 export function IncomingPage({ id }: { id?: string }) {
   const [data, setData] = useState<IncomingData>();
@@ -78,13 +79,23 @@ export function IncomingPage({ id }: { id?: string }) {
           返回书架
         </button>
       </header>
-      <p role="status">
-        {busy
-          ? '正在导入分享文件…'
-          : !id
+      {busy ? (
+        <BookLoading
+          title="正在导入书籍"
+          fileName={items.find((item) => item.status === 'parsing')?.name}
+          detail={
+            items.length
+              ? `正在解析 · 第 ${Math.min(items.filter((item) => item.status !== 'waiting' && item.status !== 'parsing').length + 1, items.length)} / ${items.length} 本`
+              : '正在准备分享文件…'
+          }
+        />
+      ) : (
+        <p role="status">
+          {!id
             ? '等待系统发送文件，也可以从书架选择文件导入。'
             : '分享内容只在本机处理。'}
-      </p>
+        </p>
+      )}
       {!!items.length && (
         <ol class="import-results">
           {items.map((item, index) => (

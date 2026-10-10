@@ -4,6 +4,7 @@ const bridge = vi.hoisted(() => ({
   consumeLaunchFile: vi.fn(),
   readUriChunk: vi.fn(),
   keepAwake: vi.fn(),
+  addListener: vi.fn(),
 }));
 vi.mock('@capacitor/core', () => ({
   Capacitor: { isNativePlatform: () => false },
@@ -11,7 +12,7 @@ vi.mock('@capacitor/core', () => ({
 }));
 vi.mock('@capacitor/app', () => ({ App: {} }));
 
-import { launchIncoming, nativeScreenLock } from './native';
+import { launchIncoming, listenIncoming, nativeScreenLock } from './native';
 
 beforeEach(() => vi.resetAllMocks());
 
@@ -71,4 +72,50 @@ it('没有 EOF 且没有字节的桥响应停止读取，避免无限循环', as
   expect(incoming?.files).toHaveLength(0);
   expect(incoming?.errors).toHaveLength(1);
   expect(bridge.readUriChunk).toHaveBeenCalledTimes(1);
+});
+
+it('普通启动的空 Intent 不报告导入错误，读取或桥调用失败都结束加载反馈', async () => {
+  const progress = vi.fn();
+  bridge.consumeLaunchFile.mockResolvedValue({});
+  expect(await launchIncoming(progress)).toBeUndefined();
+  expect(progress.mock.calls).toEqual([[undefined]]);
+  bridge.consumeLaunchFile.mockRejectedValue(new Error('bridge'));
+  await expect(launchIncoming(progress)).rejects.toThrow('bridge');
+  expect(progress).toHaveBeenLastCalledWith(undefined);
+});
+
+it('热分享串行读取，当前份交付完成才处理下一份，失败也能继续并清理监听', async () => {
+  let receive!: (payload: { items: { uri: string; name: string }[] }) => void;
+  const remove = vi.fn().mockResolvedValue(undefined);
+  bridge.addListener.mockImplementation(
+    async (_event: string, listener: typeof receive) => {
+      receive = listener;
+      return { remove };
+    },
+  );
+  let finish!: () => void;
+  bridge.readUriChunk
+    .mockImplementationOnce(
+      () =>
+        new Promise<{ data: string; eof: boolean }>((resolve) => {
+          finish = () => resolve({ data: btoa('body'), eof: true });
+        }),
+    )
+    .mockRejectedValueOnce(new Error('denied'));
+  const delivered = vi.fn().mockResolvedValue(undefined),
+    fail = vi.fn(),
+    progress = vi.fn();
+  const dispose = listenIncoming(delivered, fail, progress);
+  receive({ items: [{ uri: 'content://one', name: 'one.txt' }] });
+  receive({ items: [{ uri: 'content://two', name: 'two.txt' }] });
+  await vi.waitFor(() => expect(bridge.readUriChunk).toHaveBeenCalledTimes(1));
+  expect(delivered).not.toHaveBeenCalled();
+  finish();
+  await vi.waitFor(() => expect(delivered).toHaveBeenCalledTimes(2));
+  expect(delivered.mock.calls[0]![0].files[0].name).toBe('one.txt');
+  expect(delivered.mock.calls[1]![0].errors[0]).toContain('two.txt');
+  expect(progress).toHaveBeenLastCalledWith(undefined);
+  expect(fail).not.toHaveBeenCalled();
+  dispose();
+  await vi.waitFor(() => expect(remove).toHaveBeenCalledOnce());
 });

@@ -3,6 +3,7 @@ import { Modal } from '@/components/Modal';
 import { importText } from '@/parsers/importText';
 import { importBatch, type ImportItem } from '@/parsers/batch';
 import { navigate } from '@/app/router';
+import { BookLoading } from '@/components/BookLoading';
 
 const labels = {
   waiting: '等待中',
@@ -88,11 +89,17 @@ export function ImportSheet({
       </div>
       {!!items.length && (
         <>
-          <p role="status" aria-live="polite">
-            {busy
-              ? `正在导入 ${Math.min(finished + 1, items.length)} / ${items.length}`
-              : `导入完成：${items.filter((i) => i.status === 'success').length} 本成功，${items.filter((i) => i.status === 'duplicate').length} 本已在书架，${items.filter((i) => i.status === 'error').length} 本失败`}
-          </p>
+          {busy ? (
+            <BookLoading
+              title="正在导入书籍"
+              fileName={items.find((item) => item.status === 'parsing')?.name}
+              detail={`正在解析 · 第 ${Math.min(finished + 1, items.length)} / ${items.length} 本`}
+            />
+          ) : (
+            <p role="status" aria-live="polite">
+              {`导入完成：${items.filter((i) => i.status === 'success').length} 本成功，${items.filter((i) => i.status === 'duplicate').length} 本已在书架，${items.filter((i) => i.status === 'error').length} 本失败`}
+            </p>
+          )}
           <ul class="import-results import-list">
             {items.map((item, index) => {
               const body = (
