@@ -2,6 +2,10 @@
 
 更新日期：2026-10-10。
 
+当前任务（2026-10-10，Android 大文件误报修复）：用户提供 EPUB 实际为 4433334 字节。根因是 Capacitor PluginCall.getLong 仅接受 Long，实际 Android JSON 把 524288 等偏移量解析为 Integer，导致读取回退 0，反复累计第一块直到误报 50 MB。已改为 JSONObject.getLong，缺失偏移量也不再静默回到文件开头。新增 3 项 JVM JSON 回归，Java 总计 6 项通过；真实设备上同一个 instrumentation 测试包在原 code 3 全部失败（偏移 524288 返回开头字节），同证书覆盖安装 code 4 后 3 项全部通过，临时测试 App 已移除，主 App 未卸载/清数据。真机专项仅覆盖原生 JSON + FileProvider 分块，未冒充用户文件完整 UI 验收。
+
+用户 EPUB 本地接收/解析专项：9 块、原始 SHA 完全保留、174 章节、1775226 字，错误列表为空。原文件没有复制进源码或 APK，专项脚本/报告均在被忽略的 .review / artifacts。新 APK `release/jingye-reader-1.0.1.apk` 为 6393007 字节，SHA `7eaab8707bd31cee57a386fbbebde166e3715b6b302fabed5f5ba74eb2f3a0e5`，code 4 / 1.0.1，仍为原证书、无 INTERNET，116 个应用资源 SHA 一致，无 SW。新增 org.json 20250517 仅为 JVM 测试，与 Capacitor 自身测试版本一致，APK/网页 gzip 增量 0。lint/test/build、源码与补丁 Release 上传结果待本轮收尾记录。
+
 本次发布完成（2026-10-10）：运行代码提交 `6120947`，修复 CI 配置后的发布标签 `android-v1.0.0` 指向 `631a0ed12b218920ab42ee037ea7096642bff5a4`，二者仅 CI/进度文档不同。真实 main CI [38047760091](https://github.com/liaozhiliang222-cloud/reader/actions/runs/38047760091) 全部成功：lint、380 单测、strict 构建、安全/PWA、浏览器 102 通过/1 已知 Windows WebKit 离线 skip（9.49 分钟，无重试/失败/flaky），严格报告校验及行高变异检出/源码恢复通过；Android 3 Java 无失败、lint 0 错误/10 Warning、debug 构建通过。本次未启用网页部署，deploy 为 skipped。首次 Android CI 38047257314 因 sdkmanager 不在 PATH 失败，依据官方 runner 预装清单改为校验 SDK 36 / Build-tools 36.0.0 后通过。
 
 [Android 1.0.0 预览 Release](https://github.com/liaozhiliang222-cloud/reader/releases/tag/android-v1.0.0) 已于 19:29（UTC+8）公开，Release 408896301，draft=false / prerelease=true；APK 附件 627774732 / 6393003 字节，GitHub digest 与本地 `1fbd7aebf67276bd9a1289cbf4dc55b4d234c244633a4d6120a4322dbf7e057f` 完全一致，90 字节 SHA256 附件 627775157；公开下载两个附件后再次验证原始 APK SHA 与校验文件内容完全一致。Android 报告附件 11668720877 ZIP SHA `56ce4d10c87a5a39752488eb2ed3ebfffa6b58b027a3c31838805c978b0a4ea0`、浏览器附件 11667953753 ZIP SHA `24be6a5dcba70ba768834ec6434ca92cf26f1fac856aabcfc3f704c37be4470b` 均实际下载核对；完整/备份/分页报告独立保存在 `artifacts/ci-38047760091/`，没有用旧报告代替。用户手动开启临时本地文件访问权限完成上传，上传后已请其关闭；浏览器工具禁止访问扩展设置，关闭状态仍待用户确认。

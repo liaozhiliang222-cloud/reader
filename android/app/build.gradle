@@ -3,12 +3,14 @@ apply plugin: 'com.android.application'
 android {
     namespace = "dev.jingye.reader"
     compileSdk = rootProject.ext.compileSdkVersion
+    // 同证书的 release 真机回归，避免卸载已有 App 或清除用户数据。
+    testBuildType project.hasProperty('signedDeviceTest') ? 'release' : 'debug'
     defaultConfig {
         applicationId "dev.jingye.reader"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.0"
+        versionCode 4
+        versionName "1.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -55,6 +57,9 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
+    // JVM 上运行真实 JSONObject，避免 Android mockable jar 将 JSON 方法替换为空桩。
+    // 仅测试依赖，不进入 APK 或网页交付包；与 Capacitor 自身测试锁定版本一致。
+    testImplementation 'org.json:json:20250517'
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')

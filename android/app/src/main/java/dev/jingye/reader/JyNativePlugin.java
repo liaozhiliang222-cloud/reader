@@ -296,7 +296,7 @@ public class JyNativePlugin extends Plugin {
     public void readUriChunk(PluginCall call) {
         try {
             Uri uri = Uri.parse(call.getString("uri"));
-            long offset = call.getLong("offset", 0L);
+            long offset = readOffset(call);
             int length = call.getInt("length", 512 * 1024);
             if (offset < 0 || length <= 0 || length > 512 * 1024) {
                 call.reject("读取范围无效");
@@ -324,6 +324,11 @@ public class JyNativePlugin extends Plugin {
         } catch (Exception e) {
             call.reject("读取失败: " + e.getMessage(), e);
         }
+    }
+
+    /** PluginCall.getLong 仅接受 Long；WebView JSON 中的小整数实际为 Integer，不能回退成 0。 */
+    static long readOffset(PluginCall call) throws org.json.JSONException {
+        return call.getData().getLong("offset");
     }
 
     /** 某些 content provider 的 skip 返回 0；到 EOF 时拒绝，避免插件线程死循环。 */

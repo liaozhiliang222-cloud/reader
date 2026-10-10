@@ -1,5 +1,11 @@
 # 变更记录
 
+## Android 1.0.1 — 预览修复版
+
+- 修复原生分块读取偏移量回退为 0，导致几 MB 文件被误报超过 50 MB；单文件与分享总量保护保持有效。
+- 新增真实 Android JSON / FileProvider 的 3 项真机回归，旧版先失败、修复后全部通过；补充 3 项 JVM JSON 数值回归。
+- versionCode 4，使用原签名覆盖升级；迁移与完整物理手机验收范围见 [Android 说明](./ANDROID_RELEASE.md)。
+
 ## 未发布
 
 - 使用引导弹窗补齐 Tab/Shift+Tab 焦点循环，关闭后恢复触发按钮；浏览器返回先关闭引导。

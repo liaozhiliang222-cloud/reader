@@ -1,12 +1,18 @@
 # Android 预览版
 
-首个 APK 为 `1.0.0`，包名 `dev.jingye.reader`，versionCode `3`，支持 Android 7.0（API 24）及以上。网页版本继续为 `0.0.1` 预览版，两者共用源码，各自保存数据。
+当前修复版为 `1.0.1`，包名 `dev.jingye.reader`，versionCode `4`，支持 Android 7.0（API 24）及以上。网页版本继续为 `0.0.1` 预览版，两者共用源码，各自保存数据。
 
-本次签名 APK 为 6393003 字节，SHA-256：`1fbd7aebf67276bd9a1289cbf4dc55b4d234c244633a4d6120a4322dbf7e057f`。签名证书 SHA-256 为 `c666e187df75ec1d2d61ac7ea73f64d88a0d6f4a5dad22938b7dd23b05e22949`，与此前本地 code 2 相同。下载时可对照同页的 `.sha256` 附件。
+本次签名 APK 为 6393007 字节，SHA-256：`7eaab8707bd31cee57a386fbbebde166e3715b6b302fabed5f5ba74eb2f3a0e5`。签名证书 SHA-256 为 `c666e187df75ec1d2d61ac7ea73f64d88a0d6f4a5dad22938b7dd23b05e22949`，与此前 code 2 / 3 相同。下载时可对照同页的 `.sha256` 附件。
+
+### 1.0.1 修复内容
+
+修复“几 MB 的文件却提示超过 50 MB”：WebView JSON 中的普通偏移量是 `Integer`，Capacitor `PluginCall.getLong` 只接受 `Long`，原实现会退回 0，反复读取文件开头直到触发总大小保护。现在从原始 JSONObject 读取数值，保留实际偏移量。50 MB 单文件和 100 MB 单次分享限制保持有效。
+
+已在连接的物理手机上以同一组测试验证旧版失败、新版通过：真实 Android JSON、FileProvider content URI、4.43 MB 分块字节、精确分块末尾与负偏移量。另有 6 项 JVM Java 测试及用户提供 EPUB 的本地分块 SHA / 解析检查。测试使用临时缓存文件，未清空书架；更新后请从文件管理器重新分享原文件，旧的失败提示不会自动变成已导入的书。
 
 ## 安装与迁移
 
-从 [GitHub Releases](https://github.com/liaozhiliang222-cloud/reader/releases) 下载 `jingye-reader-1.0.0.apk`，在文件管理器中打开，按系统提示允许该文件管理器安装应用。部分手机会要求确认侧载安装。安装后首次打开即可离线使用。
+从 [GitHub Releases](https://github.com/liaozhiliang222-cloud/reader/releases) 下载 `jingye-reader-1.0.1.apk`，在文件管理器中打开，按系统提示允许该文件管理器安装应用。部分手机会要求确认侧载安装。安装后首次打开即可离线使用。
 
 覆盖安装同包名、同证书的新版会保留应用数据；卸载、清除应用数据会删除书架和笔记。升级或迁移前，在“设置 → 备份与恢复”导出完整备份。网页版与 App 数据独立：在网页版导出完整备份，在 App 内选择该文件恢复。
 
@@ -35,6 +41,8 @@ bash ./gradlew lintRelease assembleRelease
 ```
 
 通过 `apksigner verify --print-certs` 核对签名，使用 `aapt dump permissions` 确认没有 INTERNET 权限，再将 `android/app/build/outputs/apk/release/app-release.apk` 作为 Release 附件上传；APK 不进入 Git 源码历史。
+
+原生分块真机专项位于 `NativeImportTest`。可通过 `assembleReleaseAndroidTest -PsignedDeviceTest` 构建同证书的测试包，在已安装的签名 release 上运行 AndroidJUnitRunner，无需卸载主应用。测试完成后仅卸载 `dev.jingye.reader.test`。新增 `org.json:json:20250517` 仅用于 JVM 测试（与 Capacitor 自身测试版本一致），用于覆盖真实 JSON 数值类型；不进入 APK 或网页，gzip 交付增量为 0。
 
 ## 验证范围
 
