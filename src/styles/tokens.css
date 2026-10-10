@@ -1,0 +1,63 @@
+:root {
+  --font-serif:
+    'Songti SC', 'STSong', 'Noto Serif CJK SC', 'Noto Serif SC', SimSun, serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  --font-body: var(--font-serif);
+  --highlight-red: #efd4c9;
+  --highlight-blue: #cfdee2;
+  --highlight-yellow: #eadcaf;
+  --highlight-focus: #d5c6a9;
+}
+
+:root,
+[data-theme='paper'] {
+  color-scheme: light;
+  --bg: #f5f0e6;
+  --fg: #2b2b2b;
+  --fg-muted: #70695e;
+  --accent: #b5452f;
+}
+
+[data-theme='eink'] {
+  color-scheme: light;
+  --bg: #ededeb;
+  --fg: #262626;
+  --fg-muted: #646460;
+  --accent: #b5452f;
+}
+
+[data-theme='green'] {
+  color-scheme: light;
+  --bg: #dce8d6;
+  --fg: #2a332a;
+  --fg-muted: #596452;
+  /* 绿纸上略加深朱砂，达到小字号文字 4.5:1 对比度。 */
+  --accent: #ad402b;
+}
+
+[data-theme='night'] {
+  color-scheme: dark;
+  --bg: #141414;
+  --fg: #9a9a93;
+  --fg-muted: #88887f;
+  /* 同一朱砂色系提高亮度，保证深色背景下的焦点与文字可辨认。 */
+  --accent: #d87965;
+  --highlight-red: #35201a;
+  --highlight-blue: #1a2c38;
+  --highlight-yellow: #302919;
+  --highlight-focus: #353127;
+}
+
+[data-font='sans'] {
+  --font-body: var(--font-sans);
+}
+
+[data-font='serif'] {
+  --font-body: var(--font-serif);
+}
+
+[data-font='wenkai'] {
+  --font-body: 'JingyeWenkai', var(--font-serif);
+}

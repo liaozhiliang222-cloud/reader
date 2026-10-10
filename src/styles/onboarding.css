@@ -1,0 +1,162 @@
+.guide-shell {
+  min-height: 100dvh;
+  display: grid;
+  align-items: center;
+}
+.onboarding {
+  width: min(100%, 560px);
+  margin-inline: auto;
+  padding: max(24px, env(safe-area-inset-top)) 24px
+    max(24px, env(safe-area-inset-bottom));
+}
+.guide-top,
+.guide-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.guide-top {
+  color: var(--fg-muted);
+  font-size: 14px;
+}
+.guide-step {
+  margin-top: 32px;
+  color: var(--fg-muted);
+}
+.onboarding h1 {
+  font-size: 26px;
+  line-height: 1.5;
+  outline: none;
+}
+.onboarding p {
+  line-height: 1.8;
+}
+.guide-icon {
+  display: block;
+  margin-block: 24px;
+  border-radius: 16px;
+}
+.guide-actions {
+  margin-top: 32px;
+  justify-content: flex-end;
+}
+.onboarding button,
+.environment-notice button {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+.install-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0;
+  list-style-position: inside;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.install-steps svg,
+.install-steps img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin: 12px auto;
+}
+.install-steps svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+.install-steps span {
+  display: block;
+}
+.environment-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 2px solid var(--accent);
+  padding: 2px 0 2px 12px;
+  margin-block: 12px;
+  color: var(--fg-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.environment-notice p {
+  flex: 1;
+  margin: 0;
+}
+.environment-notice button {
+  flex-shrink: 0;
+  padding-inline: 8px;
+}
+.guide-modal {
+  padding: 0;
+}
+.quiet-hint {
+  position: fixed;
+  z-index: 20;
+  top: max(40px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--bg);
+  color: var(--fg-muted);
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 14px;
+  animation: quiet-hint 2s ease both;
+}
+@keyframes quiet-hint {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quiet-hint {
+    animation: none;
+  }
+}
+.tap-hint {
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: min(92vw, 560px);
+  height: 40dvh;
+  padding: 0;
+  background: transparent;
+  color: var(--fg);
+  white-space: normal;
+  animation-duration: 3s;
+}
+.tap-hint > span {
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  text-align: center;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border: 1px dashed var(--line);
+}
+.tap-hint > span + span {
+  border-left: 0;
+}
+.tap-hint small {
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+.tap-hint em {
+  position: fixed;
+  top: -24px;
+  left: 0;
+  font-style: normal;
+  font-size: 12px;
+  color: var(--fg-muted);
+}

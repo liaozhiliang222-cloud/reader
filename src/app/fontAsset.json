@@ -1,0 +1,9 @@
+{
+  "file": "fonts/wenkai-gb2312-v1.522.woff2",
+  "size": 1600452,
+  "sha256": "ba09ef107a2c01bfe6b7e562bd17c90bf4152b660cab3aacb07f2ee76f16a35b",
+  "upstream": "https://github.com/lxgw/LxgwWenKai/releases/tag/v1.522",
+  "upstreamVersion": "1.522",
+  "upstreamSha256": "39ad71264b588165b469e35e6afb162a378dacd1f95348160240ba9038ac3009",
+  "glyphCoverage": 7707
+}

@@ -1,0 +1,164 @@
+.modal {
+  width: min(600px, calc(100% - 24px));
+  max-height: min(85dvh, 900px);
+  margin: auto auto max(12px, env(safe-area-inset-bottom));
+  padding: 24px;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overscroll-behavior: contain;
+}
+.modal::backdrop {
+  background: rgb(0 0 0 / 30%);
+}
+.encoding-panel label,
+.encoding-panel select {
+  display: block;
+  width: 100%;
+  margin-block: 12px;
+}
+.encoding-preview {
+  padding: 12px;
+  border-block: 1px solid var(--line);
+}
+.encoding-preview p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.modal h2 {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0;
+}
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.panel-heading h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.panel-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.panel-actions button {
+  padding: 8px 16px;
+}
+.muted {
+  color: var(--fg-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.import-results {
+  padding-left: 24px;
+}
+.import-results li {
+  padding-block: 12px;
+  border-top: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.import-results strong,
+.import-results span {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: normal;
+}
+.import-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 16px;
+}
+.import-list li {
+  padding-block: 0;
+}
+.import-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+.import-row .import-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+.import-row small {
+  flex-shrink: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+.import-mark {
+  width: 1.2em;
+  margin: 0;
+  text-align: center;
+  color: var(--fg-muted);
+}
+[data-status='success'] .import-mark {
+  color: var(--accent);
+}
+button.import-row .import-name {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 4px;
+}
+.import-list p[role='alert'] {
+  margin: 0 0 12px calc(1.2em + 16px);
+  color: var(--accent);
+  font-size: 13px;
+}
+.paste-page {
+  max-width: 800px;
+  margin: auto;
+  padding: 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.paste-page h1 {
+  font-size: 28px;
+}
+.paste-page form > label {
+  display: grid;
+  gap: 12px;
+}
+.paste-page input {
+  min-height: 44px;
+}
+.paste-page textarea,
+.paste-page input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--fg-muted);
+  padding: 12px;
+  font-size: 16px;
+}
+.paste-page .panel-heading {
+  margin-block: 16px;
+}
+.paste-page textarea {
+  min-height: 45dvh;
+  resize: vertical;
+  line-height: 1.8;
+}
+.primary-action {
+  color: var(--accent);
+  border-color: var(--accent);
+  padding-inline: 24px;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}

@@ -1,0 +1,513 @@
+[
+  {
+    "id": "gutenberg-24113",
+    "tocTitle": "第 2 节",
+    "title": "九命奇冤",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/24113",
+    "download": "https://www.gutenberg.org/ebooks/24113.epub3.images",
+    "licenseBasis": "Publisher marks the edition public domain in the USA; Wu Jianren died in 1910. Original license notices retained; local testing only, not distributed with the app.",
+    "features": ["Chinese", "long prose"],
+    "bodyContains": "區區兩扇木門",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "eloquent-javascript",
+    "tocTitle": "The Document Object Model",
+    "title": "Eloquent JavaScript, official EPUB (3rd edition, 2018)",
+    "publisher": "Marijn Haverbeke",
+    "page": "https://eloquentjavascript.net/",
+    "download": "https://eloquentjavascript.net/Eloquent_JavaScript.epub",
+    "licenseBasis": "Author's page links Creative Commons Attribution-NonCommercial 3.0; original notices and illustrations retained; local compatibility testing only.",
+    "features": ["code", "tables", "illustrations", "SVG"],
+    "bodyContains": "When you open a web page",
+    "additionalProbes": [
+      {
+        "tocTitle": "Regular Expressions",
+        "bodyContains": "Any digit character",
+        "kind": "real-table"
+      }
+    ],
+    "sourceStructure": {
+      "table": 5,
+      "ruby": 0,
+      "notes": 0,
+      "images": 78,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "standardebooks-alice",
+    "tocTitle": "I. Down the Rabbit-Hole",
+    "title": "Alice's Adventures in Wonderland",
+    "publisher": "Standard Ebooks",
+    "page": "https://standardebooks.org/ebooks/lewis-carroll/alices-adventures-in-wonderland",
+    "download": "https://standardebooks.org/ebooks/lewis-carroll/alices-adventures-in-wonderland/john-tenniel/downloads/lewis-carroll_alices-adventures-in-wonderland_john-tenniel.epub?source=download",
+    "licenseBasis": "Publisher dedicates its work to CC0; original text and John Tenniel illustrations are identified as US public domain. Original notices retained; local testing, no redistribution with the app.",
+    "features": ["illustrations", "poetry", "SVG image wrappers", "notes"],
+    "bodyContains": "",
+    "additionalProbes": [],
+    "inspectionStatus": "download-unavailable",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "accessibility-toolkit",
+    "tocTitle": "Organizing Content",
+    "title": "Accessibility Toolkit, 2nd Edition",
+    "publisher": "BCcampus / Camosun College / CAPER-BC",
+    "page": "https://opentextbc.ca/accessibilitytoolkit/",
+    "download": "https://opentextbc.ca/accessibilitytoolkit/open/download?type=epub",
+    "licenseBasis": "Publisher's page links Creative Commons Attribution 4.0, except where otherwise noted. Original edition and notices retained; no redistribution in the repository.",
+    "features": ["tables", "illustrations", "notes", "nested contents"],
+    "bodyContains": "",
+    "additionalProbes": [],
+    "inspectionStatus": "download-unavailable",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-52323",
+    "tocTitle": "第 2 节",
+    "title": "唐诗三百首",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/52323",
+    "download": "https://www.gutenberg.org/ebooks/52323.epub3.images",
+    "licenseBasis": "Publisher marks this edition public domain in the USA; compiler Hengtangtuishi lived 1711–1778. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["Chinese", "poetry"],
+    "bodyContains": "孤鴻海上來",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-132",
+    "tocTitle": "Chapter I. LAYING PLANS",
+    "title": "The Art of War",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/132",
+    "download": "https://www.gutenberg.org/ebooks/132.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["annotations", "military text"],
+    "bodyContains": "The art of war is of vital importance",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 2,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-55",
+    "tocTitle": "Chapter I The Cyclone",
+    "title": "The Wonderful Wizard of Oz",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/55",
+    "download": "https://www.gutenberg.org/ebooks/55.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["fiction"],
+    "bodyContains": "Dorothy lived in the midst",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-16328",
+    "tocTitle": "I. THE LIFE AND DEATH OF SCYLD.",
+    "title": "Beowulf: An Anglo-Saxon Epic Poem",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/16328",
+    "download": "https://www.gutenberg.org/ebooks/16328.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["poetry", "notes"],
+    "bodyContains": "Spear-Danes",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 0,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-11",
+    "tocTitle": "CHAPTER I. Down the Rabbit-Hole",
+    "title": "Alice's Adventures in Wonderland",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/11",
+    "download": "https://www.gutenberg.org/ebooks/11.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["fiction", "poetry"],
+    "bodyContains": "Alice was beginning to get very tired",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-1342",
+    "tocTitle": "未取得原文件，正文目录待检查",
+    "title": "Pride and Prejudice",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/1342",
+    "download": "https://www.gutenberg.org/ebooks/1342.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": [],
+    "bodyContains": "",
+    "additionalProbes": [],
+    "inspectionStatus": "download-unavailable",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-84",
+    "tocTitle": "Letter 1",
+    "title": "Frankenstein; or, the modern prometheus",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/84",
+    "download": "https://www.gutenberg.org/ebooks/84.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["letters", "fiction"],
+    "bodyContains": "You will rejoice to hear",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-1661",
+    "tocTitle": "I. A SCANDAL IN BOHEMIA",
+    "title": "The Adventures of Sherlock Holmes",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/1661",
+    "download": "https://www.gutenberg.org/ebooks/1661.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["short stories"],
+    "bodyContains": "To Sherlock Holmes she",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 2,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-2701",
+    "tocTitle": "CHAPTER 1. Loomings.",
+    "title": "Moby Dick; Or, The Whale",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/2701",
+    "download": "https://www.gutenberg.org/ebooks/2701.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["long prose", "nested fragments"],
+    "bodyContains": "Call me Ishmael.",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-345",
+    "tocTitle": "CHAPTER I JONATHAN HARKER’S JOURNAL",
+    "title": "Dracula",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/345",
+    "download": "https://www.gutenberg.org/ebooks/345.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["journals", "fiction"],
+    "bodyContains": "Left Munich at",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 2,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-98",
+    "tocTitle": "CHAPTER I. The Period",
+    "title": "A Tale of Two Cities",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/98",
+    "download": "https://www.gutenberg.org/ebooks/98.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["illustrations", "fiction"],
+    "bodyContains": "It was the best of times",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 33,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-174",
+    "tocTitle": "CHAPTER I.",
+    "title": "The Picture of Dorian Gray",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/174",
+    "download": "https://www.gutenberg.org/ebooks/174.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["fiction"],
+    "bodyContains": "The studio was filled",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-205",
+    "tocTitle": "Economy",
+    "title": "Walden, and On The Duty Of Civil Disobedience",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/205",
+    "download": "https://www.gutenberg.org/ebooks/205.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["essays", "formatted accounts"],
+    "bodyContains": "When I wrote the following pages",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 2,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-1232",
+    "tocTitle": "CHAPTER I. HOW MANY KINDS OF PRINCIPALITIES THERE ARE, AND BY WHAT MEANS THEY ARE ACQUIRED",
+    "title": "The Prince",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/1232",
+    "download": "https://www.gutenberg.org/ebooks/1232.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["political prose"],
+    "bodyContains": "All states, all powers",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-1514",
+    "tocTitle": "SCENE I. Athens. A room in the Palace of Theseus",
+    "title": "A Midsummer Night's Dream",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/1514",
+    "download": "https://www.gutenberg.org/ebooks/1514.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["drama", "verse"],
+    "bodyContains": "Now, fair Hippolyta",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-36",
+    "tocTitle": "I. THE EVE OF THE WAR.",
+    "title": "The war of the worlds",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/36",
+    "download": "https://www.gutenberg.org/ebooks/36.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["fiction"],
+    "bodyContains": "No one would have believed",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-1260",
+    "tocTitle": "CHAPTER I",
+    "title": "Jane Eyre: An Autobiography",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/1260",
+    "download": "https://www.gutenberg.org/ebooks/1260.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["illustrations", "fiction"],
+    "bodyContains": "There was no possibility",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 0,
+      "ruby": 0,
+      "notes": 0,
+      "images": 29,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-768",
+    "tocTitle": "CHAPTER I",
+    "title": "Wuthering Heights",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/768",
+    "download": "https://www.gutenberg.org/ebooks/768.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["fiction"],
+    "bodyContains": "I have just returned from a visit",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 0,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "gutenberg-6800",
+    "tocTitle": "Book IV.",
+    "title": "The Works of Frederick Schiller",
+    "publisher": "Project Gutenberg",
+    "page": "https://www.gutenberg.org/ebooks/6800",
+    "download": "https://www.gutenberg.org/ebooks/6800.epub3.images",
+    "licenseBasis": "Official catalog marks this edition public domain in the USA. Original notices retained; local compatibility testing only, not distributed with the app.",
+    "features": ["long collected works", "history"],
+    "bodyContains": "The weak bond of union",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 1,
+      "ruby": 0,
+      "notes": 0,
+      "images": 1,
+      "verticalCss": false
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 1
+  },
+  {
+    "id": "idpf-kusamakura",
+    "tocTitle": "一",
+    "title": "草枕 / Kusamakura",
+    "publisher": "IDPF / W3C EPUB 3 Samples",
+    "page": "https://idpf.github.io/epub3-samples/30/samples.html",
+    "download": "https://github.com/IDPF/epub3-samples/releases/download/20230704/kusamakura-japanese-vertical-writing.epub",
+    "licenseBasis": "Official sample table licenses these full literary editions under CC-BY-SA 3.0 unless otherwise noted. Original notices retained; local testing only, no redistribution with the app.",
+    "features": [
+      "Japanese",
+      "original vertical writing",
+      "ruby",
+      "non-ASCII paths",
+      "media overlays"
+    ],
+    "editionKind": "complete-literary-work-from-standards-collection",
+    "bodyContains": "山路やまみちを登りながら",
+    "additionalProbes": [],
+    "sourceStructure": {
+      "table": 0,
+      "ruby": 4603,
+      "notes": 0,
+      "images": 5,
+      "verticalCss": true
+    },
+    "inspectionStatus": "original-source-reviewed",
+    "tocOccurrence": 0
+  },
+  {
+    "id": "idpf-wasteland",
+    "tocTitle": "未取得原文件，正文目录待检查",
+    "title": "The Waste Land",
+    "publisher": "IDPF / W3C EPUB 3 Samples",
+    "page": "https://idpf.github.io/epub3-samples/30/samples.html",
+    "download": "https://github.com/IDPF/epub3-samples/releases/download/20230704/wasteland.epub",
+    "licenseBasis": "Official sample table licenses these full literary editions under CC-BY-SA 3.0 unless otherwise noted. Original notices retained; local testing only, no redistribution with the app.",
+    "features": ["poetry", "notes", "section fragments"],
+    "editionKind": "complete-literary-work-from-standards-collection",
+    "bodyContains": "",
+    "additionalProbes": [],
+    "inspectionStatus": "download-unavailable",
+    "tocOccurrence": 0
+  }
+]

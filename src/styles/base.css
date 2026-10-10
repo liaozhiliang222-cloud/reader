@@ -1,0 +1,204 @@
+:root {
+  /* 界面用无衬线，书名、标题和正文用衬线，区分“界面”和“书页”。 */
+  font-family: var(--font-sans);
+  --line: color-mix(in srgb, var(--fg-muted) 45%, transparent);
+  color: var(--fg);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  min-width: 280px;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button,
+summary,
+a {
+  /* 禁止控件双击放大与长按呼出，保留正文选区和双指缩放。 */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+button {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  button:not(:disabled):hover {
+    border-color: var(--fg-muted);
+  }
+}
+/* 返回、关闭等导航类次要操作只保留文字，不画边框。 */
+.text-button,
+.panel-heading > button,
+.settings-page > header > button,
+.paste-page .panel-heading button,
+.reader-menu-top button {
+  border-color: transparent;
+  color: var(--fg-muted);
+}
+[data-theme='night'] {
+  /* 深色背景下分隔线与控件描边再降一档亮度。 */
+  --line: color-mix(in srgb, var(--fg-muted) 30%, transparent);
+}
+h1,
+h2,
+.wordmark {
+  font-family: var(--font-serif);
+}
+.resource-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.welcome {
+  max-width: 1040px;
+  min-height: 100svh;
+  margin: auto;
+  padding: max(28px, env(safe-area-inset-top)) 40px
+    max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--fg-muted);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+}
+.wordmark {
+  color: var(--fg);
+  font-size: 26px;
+  font-weight: bold;
+}
+.welcome-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 0;
+}
+.book-symbol {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  width: 38px;
+  height: 46px;
+  font-size: 22px;
+  margin-bottom: 28px;
+}
+.eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--fg-muted);
+}
+h1 {
+  font-size: clamp(36px, 6vw, 58px);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  margin: 20px 0;
+}
+.intro {
+  color: var(--fg-muted);
+  font-size: 15px;
+  line-height: 2;
+}
+.stage-note {
+  color: var(--fg-muted);
+  font-size: 12px;
+  max-width: 280px;
+  line-height: 1.8;
+  margin-top: 40px;
+}
+.update-notice {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+  margin-block: 16px;
+  font-size: 14px;
+}
+.update-notice button {
+  min-height: 44px;
+  padding-inline: 16px;
+}
+footer {
+  color: var(--fg-muted);
+  font-size: 12px;
+  text-align: center;
+  letter-spacing: 0.15em;
+}
+.debug-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  max-height: 40svh;
+  overflow: auto;
+  background: var(--bg);
+  color: var(--fg);
+  border-top: 1px solid var(--line);
+  padding: 8px 16px;
+  font: 12px/1.5 monospace;
+}
+.reader ~ .debug-panel,
+body:has(.reader) .debug-panel {
+  bottom: 120px;
+  max-width: 220px;
+  opacity: 0.95;
+}
+.debug-panel summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.debug-panel pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .welcome {
+    padding-inline: 24px;
+  }
+}

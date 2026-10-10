@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["vite/client", "node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "playwright.compat.config.ts",
+    "playwright.deployment.config.ts",
+    "playwright.preferences.config.ts",
+    "playwright.long-chapters.config.ts",
+    "playwright.performance.config.ts",
+    "playwright.sharing.config.ts",
+    "e2e",
+    "playwright.interactions.config.ts",
+    "playwright.markdown.config.ts",
+    "playwright.markdown-v2.config.ts",
+    "playwright.markdown-deployment.config.ts",
+    "playwright.experience.config.ts"
+  ]
+}

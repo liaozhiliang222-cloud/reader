@@ -1,0 +1,134 @@
+.reader-menu {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  animation: reader-menu-in 180ms ease both;
+}
+.reader-menu-top,
+.reader-menu-bottom {
+  pointer-events: auto;
+}
+.reader-menu.closing {
+  animation-name: reader-menu-out;
+  pointer-events: none;
+}
+.reader-menu.closing .reader-menu-top,
+.reader-menu.closing .reader-menu-bottom {
+  pointer-events: none;
+}
+/* 顶/底栏在整体淡入的同时向各自方向轻滑，和抽屉滑入方向一致。 */
+.reader-menu:not(.closing) .reader-menu-top {
+  animation: reader-menu-top-in 180ms ease both;
+}
+.reader-menu:not(.closing) .reader-menu-bottom {
+  animation: reader-menu-bottom-in 180ms ease both;
+}
+.reader-menu.closing .reader-menu-top {
+  animation: reader-menu-top-out 180ms ease both;
+}
+.reader-menu.closing .reader-menu-bottom {
+  animation: reader-menu-bottom-out 180ms ease both;
+}
+@keyframes reader-menu-top-in {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes reader-menu-top-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes reader-menu-bottom-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes reader-menu-bottom-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes reader-menu-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes reader-menu-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.reader-drawer {
+  animation: reader-drawer-in 240ms ease-out both;
+}
+.reader-drawer.closing {
+  animation-name: reader-drawer-out;
+  pointer-events: none;
+}
+@keyframes reader-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes reader-drawer-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+.reader-previous-corner {
+  position: absolute;
+  z-index: 4;
+  top: 4px;
+  left: 4px;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  font-size: 28px;
+  color: var(--fg-muted);
+  background: transparent;
+}
+.tap-mode-help {
+  grid-column: 1 / -1;
+  margin: 0;
+  line-height: 1.6;
+  font-size: 14px;
+  color: var(--fg-muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

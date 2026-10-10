@@ -1,0 +1,102 @@
+import type { TextChapter } from '@/parsers/txt/chapters';
+import type { TocEntry } from '@/parsers/epub/parse';
+import type { SafeNode } from '@/parsers/epub/sanitize';
+import type { EpubParserVersion } from '@/parsers/epub/version';
+
+export interface Locator {
+  chapterIndex: number;
+  paragraphIndex: number;
+  charOffset: number;
+}
+export interface Book {
+  id: string;
+  title: string;
+  type: 'txt' | 'epub' | 'paste' | 'md';
+  draftFormat?: 'markdown';
+  markdownVersion?: 1 | 2;
+  encoding?: string;
+  contentRevision?: number;
+  parserVersion?: EpubParserVersion;
+  author?: string;
+  coverBlobId?: string;
+  fileBlobId?: string;
+  draftBlobId?: string;
+  settingsOverride?: Partial<ReadingSettings>;
+  missingFile?: boolean;
+  toc?: TocEntry[];
+  chapterSummaries?: ChapterSummary[];
+  charCount: number;
+  chapterCount: number;
+  importedAt: number;
+  lastReadAt: number;
+  size: number;
+}
+export type ChapterSummary = Pick<
+  TextChapter,
+  'index' | 'title' | 'charStart' | 'charCount'
+> & { level?: number };
+export interface StoredChapter extends TextChapter {
+  bookId: string;
+  html?: string;
+  level?: number;
+  nodes?: SafeNode[];
+}
+
+export interface Bookmark {
+  id: string;
+  bookId: string;
+  locator: Locator;
+  chapterTitle: string;
+  excerpt: string;
+  createdAt: number;
+  unanchored?: boolean;
+}
+export interface Highlight {
+  id: string;
+  bookId: string;
+  chapterIndex: number;
+  start: { paragraphIndex: number; charOffset: number };
+  end: { paragraphIndex: number; charOffset: number };
+  text: string;
+  color: 'red' | 'blue' | 'yellow';
+  note?: string;
+  createdAt: number;
+  updatedAt: number;
+  unanchored?: boolean;
+}
+export interface ReadingSettings {
+  fontSize: number;
+  lineHeight: number;
+  paragraphSpacing: number;
+  margin: 'narrow' | 'medium' | 'wide';
+  indent: boolean;
+  fontFamily: 'serif' | 'sans' | 'wenkai';
+  align: 'justify' | 'left';
+  theme: 'paper' | 'eink' | 'green' | 'night';
+  lightTheme?: 'paper' | 'eink' | 'green';
+  texture: boolean;
+  pageAnimation: 'none' | 'fade' | 'slide';
+  tapMode: 'normal' | 'oneHand';
+  showHeaderFooter: boolean;
+  wakeLock: 'off' | 'idle5m' | 'always';
+  quietHint: boolean;
+}
+export interface AppSettings {
+  shelfSort: 'recent' | 'imported' | 'title';
+  reading: ReadingSettings;
+  autoResume: boolean;
+  lastBookId?: string;
+  followSystemTheme: boolean;
+  checkUpdates: boolean;
+  onboarded: boolean;
+  lastBackupAt?: number;
+  backupReminderDismissed?: { baseline: number; cycle: number };
+  environmentNoticeDismissed?: string;
+  tapHintSeen?: boolean;
+}
+export interface Progress {
+  bookId: string;
+  locator: Locator;
+  percent: number;
+  updatedAt: number;
+}

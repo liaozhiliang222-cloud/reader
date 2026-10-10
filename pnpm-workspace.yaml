@@ -1,0 +1,4 @@
+# Patched renderers, including Mermaid's indirect dependencies.
+overrides:
+  katex: 0.19.0
+  dompurify: 3.4.16

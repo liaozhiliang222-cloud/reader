@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# 编码样本必须保留原始字节，UTF-8 预期文本也包含用于验收的 CRLF。
+src/parsers/txt/fixtures/*.bin binary
+src/parsers/txt/fixtures/*.expected.txt -text
