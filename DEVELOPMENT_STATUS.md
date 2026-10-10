@@ -2,9 +2,15 @@
 
 更新日期：2026-10-10。
 
+当前任务（2026-10-10，暂停发布并优化按钮反馈）：用户明确要求先别上传。`src/styles/base.css` 已关闭按钮、链接、summary 与输入控件的 WebView 默认蓝色触摸高亮；启用按钮仅在 `:active` 时使用正文色 8% 与背景色的混色，无额外动画，保留原 `:focus-visible` 与正文选择。Chrome 390×844 实际按住按钮确认 paper/eink/green/night 四主题底色、透明触摸高亮、松开后恢复及导入面板操作；Shift+Tab 的 2px 主题色焦点仍有效。纯样式没有新增镜像单测或依赖。证据截图与计算样式 JSON 保存在本机 visualizations，手机触摸观感未代替用户验收。
+
+本轮检查：pnpm lint、87 文件 / 380 单测、pnpm build、pnpm build:android 均通过；Android lintRelease / assembleRelease 通过（0 错误 / 11 条既有依赖和模板 Warning）。重打包为 `release/jingye-reader-1.0.1.apk`，6393139 字节，SHA `9ee00b45c966618a4de26a33d0f23ba5a8fd35f1a8f375eac2ffc34d31a88c06`；116 个内嵌资源与本轮构建 SHA 一致、ZIP CRC 通过、无 INTERNET / SW / 私钥 / 用户书籍。原证书、code 4；已 adb install -r 覆盖连接手机，安装成功且设备 base.apk SHA 完全一致，未卸载主 App 或清数据。本轮未重跑原生 IO 专项，上一轮红绿验证仍适用于未变化的 Java 代码。日志为 `artifacts/button-feedback-*.log`，包核验报告为 `artifacts/android-package-jingye-reader-1.0.1.apk.json`。
+
+发布暂停检查点：上一轮原生修复源码 `bc0aa8e` 与 `android-v1.0.1` 标签已推送，旧 APK 曾开始传到草稿，未点击 Publish；本轮按钮改动与新包均未上传。公开 Release API 当前仅返回 1.0.0。旧浏览器草稿标签已关闭，未进一步修改草稿；旧包副本保存在 `artifacts/jingye-reader-1.0.1-before-tap-fix.apk`。用户恢复发布后，先对齐最终源码、发布标签、新 APK 和 SHA，再核对草稿旧附件是否存在；不能把旧草稿 SHA 或 bc0aa8e 标签当成本轮包的来源。继续暂停上传与发布，等待用户下一步指示。
+
 当前任务（2026-10-10，Android 大文件误报修复）：用户提供 EPUB 实际为 4433334 字节。根因是 Capacitor PluginCall.getLong 仅接受 Long，实际 Android JSON 把 524288 等偏移量解析为 Integer，导致读取回退 0，反复累计第一块直到误报 50 MB。已改为 JSONObject.getLong，缺失偏移量也不再静默回到文件开头。新增 3 项 JVM JSON 回归，Java 总计 6 项通过；真实设备上同一个 instrumentation 测试包在原 code 3 全部失败（偏移 524288 返回开头字节），同证书覆盖安装 code 4 后 3 项全部通过，临时测试 App 已移除，主 App 未卸载/清数据。真机专项仅覆盖原生 JSON + FileProvider 分块，未冒充用户文件完整 UI 验收。
 
-用户 EPUB 本地接收/解析专项：9 块、原始 SHA 完全保留、174 章节、1775226 字，错误列表为空。原文件没有复制进源码或 APK，专项脚本/报告均在被忽略的 .review / artifacts。新 APK `release/jingye-reader-1.0.1.apk` 为 6393007 字节，SHA `7eaab8707bd31cee57a386fbbebde166e3715b6b302fabed5f5ba74eb2f3a0e5`，code 4 / 1.0.1，仍为原证书、无 INTERNET，116 个应用资源 SHA 一致，无 SW。新增 org.json 20250517 仅为 JVM 测试，与 Capacitor 自身测试版本一致，APK/网页 gzip 增量 0。lint/test/build、源码与补丁 Release 上传结果待本轮收尾记录。
+用户 EPUB 本地接收/解析专项：9 块、原始 SHA 完全保留、174 章节、1775226 字，错误列表为空。原文件没有复制进源码或 APK，专项脚本/报告均在被忽略的 .review / artifacts。原生修复初始 APK 为 6393007 字节，SHA `7eaab8707bd31cee57a386fbbebde166e3715b6b302fabed5f5ba74eb2f3a0e5`，code 4 / 1.0.1，仍为原证书、无 INTERNET，116 个应用资源 SHA 一致，无 SW；现已被上方按钮优化的新包替代。新增 org.json 20250517 仅为 JVM 测试，与 Capacitor 自身测试版本一致，APK/网页 gzip 增量 0。上一轮 lint / 380 单测 / build 与 Java 6 项均通过，源码已推送；补丁发布因用户要求暂停。
 
 本次发布完成（2026-10-10）：运行代码提交 `6120947`，修复 CI 配置后的发布标签 `android-v1.0.0` 指向 `631a0ed12b218920ab42ee037ea7096642bff5a4`，二者仅 CI/进度文档不同。真实 main CI [38047760091](https://github.com/liaozhiliang222-cloud/reader/actions/runs/38047760091) 全部成功：lint、380 单测、strict 构建、安全/PWA、浏览器 102 通过/1 已知 Windows WebKit 离线 skip（9.49 分钟，无重试/失败/flaky），严格报告校验及行高变异检出/源码恢复通过；Android 3 Java 无失败、lint 0 错误/10 Warning、debug 构建通过。本次未启用网页部署，deploy 为 skipped。首次 Android CI 38047257314 因 sdkmanager 不在 PATH 失败，依据官方 runner 预装清单改为校验 SDK 36 / Build-tools 36.0.0 后通过。
 

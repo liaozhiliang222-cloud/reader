@@ -32,6 +32,15 @@ textarea {
 }
 button,
 summary,
+a,
+input,
+select,
+textarea {
+  /* 使用主题内的按压反馈，避免 WebView 默认的亮蓝色触摸高亮。 */
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+summary,
 a {
   /* 禁止控件双击放大与长按呼出，保留正文选区和双指缩放。 */
   touch-action: manipulation;
@@ -45,6 +54,9 @@ button {
   min-height: 44px;
   padding: 6px 14px;
   cursor: pointer;
+}
+button:not(:disabled):active {
+  background-color: color-mix(in srgb, var(--fg) 8%, var(--bg));
 }
 @media (hover: hover) {
   button:not(:disabled):hover {
