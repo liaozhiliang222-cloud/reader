@@ -2,6 +2,25 @@
 
 地址：[静页阅读器](https://jingye-reader.pages.dev/)；现有自定义域名 [reader.surveykit.cc](https://reader.surveykit.cc/) 同步。项目jingye-reader，生产分支main，版本0.0.1，使用本地生产构建Direct Upload；用户明确授权持续更新。此结果不代表完整M2/M3、开源发布或真机验收结束。
 
+## 2026-10-10 CI 验收与全屏修复上线
+
+- 当前生产部署 [dd14fa8b](https://dd14fa8b.jingye-reader.pages.dev/)，完整 ID `dd14fa8b-c7a0-4959-acda-76b6a38aca76`。仍为原账号 `7c33f9356512402ffd494750506a6e29`、原项目 `jingye-reader` 与 Production/main；Wrangler 原生列表确认 Source `6ce56cd`，稳定地址和自定义域名同步。
+- 修复阅读器挂载到事件监听之间完成的全屏切换未同步到按钮。代码提交 `6ce56cd23baa62d3080f46d2f52d6fc4dd5fcf64` 的 [真实 CI](https://github.com/liaozhiliang222-cloud/reader/actions/runs/38019710585) 已完整成功：lint、85 文件/372 单测、strict 构建、安全/PWA、102 浏览器通过/1 已知 Windows WebKit 离线 skip（11.5 分钟）、严格完整报告检查及行高变异/恢复。本机完整套件另为 102/1（9.5 分钟），两种环境各用已审查的系统字体截图基线，没有扩大像素容忍度。
+- 原生 CI 附件 11658261604 的 ZIP SHA 为 `a13e4a56790f3ddc16f521be445206b1ba9d7d217988ae1e7e0fd8ec41eeec8a`，下载后核对 JSON/完整 HTML 与独立变异报告；故意改坏时两引擎截图失败、恢复后两引擎通过。该结果与 38017213626 的独立故意失败红色 CI 分别保留。
+- 发布前最后 lint、372 单测、strict 构建、安全 104 惰性 URL/PWA 110 资源与上传清单通过。114 静态文件、7745744 字节，全部 JS/CSS gzip 1695.43 KB；主包 `index-BULRReMR.js`，无新依赖。preparedAt `2026-10-10T03:18:03.238Z`；唯一、稳定、自定义地址各 113 资源大小/SHA、安全与缓存头全量通过。只上传 `dist`，未包含用户书籍、凭证、原始测试报告或源码映射。
+- 本次实际 HTTPS 常规 4/4（45.1 秒），额外引导焦点/返回与 Chromium 可信拖动 3/3（14.7 秒）通过。后者复用生产用例和部署配置 `.review/m2-fullscreen-experience-online.config.ts`，无本地服务器。另一个 Chromium 原生全屏专项 1/1（3.4 秒）明确断言进入/退出的实际 `document.fullscreenElement` 与按钮一致；没有模拟全屏 API。模拟移动视口/可信 CDP 触摸不计物理手机验收。
+- 当前原始报告为 `artifacts/deployment-build.json`、三份 HTTP、`deployment-browser-results.json`、`fullscreen-deployment-results.json` 与 `fullscreen-state-deployment-results.json`；汇总绑定在 `artifacts/m2-source-ci-release.json`。本机完整结果与远程 CI 附件独立保留。上次 82ac11ae 构建/HTTP/4+2 浏览器证据原字节归档在 `artifacts/deployment-history/m2-source-82ac11ae/`。本次未重跑真实旧客户端升级专项，不能将上次结果改写为本次通过。
+- CI 自动部署 job 仍因未配置 Cloudflare secrets/启用变量而跳过；本次是在检查成功后，用已有本机 OAuth Direct Upload 更新原项目。项目许可证、正式 tag、物理安装/分享/离线/性能等仍待办。
+
+## 2026-10-10 首次 M2 引导修复与源码上传（历史）
+
+- 原账号、原项目 jingye-reader 与生产分支 main，记录 [82ac11ae](https://82ac11ae.jingye-reader.pages.dev/)，完整 ID `82ac11ae-9808-4233-a5a1-02a813860623`；Wrangler 原生列表显示 Source `576d65b`，对应用户仓库首次提交。稳定地址与现有自定义域名同步。
+- 新版修复使用引导的焦点循环/恢复与浏览器返回，关于页加入源码、Issues 和 Gmail 入口。无新依赖，运行请求仍限同源应用资源；外部反馈入口只在点击时导航，不发送书籍。
+- lint、369 单测、strict 构建、安全 104 惰性 URL、110 离线资源检查通过；本地专项 17/17，完整浏览器 102 通过/1 已知 Windows WebKit 离线 skip。
+- 本轮 114 静态文件、7745740 字节，全部 JS/CSS gzip 1695.46 KB。唯一、稳定与自定义地址各 113 资源大小/SHA/CSP/安全/缓存头全部通过，绑定 preparedAt `2026-10-10T02:31:13.692Z`；线上常规 4/4（40.4 秒）、两个引擎引导焦点/返回 2/2（11.1 秒）通过。后者使用忽略的 `.review/m2-guide-online.config.ts` 复用实际生产用例与 HTTPS 配置，没有本地服务器或数据库替身。
+- 该次原始构建、三份 HTTP、常规 4 项和引导 2 项报告已原字节归档在 `artifacts/deployment-history/m2-source-82ac11ae/`；更早 HTTP/浏览器及其他旧报告在 `artifacts/deployment-history/before-m2-source-upload-20261010/`，各保留原本的构建绑定。该次未重跑旧客户端升级专项，不能用上次两项结果当作该次证据。
+- 仓库 CI 已预留检查成功后的 main 自动上传，需配置 `CLOUDFLARE_ACCOUNT_ID`、`CLOUDFLARE_API_TOKEN` secrets 与 `CLOUDFLARE_DEPLOY_ENABLED=true` 仓库变量；当前尚未启用。本轮仍用本机 OAuth Direct Upload，配置说明见 CONTRIBUTING.md。真机安装/分享/离线/性能仍单列。
+
 ## 2026-10-09 Markdown 第二版上线
 
 - 使用已登录的原 Cloudflare 账户和现有 jingye-reader 项目，未创建新项目或域名。Wrangler 的生产部署列表确认分支 main，最终记录为 [f4b42eaa](https://f4b42eaa.jingye-reader.pages.dev/)，完整 ID 为 `f4b42eaa-eb40-4d5c-8073-7f4f0b4e1aad`。公式、代码高亮、脚注、同文档双链、图文包和 Mermaid 已上线。

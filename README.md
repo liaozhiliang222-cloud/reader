@@ -8,7 +8,7 @@
 
 <img src="docs/screenshots/reading.png" alt="静页纸感分页正文" width="240"> <img src="docs/screenshots/install-guide.png" alt="320px iOS 安装图示与旧系统提示" width="240">
 
-`pnpm check:experience` 验证首次引导三屏、320px 键盘操作、重载、设置页复看与返回，以及受控安装事件、环境提示、IDB 写入故障和 Chromium 可信触摸。17 项通过；WebKit 未运行 CDP 触摸拖动，模拟 UA/安装事件不计真机安装。详情见 [浏览器验收](./e2e/README.md)。GitHub Actions 已准备 push/PR 的 lint、单测、构建和完整 E2E，实际 CI 结果与真机待办分别记录。
+`pnpm check:experience` 验证首次引导三屏、320px 键盘操作、重载、设置页复看与返回，以及受控安装事件、环境提示、IDB 写入故障和 Chromium 可信触摸。17 项通过；WebKit 未运行 CDP 触摸拖动，模拟 UA/安装事件不计真机安装。详情见 [浏览器验收](./e2e/README.md)。[GitHub CI](https://github.com/liaozhiliang222-cloud/reader/actions/runs/38019710585) 已实际通过 lint、372 单测、构建、完整浏览器 102 通过/1 已知环境跳过，以及分页变异/恢复检查；CI 与真机待办分别记录。
 
 Markdown 支持 `.md` / `.markdown` 文件，以及在粘贴页选择 Markdown。标题生成分层目录，正文支持强调、引用、嵌套列表、只读任务列表、表格、代码和分隔线。表格逐行显示“表头：单元格”，适合分页和窄屏；代码保留缩进并自动折行。标题链接在本书内跳转，HTTP(S) 外链只提供地址和复制，原始 HTML 保留为文字。
 
@@ -16,7 +16,7 @@ Markdown 支持 `.md` / `.markdown` 文件，以及在粘贴页选择 Markdown�
 
 MD 沿用字号、主题、进度、书签、划线、笔记与备份。粘贴格式默认纯文本，旧文稿不自动转换；修改正文或切换格式时，已有标注须在页面中确认重置。MD 文件原始字节和文稿原文均保留。备份导出升级为 v4，当前版本仍接受 v1/v2/v3；v4 备份需使用支持对应 MD 解析版本的应用恢复。运行 `pnpm check:markdown-v2` 可检查 Chromium/WebKit 移动视口下的首版、第二版、图片分页与既有分页像素基线，共 20 项。
 
-Markdown 第二版已于 2026-10-09 部署到 [静页](https://jingye-reader.pages.dev/) 和现有 [自定义域名](https://reader.surveykit.cc/)。线上 MD 八项、真实旧客户端升级两项通过，最终缓存头修复后常规四项再次通过；具体构建与验收范围见 [部署记录](./DEPLOYMENT.md)。已安装旧版时回到书架点击“点击更新”，书籍、进度和笔记保留。原创图文体验包位于 `test-books/markdown-v2-demo.md.zip`，包含六项增强示例。
+Markdown 第二版已于 2026-10-09 部署到 [静页](https://jingye-reader.pages.dev/) 和现有 [自定义域名](https://reader.surveykit.cc/)。线上 MD 八项、真实旧客户端升级两项通过，最终缓存头修复后常规四项再次通过；具体构建与验收范围见 [部署记录](./DEPLOYMENT.md)。已安装旧版时回到书架点击“点击更新”，书籍、进度和笔记保留。[原创图文体验包](./docs/examples/markdown-v2-demo.md.zip)包含六项增强示例，仅含自编 Markdown 与流程 SVG；下载后通过应用导入。
 
 分享链路可用 `pnpm check:sharing` 独立验收：真实浏览器表单POST、Service Worker暂存、文件/文字导入、失败重试及跨标签原数据保留，六项通过。Chromium覆盖中文文件名；当前Windows WebKit的原生multipart中文文件名解析有已复现限制，其文件场景只覆盖英文名。此结果不等同于Android系统分享或iOS安装验收，详情见 [浏览器验收说明](./e2e/README.md)。
 
