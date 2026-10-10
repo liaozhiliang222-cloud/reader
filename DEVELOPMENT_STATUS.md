@@ -2,6 +2,8 @@
 
 更新日期：2026-10-10。
 
+当前任务（2026-10-10，恢复 Android 1.0.1 发布）：用户已明确要求“发布吧”，暂停上传的指示已撤销。最终运行代码为 `7b48bdb`（原生大文件修复 + 四主题按钮反馈），APK SHA 为 `9ee00b45c966618a4de26a33d0f23ba5a8fd35f1a8f375eac2ffc34d31a88c06`、6393139 字节。已确认旧 1.0.1 草稿仍存在，包含按钮修改前的两个附件；准备替换旧附件、将未发布标签对齐最终源码、核对 CI 并公开发布。发布成功与公开下载校验尚未完成，不能视为已发布。
+
 当前任务（2026-10-10，暂停发布并优化按钮反馈）：用户明确要求先别上传。`src/styles/base.css` 已关闭按钮、链接、summary 与输入控件的 WebView 默认蓝色触摸高亮；启用按钮仅在 `:active` 时使用正文色 8% 与背景色的混色，无额外动画，保留原 `:focus-visible` 与正文选择。Chrome 390×844 实际按住按钮确认 paper/eink/green/night 四主题底色、透明触摸高亮、松开后恢复及导入面板操作；Shift+Tab 的 2px 主题色焦点仍有效。纯样式没有新增镜像单测或依赖。证据截图与计算样式 JSON 保存在本机 visualizations，手机触摸观感未代替用户验收。
 
 本轮检查：pnpm lint、87 文件 / 380 单测、pnpm build、pnpm build:android 均通过；Android lintRelease / assembleRelease 通过（0 错误 / 11 条既有依赖和模板 Warning）。重打包为 `release/jingye-reader-1.0.1.apk`，6393139 字节，SHA `9ee00b45c966618a4de26a33d0f23ba5a8fd35f1a8f375eac2ffc34d31a88c06`；116 个内嵌资源与本轮构建 SHA 一致、ZIP CRC 通过、无 INTERNET / SW / 私钥 / 用户书籍。原证书、code 4；已 adb install -r 覆盖连接手机，安装成功且设备 base.apk SHA 完全一致，未卸载主 App 或清数据。本轮未重跑原生 IO 专项，上一轮红绿验证仍适用于未变化的 Java 代码。日志为 `artifacts/button-feedback-*.log`，包核验报告为 `artifacts/android-package-jingye-reader-1.0.1.apk.json`。

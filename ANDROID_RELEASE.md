@@ -1,6 +1,6 @@
 # Android 预览版
 
-当前本地待发布修复版为 `1.0.1`，包名 `dev.jingye.reader`，versionCode `4`，支持 Android 7.0（API 24）及以上。用户已暂停上传与发布，GitHub 公开版本仍为 `1.0.0`。网页版本继续为 `0.0.1` 预览版，两者共用源码，各自保存数据。
+当前修复版为 `1.0.1`，包名 `dev.jingye.reader`，versionCode `4`，支持 Android 7.0（API 24）及以上。网页版本继续为 `0.0.1` 预览版，两者共用源码，各自保存数据。
 
 包含按钮优化的本地签名 APK 为 6393139 字节，SHA-256：`9ee00b45c966618a4de26a33d0f23ba5a8fd35f1a8f375eac2ffc34d31a88c06`。签名证书 SHA-256 为 `c666e187df75ec1d2d61ac7ea73f64d88a0d6f4a5dad22938b7dd23b05e22949`，与此前 code 2 / 3 相同。校验文件位于 `release/jingye-reader-1.0.1.apk.sha256`。
 
@@ -14,7 +14,7 @@
 
 ## 安装与迁移
 
-待发布版保存在 `release/jingye-reader-1.0.1.apk`；[GitHub Releases](https://github.com/liaozhiliang222-cloud/reader/releases) 目前提供 `1.0.0`。APK 可在文件管理器中打开，按系统提示允许该文件管理器安装应用。部分手机会要求确认侧载安装。安装后首次打开即可离线使用。
+从 [Android 1.0.1 Release](https://github.com/liaozhiliang222-cloud/reader/releases/tag/android-v1.0.1) 下载 `jingye-reader-1.0.1.apk`；本地产物保存在 `release/`。APK 可在文件管理器中打开，按系统提示允许该文件管理器安装应用。部分手机会要求确认侧载安装。安装后首次打开即可离线使用。
 
 覆盖安装同包名、同证书的新版会保留应用数据；卸载、清除应用数据会删除书架和笔记。升级或迁移前，在“设置 → 备份与恢复”导出完整备份。网页版与 App 数据独立：在网页版导出完整备份，在 App 内选择该文件恢复。
 
