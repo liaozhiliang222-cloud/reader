@@ -6,7 +6,7 @@
 
 当前为 0.0.1 预览版本，项目许可证待定。以下为隔离浏览器的实际界面截图，正文为原创验收文字，不代表物理手机验收。
 
-Android `1.0.0` 预览 APK 可从 [Releases](https://github.com/liaozhiliang222-cloud/reader/releases) 下载，支持 Android 7.0 及以上。资源内置、无联网权限，提供原生保存/分享、系统返回、沉浸阅读和音量键翻页。安装、网页版数据迁移、构建和验证范围见 [Android 发布说明](./ANDROID_RELEASE.md)；听书仍处于计划阶段。
+Android `1.0.1` 预览 APK 可从 [Release](https://github.com/liaozhiliang222-cloud/reader/releases/tag/android-v1.0.1) 下载，支持 Android 7.0 及以上。本版修复几 MB 文件的大小误报、启动时旧导入错误页闪现，并加入跟随主题的翻页加载反馈。资源内置、无联网权限，提供原生保存/分享、系统返回、沉浸阅读和音量键翻页。安装、网页版数据迁移、构建和验证范围见 [Android 发布说明](./ANDROID_RELEASE.md)；听书仍处于计划阶段。
 
 <img src="docs/screenshots/reading.png" alt="静页纸感分页正文" width="240"> <img src="docs/screenshots/install-guide.png" alt="320px iOS 安装图示与旧系统提示" width="240">
 
