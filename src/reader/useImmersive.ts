@@ -31,6 +31,9 @@ export function useImmersive(mode: ReadingSettings['wakeLock']) {
     document.addEventListener('pointerdown', activity);
     document.addEventListener('keydown', activity);
     document.addEventListener('fullscreenchange', change);
+    // A transition started on the bookshelf can finish before this effect.
+    // Subscribe first, then read the current native state so neither is missed.
+    change();
     return () => {
       lock.dispose();
       controller.current = undefined;

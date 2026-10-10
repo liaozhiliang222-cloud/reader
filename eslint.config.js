@@ -10,6 +10,7 @@ export default tseslint.config(
       'node_modules/**',
       'test-books/**',
       '.font-tools/**',
+      '.review/**',
       '.e2e-update/**',
       '.e2e-long/**',
       '.e2e-performance/**',
