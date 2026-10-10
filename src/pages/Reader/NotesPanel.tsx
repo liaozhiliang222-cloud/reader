@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { groupHighlights } from '@/reader/annotation';
 import { notesFilename, notesMarkdown } from '@/reader/exportNotes';
 import { downloadBlob, shareMarkdown } from '@/app/files';
+import { isNativeApp } from '@/app/platform';
 import type { Book, ChapterSummary, Highlight } from '@/types';
 
 export function NotesPanel({
@@ -39,19 +40,22 @@ export function NotesPanel({
       <div class="notes-export">
         <button
           onClick={() => {
-            try {
+            void Promise.resolve(
               downloadBlob(
                 new Blob([markdown()], { type: 'text/markdown;charset=utf-8' }),
                 name,
-              );
-            } catch {
-              setError('下载未能开始，请尝试分享。');
-            }
+              ),
+            ).catch((cause) => {
+              if (!(
+                cause instanceof DOMException && cause.name === 'AbortError'
+              ))
+                setError('下载未能开始，请尝试分享。');
+            });
           }}
         >
           下载 Markdown
         </button>
-        {typeof navigator.share === 'function' && (
+        {(typeof navigator.share === 'function' || isNativeApp) && (
           <button disabled={sharing} onClick={() => void share()}>
             {sharing ? '分享中…' : '分享笔记'}
           </button>

@@ -1,7 +1,8 @@
 import { useState } from 'preact/hooks';
 import { navigate } from '@/app/router';
 import { copyText } from '@/app/files';
-import { version } from '../../../package.json';
+import { isNativeApp } from '@/app/platform';
+const version = import.meta.env.VITE_APP_VERSION;
 
 export function AboutPage() {
   const [message, setMessage] = useState('');
@@ -24,18 +25,26 @@ export function AboutPage() {
       <section aria-labelledby="privacy-title">
         <h2 id="privacy-title">隐私与本地数据</h2>
         <p>
-          我们不收集任何阅读数据。书籍原文、阅读进度、书签、划线、笔记和设置只保存在当前浏览器的本地存储中，不上传服务器。
+          我们不收集任何阅读数据。书籍原文、阅读进度、书签、划线、笔记和设置只保存在
+          {isNativeApp ? '应用私有存储' : '当前浏览器的本地存储'}
+          中，不上传服务器。
         </p>
         <p>
-          应用没有统计 SDK、广告、第三方 CDN
-          或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。
+          {isNativeApp
+            ? '应用未申请联网权限，资源与可选字体均内置在安装包中；不参与系统云备份或自动换机传输。'
+            : '应用没有统计 SDK、广告、第三方 CDN 或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。'}
         </p>
         <p>
-          首次离线资源准备完成后可以断网阅读。备份由你主动导出到文件，恢复也只在本机处理；系统分享或复制后的保存位置由你选择。
+          {isNativeApp
+            ? '安装后即可离线阅读。'
+            : '首次离线资源准备完成后可以断网阅读。'}
+          备份由你主动导出到文件，恢复也只在本机处理；系统分享或复制后的保存位置由你选择。
         </p>
         <p>
-          清除浏览器数据或系统回收存储可能删除本机书籍与笔记。请把备份保存在浏览器之外；可在“设置
-          →
+          {isNativeApp
+            ? '卸载应用会删除本机书籍与笔记。请把备份保存在应用之外；'
+            : '清除浏览器数据或系统回收存储可能删除本机书籍与笔记。请把备份保存在浏览器之外；'}
+          可在“设置 →
           备份与恢复”导出，或使用“清空所有数据”删除本机用户数据。可选字体缓存可在字体设置中单独删除。
         </p>
       </section>

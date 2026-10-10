@@ -1,4 +1,15 @@
-export function downloadBlob(blob: Blob, name: string) {
+import { isNativeApp, nativeApp } from './platform';
+
+export function downloadBlob(blob: Blob, name: string): Promise<void> {
+  if (isNativeApp) {
+    return nativeApp().then((native) =>
+      native.saveFile(blob, name).catch((cause) => {
+        throw cause instanceof Error && /cancelled/i.test(cause.message)
+          ? new DOMException('cancelled', 'AbortError')
+          : cause;
+      }),
+    );
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -10,8 +21,13 @@ export function downloadBlob(blob: Blob, name: string) {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 15_000);
   }
+  return Promise.resolve();
 }
 export async function shareMarkdown(text: string, name: string, title: string) {
+  if (isNativeApp) {
+    const native = await nativeApp();
+    return native.shareFile(new Blob([text], { type: 'text/markdown' }), name);
+  }
   if (!navigator.share) throw new Error('此浏览器不支持分享，请使用下载。');
   const file = new File([text], name, { type: 'text/markdown' });
   if (navigator.canShare?.({ files: [file] }))
@@ -19,6 +35,10 @@ export async function shareMarkdown(text: string, name: string, title: string) {
   else await navigator.share({ title, text });
 }
 export async function shareBlob(blob: Blob, name: string) {
+  if (isNativeApp) {
+    const native = await nativeApp();
+    return native.shareFile(blob, name);
+  }
   if (!navigator.share) throw new Error('此浏览器不支持分享，请使用下载。');
   const file = new File([blob], name, { type: blob.type });
   if (!navigator.canShare?.({ files: [file] }))

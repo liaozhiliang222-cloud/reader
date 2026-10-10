@@ -1,6 +1,7 @@
 import type { ReadingSettings } from '@/types';
 import { mediaState, listenMedia, type MediaState } from './media';
 import { resolveTheme } from './themePreference';
+import { isNativeApp, nativeApp } from './platform';
 const colors = {
   paper: '#F5F0E6',
   eink: '#EDEDEB',
@@ -14,6 +15,10 @@ export function applyAppearance(reading: ReadingSettings) {
   document
     .querySelector('meta[name="theme-color"]')
     ?.setAttribute('content', colors[reading.theme]);
+  if (isNativeApp)
+    void nativeApp().then((native) =>
+      native.syncStatusBar(colors[reading.theme], reading.theme === 'night'),
+    );
 }
 export function watchAppearance(
   reading: ReadingSettings,

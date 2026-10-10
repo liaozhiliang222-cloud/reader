@@ -6,6 +6,8 @@
 
 当前为 0.0.1 预览版本，项目许可证待定。以下为隔离浏览器的实际界面截图，正文为原创验收文字，不代表物理手机验收。
 
+Android `1.0.0` 预览 APK 可从 [Releases](https://github.com/liaozhiliang222-cloud/reader/releases) 下载，支持 Android 7.0 及以上。资源内置、无联网权限，提供原生保存/分享、系统返回、沉浸阅读和音量键翻页。安装、网页版数据迁移、构建和验证范围见 [Android 发布说明](./ANDROID_RELEASE.md)；听书仍处于计划阶段。
+
 <img src="docs/screenshots/reading.png" alt="静页纸感分页正文" width="240"> <img src="docs/screenshots/install-guide.png" alt="320px iOS 安装图示与旧系统提示" width="240">
 
 `pnpm check:experience` 验证首次引导三屏、320px 键盘操作、重载、设置页复看与返回，以及受控安装事件、环境提示、IDB 写入故障和 Chromium 可信触摸。17 项通过；WebKit 未运行 CDP 触摸拖动，模拟 UA/安装事件不计真机安装。详情见 [浏览器验收](./e2e/README.md)。[GitHub CI](https://github.com/liaozhiliang222-cloud/reader/actions/runs/38019710585) 已实际通过 lint、372 单测、构建、完整浏览器 102 通过/1 已知环境跳过，以及分页变异/恢复检查；CI 与真机待办分别记录。

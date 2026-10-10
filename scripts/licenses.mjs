@@ -87,6 +87,12 @@ async function visit(name, parent) {
 }
 for (const name of Object.keys(root.dependencies).sort())
   await visit(name, new URL('../package.json', import.meta.url));
+// Capacitor Android 位于 devDependencies，但它的原生代码会随 APK 交付。
+if (root.devDependencies?.['@capacitor/android'])
+  await visit(
+    '@capacitor/android',
+    new URL('../package.json', import.meta.url),
+  );
 notices.sort((a, b) => a.key.localeCompare(b.key));
 await writeFile(
   'public/licenses.txt',

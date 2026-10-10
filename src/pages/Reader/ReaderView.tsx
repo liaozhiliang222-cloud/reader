@@ -17,6 +17,7 @@ import { AnnotationMenu } from './AnnotationMenu';
 import { NoteEditor } from './NoteEditor';
 import { useAnnotations } from '@/reader/useAnnotations';
 import { toggleFullscreen, useImmersive } from '@/reader/useImmersive';
+import { isNativeApp, nativeApp } from '@/app/platform';
 import { addBookmark, listBookmarks, removeBookmark } from '@/db/bookmarks';
 import { QuietHint } from '@/components/QuietHint';
 import { TapHint } from '@/components/TapHint';
@@ -85,21 +86,20 @@ export function ReaderView({
     setMenu(false);
     setDrawer(false);
   });
-  const leave = useBackClose(
+  const overlayOpen =
     menu ||
-      drawer ||
-      encodingOpen ||
-      !!linkAddress ||
-      !!annotations.target ||
-      !!annotations.editor,
-    () => {
-      if (linkAddress) setLinkAddress('');
-      else if (encodingOpen) setEncodingOpen(false);
-      else if (annotations.target || annotations.editor) annotations.close();
-      else if (drawer) setDrawer(false);
-      else setMenu(false);
-    },
-  );
+    drawer ||
+    encodingOpen ||
+    !!linkAddress ||
+    !!annotations.target ||
+    !!annotations.editor;
+  const leave = useBackClose(overlayOpen, () => {
+    if (linkAddress) setLinkAddress('');
+    else if (encodingOpen) setEncodingOpen(false);
+    else if (annotations.target || annotations.editor) annotations.close();
+    else if (drawer) setDrawer(false);
+    else setMenu(false);
+  });
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
   const currentBookmarks = engineRef.current?.bookmarksOnPage(bookmarks) ?? [];
@@ -130,6 +130,34 @@ export function ReaderView({
     }
   };
   const { wakeStatus, fullscreen } = useImmersive(reading.wakeLock);
+  // 音量键翻页：仅原生 App；开关打开且没有浮层时才接管，离开阅读页恢复调音量。
+  useEffect(() => {
+    if (!isNativeApp) return;
+    let dispose: (() => void) | undefined;
+    let cancelled = false;
+    void nativeApp().then((native) => {
+      if (cancelled) return;
+      dispose = native.listenVolumeKey((direction) =>
+        engineRef.current?.turn(direction === 'next' ? 1 : -1),
+      );
+    });
+    return () => {
+      cancelled = true;
+      dispose?.();
+      void nativeApp().then((native) => native.setVolumeKeys(false));
+    };
+  }, []);
+  useEffect(() => {
+    if (!isNativeApp) return;
+    let cancelled = false;
+    void nativeApp().then((native) => {
+      if (!cancelled)
+        void native.setVolumeKeys(!!reading.volumeKeys && !overlayOpen);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [reading.volumeKeys, overlayOpen]);
   const followSystemTheme = settings.value.followSystemTheme;
   const changeReading = (patch: Partial<ReadingSettings>) => {
     setReading((current) => ({ ...current, ...themePatch(patch, current) }));

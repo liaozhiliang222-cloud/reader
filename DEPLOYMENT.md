@@ -91,3 +91,11 @@ Android/iOS安装、系统分享、原生选区、飞行模式、中端机性能
 - 检查：lint、342 单测、build、prepare-deployment（16 资产 SHA）、security-check（15 处 inert URL 复核）、pwa-check、bundle-size（gzip 186.02 KB，仍超 150 KB 参考值，为提示非失败）、本地全量 E2E 69 过 1 skip 均已通过。
 - 部署后：check-deployment 两个地址各 15 资产 HTTPS/SHA/安全头一致；线上浏览器套件 4/4 通过（双引擎真实 Worker/IDB、进度书签重载、Chromium 断网重启、SVG 导入恢复）。
 - 未验证：真机、旧版本升级回归（本次未跑 update 流程配合的部署验证）。
+
+## 2026-10-10 MD UI 规范统一部署
+
+- 部署地址：https://82d9609d.jingye-reader.pages.dev ，正式地址 https://jingye-reader.pages.dev/ 已同步。
+- 内容：粘贴页正文格式改用分段控件、链接下划线偏移统一、移除失效的 inline 尺寸声明、MD 代码块 4px 圆角。
+- 检查：lint、372 单测、build、prepare-deployment（113 资产）、security-check、pwa-check、bundle-size（gzip 1695.53 KB，MD v2 离线预缓存所致，为提示非失败）均通过；本地 markdown 8/8、sharing 6/6、markdown-v2 20/20 双引擎通过。
+- 部署后：check-deployment 两个地址各 113 资产 HTTPS/SHA/安全头一致；线上浏览器套件 4/4 通过。
+- 修正测试：deployment.live.ts 等待 serviceWorker.controller 的轮询超时由默认约 10s 调为 60s——预缓存条目增至约 6MB 后，真实安装实测约 13.6s 才激活，属网络相关的等待预算问题，非产品故障。

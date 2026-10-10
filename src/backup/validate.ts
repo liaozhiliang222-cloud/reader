@@ -129,6 +129,7 @@ export function validateReading(value: unknown): Partial<ReadingSettings> {
     'texture',
     'showHeaderFooter',
     'quietHint',
+    'volumeKeys',
   ] as const)
     if (data[key] !== undefined) result[key] = boolean(data[key], key);
   return result;

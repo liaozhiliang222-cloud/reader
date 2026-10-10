@@ -2,6 +2,14 @@
 
 更新日期：2026-10-10。
 
+当前任务检查点（2026-10-10，Android 源码与 APK 发布复核）：用户授权上传最新源码和 1.0.0 APK。已修复超过 512 KB 的原生 Base64 分块导入、音量键开关备份丢失、退出阅读页未恢复系统栏、原生常亮申请失败、导入停滞/大小限制和异步监听清理；关闭系统云备份/自动换机，收窄 FileProvider，补 MD 图文 ZIP 的打开方式。发布签名缺失时只生成未签名包，禁止回退调试证书；移除未调用的 Filesystem/Share 插件、模板空测试，补齐 Capacitor 原生许可、Gradle 官方 SHA 和独立 Android CI。
+
+当前自动检查：lint、87 文件/380 单测、网页与 Android strict 构建、安全 104 URL/PWA 资源检查通过。完整本地浏览器 102 通过/1 已知 Windows WebKit 离线 skip（10.0 分钟），随后原生分支小修由专项单测覆盖，最终代码完整浏览器还将由本次 GitHub CI 验证。Android Java 3 项、lintRelease（0 错误/10 个模板或依赖提示）、assembleRelease 通过；中文路径导致的 Gradle 类加载故障经临时 J: 映射解决并撤销，本机 SDK 路径转义已修正。并未提高截图容忍度、重试或用模拟器冒充真机。
+
+最终待上传 APK：`release/jingye-reader-1.0.0.apk`，6393003 字节，SHA-256 `1fbd7aebf67276bd9a1289cbf4dc55b4d234c244633a4d6120a4322dbf7e057f`；包名 `dev.jingye.reader`、code 3 / 1.0.0、minSdk 24 / targetSdk 36，同原 code 2 证书 `c666e187df75ec1d2d61ac7ea73f64d88a0d6f4a5dad22938b7dd23b05e22949`，apksigner 验证通过，无 INTERNET、allowBackup=false，116 个包内资源逐个 SHA 与同步构建一致，无 SW/manifest。旧 code 2 产物保存在 `.review/android-review-original-code2.apk`；密钥/属性/构建/测试书/本机报告与 APK 均不会入源码历史。本轮没有重新安装或操作物理手机，既有荣耀记录仍为历史范围。
+
+依赖说明：Capacitor Core 8.5.3 用于平台判断和原生桥，App 8.1.2 用于系统返回/退出。独立生产压缩为 3.242 / 4.146 KB gzip（App 包含共享 Core，不能相加）；CLI/Android 为构建工具及原生壳，不加入网页 JS，原生壳另保留 MIT 通知。实际全部网页 JS/CSS 为 1701.93 KB gzip，较上次已提交版本 1695.43 KB 增加约 6.50 KB。“网页零增量”尚未达到，当前 PWA 也预缓存惰性原生模块。APK 的 JS/CSS 含桥资源为 1696.51 KB gzip。用户已确认源码和 APK 同传；GitHub 网页现有登录可发布，无需 gh 登录。源码提交、远程 CI 和 Release 结果待本轮继续记录；真机全量、30 MB 备份、旧 WebView、真实 content URI、迁移与 TTS 仍待办。
+
 本轮完成检查点（2026-10-10）：用户指定仓库 reader 的代码提交 6ce56cd23baa62d3080f46d2f52d6fc4dd5fcf64 已通过真实 GitHub CI [38019710585](https://github.com/liaozhiliang222-cloud/reader/actions/runs/38019710585)：lint、85 文件/372 单测、strict 构建、安全/PWA、完整浏览器 102 通过/1 已知 Windows WebKit 离线 skip（11.5 分钟），严格报告校验及两个引擎的行高变异检出/恢复通过。下载的原生附件 11658261604 ZIP SHA 为 a13e4a56790f3ddc16f521be445206b1ba9d7d217988ae1e7e0fd8ec41eeec8a，已核对完整 JSON/HTML 与独立分页报告，没有用本地结果代替远程 CI。独立故意失败测试的 CI 38017213626 变红已确认，临时分支均已清理。
 
 首次 CI 38017099524 为 98 通过/4 失败/1 skip。全屏切换在挂载后、effect 监听前结束会丢失按钮状态，已修复并增加先红后绿的进入/退出单测。两端 SimSun SHA 相同、默认布局/换行一致但字形绘制不同；Windows Server 六张图经诊断运行 38019268102 采集、逐张查看和 SHA 核验，保留本机原六张基线，没有提高像素容忍度、重试或自动更新截图。诊断采集第一次仅因 CSS 浮点序列化差异失败，修正几何比较精度后完成；采集本身不计完整 CI。分页专项使用独立配置与 JSON，实际核验完整报告未被覆盖。
@@ -655,3 +663,40 @@
 - 最终唯一、稳定与自定义地址各 113 公开资源全部匹配大小/SHA/CSP/nosniff/no-referrer/DENY 与缓存规则；均绑定 preparedAt `2026-10-09T13:52:28.057Z`，稳定 checkedAt `2026-10-09T14:02:17.020Z`。最终常规 4/4 再跑通过（55.6 秒），原始 `artifacts/deployment-browser-results.json`。正式地址前两次完整检查分别发生连接中断、超时，自定义域名首次传输另有超时；重跑完整成功记录与失败区别保留，HTTP/SHA/安全断言不放宽，传输重试单独记录。
 - 原始首发构建、三份 HTTP、线上 4/8/升级 2 与严格升级汇总保存在 `artifacts/deployment-history/markdown-v2-first-2f07f9db/`；此前 UI 站报告另存 `pre-markdown-v2-20261009-*`。首发两项升级与八项 MD 没有重绑定到仅缓存头修复的最终上传。线上公式/代码、流程图、时序图及本地图片四张选定截图已查看，位于 `.review/markdown-v2-online/`，与本地八张截图独立。
 - Chromium 真实断网启动及公式/图表重开通过；Windows WebKit 仅计在线缓存重开，仍不声称 iOS 真机离线。物理手机、原生长按/安装/分享、中端机性能、大库峰值与七天自用继续待验收。旧安装回书架点击“点击更新”，跨域本地书架仍独立，完整备份可用于迁移。本轮部署已完成，不自动启动其余阶段。
+
+## MD 功能 UI 规范统一（2026-10-10，Devin，未部署）
+
+- 审查结论：MD 功能大部分符合既有规范——链接弹窗复用 Modal/panel-actions、书架格式标签沿用 TXT/EPUB 短大写（MD）、代码块/表格/引用均使用 var(--line) 描边、hljs 配色含夜间覆盖、链接有 44px 行高热区与键盘可达。
+- 修正三处不一致：
+  - 粘贴页“正文格式”由带边框 fieldset + 18px 原生单选改为全局统一的 .segmented 分段控件（单选 input 保留，E2E 按名称选择不受影响）；删除 reader.css 中遗留的 .draft-format 系列样式。
+  - a[data-md-link] 补 text-underline-offset: 3px（对齐 .resource-link），移除对 inline 元素无效的死代码 min-width/min-height。
+  - MD 代码块边框补 border-radius: 4px（对齐全站控件圆角）。
+- 保留未改：MD 标题 font-weight:600——font-synthesis:none 下无真实粗体字重的衬线字体（如 SimSun）会渲染为常规字重，h4–h6 仅靠字号区分；改为 normal 会失去层级，故保留。Mermaid 图 background:#fff 为图表可读性所需，保留。MD 引用块用 var(--line) 而非笔记弹层的 var(--accent)，属刻意区分书内容与界面引用。
+- 验证：lint、372 单测、build 通过；markdown 套件 8/8、sharing 6/6、markdown-v2 套件 20/20（含分页像素基线）双引擎通过；截图已查看（粘贴页分段控件、MD 正文、夜间主题）。
+- 部署：已上线 https://jingye-reader.pages.dev/（构建 https://82d9609d.jingye-reader.pages.dev），双地址 113 资产 SHA/安全头一致，线上套件 4/4。deployment.live.ts 的 SW 激活轮询放宽到 60s（约 6MB 预缓存安装实测 ~13.6s）。
+
+## Android 打包 A0–A1 实施（2026-10-10，Devin，真机部分验收）
+
+- A0 完成：Android Studio + JDK 21 + SDK 36 + adb 链路打通；最小壳 debug 包装上荣耀 PTP-AN10（Android 16）。逐项实测记录在 ANDROID_PLAN.md 第 9 节。
+- A1 主体落地：`src/app/platform/` 平台层（isNativeApp/nativeApp 动态导入，网页构建零增量）；`vite --mode android` 不生成 SW；自定义 `JyNative` 桥插件提供 pickSaveTarget/writeUri（SAF 分块写）、shareChunk/shareCacheFile（系统分享）、keepAwake、setImmersive、statusBar、openUrl、consumeLaunchFile/readUriChunk/incomingFile（外部打开导入）；返回键接管覆盖 dialog/useBackClose/页面/退出四级。
+- 修的真问题：旧 SW 会服务旧资源（加 cleanupServiceWorkers 启动清理）；Modal 浮层不吃返回键（dispatch cancel）；target=_blank 在 WebView 全死（原生 openUrl）；targetSdk 36 下 setStatusBarColor 失效（改 DecorView 上色）；downloadBlob 原生分支未返回 Promise（取消保存会静默吞错）。
+- 自动检查：pnpm lint / 372 单测 / build 全通过；android 构建+cap sync+gradlew assembleDebug+install 全通过。
+- 真机已验：导入三格式、SAF 保存落盘 /sdcard/Download、系统分享面板、返回键四级、外链开系统浏览器、沉浸模式、米白/墨黑状态栏（截图在 .review/）。
+- 未完成：SAF 手动选位置体验、分享实际发出到目标 App、恢复备份链路、剪贴板读取、浅灰/护眼绿状态栏复核、A1-06 全量回归、A2/A3 全部。
+
+## Android A2 原生增强（2026-10-10，Devin，真机验收）
+
+- A2-01 打开方式/分享到：Manifest 注册 VIEW（MIME + 扩展名两组过滤）、SEND、SEND_MULTIPLE；JyNative describeIntent 输出 items[]+text，多文件与纯文本分享均支持，单文件失败记入 IncomingData.errors 不阻断其余；文件名缺扩展名时按 MIME 补后缀（importText 按扩展名分发）。实测：file:// VIEW intent → #/incoming/ 流程，读取失败如实入列。
+- A2-02 音量键翻页：MainActivity.dispatchKeyEvent 拦截（repeatCount>0 消费不翻页）；JyNative setVolumeKeys/volumeKey 事件；阅读页 overlayOpen 或离开阅读页即恢复调音量；ReadingSettings.volumeKeys 默认关、随备份导出、控件仅 App 显示。实测音量减下一页、加上一页、菜单中不翻页。
+- A2-03 图标与启动画面：自适应图标（纸色 @color/ic_launcher_background + 书形矢量前景 drawable-v24/ic_launcher_foreground.xml）+ API24/25 位图兜底（PIL 生成圆角方形/圆形）；启动画面改 Theme.SplashScreen 正确属性（纸色底 + drawable/ic_splash 矢量书形），实测冷启动纸色卡片+书形图标无白屏。
+- 自动检查：lint / 372 单测 / build 全通过；APK 构建+安装通过。
+- 待手动验证：真实文件管理器/微信/QQ 的 content:// 打开与分享、桌面图标显示、EXTRA_TEXT 纯文本分享落地粘贴页。
+
+## Android A3 签名发布（2026-10-10，Devin，真机验收）
+
+- 签名：keystore 在仓库外 `D:\Android\keystore\jingye-release.keystore`（CN=Jingye Reader，SHA-256 证书 `c666e187…e22949`）；`android/app/build.gradle` 从 `android/keystore.properties` 读签名（该文件与 `*.keystore`、`release/` 均已 gitignore）。密码仅存于本机属性文件，未入对话与仓库。
+- 产物：`release/jingye-reader-1.0.0.apk`（6.5MB，APK SHA-256 `397721f5…c4b6b0`）；包名 `dev.jingye.reader`，versionCode 2 / versionName 1.0.0（versionCode 1 为内部构建，仅用于升级测试），minSdk 24 / targetSdk 36。
+- 验证：`apksigner verify` 通过；`aapt dump permissions` 确认无 INTERNET。荣耀侧载弹安全确认（预期），勾选后正常安装启动。
+- 升级与数据保留：code 1 → code 2 同签名 `install -r` 成功；升级前写入的「墨黑夜读」设置在升级后保留，直入书架无引导——IndexedDB 数据完整。最终发布包重载后手机上运行的即发布文件。
+- 注意：release 构建的 WebView 不可远程调试（CDP 无响应），真机验证以 `input tap` + 截图进行；后续真机回归用 debug 包。
+- 未完成：GitHub Releases 发布待 `gh auth` 与用户确认；签名密钥两份离线备份需用户执行；A1-06 全量回归继续观察。

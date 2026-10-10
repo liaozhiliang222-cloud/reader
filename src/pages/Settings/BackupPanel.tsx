@@ -11,6 +11,7 @@ import {
   type BackupProgress,
 } from '@/backup/types';
 import { downloadBlob, shareBlob } from '@/app/files';
+import { isNativeApp } from '@/app/platform';
 import { settings } from '@/app/settings';
 import { markBackupSaved } from '@/db/backupReminder';
 import { Modal } from '@/components/Modal';
@@ -120,11 +121,15 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
     void run(async () => {
       if (!generated) return;
       if (share) await shareBlob(generated.blob, generated.name);
-      else downloadBlob(generated.blob, generated.name);
+      else await downloadBlob(generated.blob, generated.name);
       const value = await markBackupSaved(generated.exportedAt);
       if (live.current) {
         settings.value = value;
-        setMessage('已交给浏览器保存，请确认备份文件已保存。');
+        setMessage(
+          isNativeApp
+            ? '备份已保存到所选位置。'
+            : '已交给浏览器保存，请确认备份文件已保存。',
+        );
       }
     });
   const restore = () =>
@@ -195,7 +200,7 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
             <button disabled={busy} onClick={() => saveFile(false)}>
               下载备份
             </button>
-            {typeof navigator.share === 'function' && (
+            {(typeof navigator.share === 'function' || isNativeApp) && (
               <button disabled={busy} onClick={() => saveFile(true)}>
                 分享备份
               </button>

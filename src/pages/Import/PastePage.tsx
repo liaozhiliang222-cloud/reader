@@ -156,9 +156,9 @@ export function PastePage({
               placeholder="留空时使用正文第一行"
             />
           </label>
-          <fieldset class="draft-format" disabled={busy}>
+          <fieldset class="segmented" disabled={busy}>
             <legend>正文格式</legend>
-            <div class="draft-format-options">
+            <div class="segmented-options">
               <label>
                 <input
                   type="radio"

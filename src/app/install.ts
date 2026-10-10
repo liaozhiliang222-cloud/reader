@@ -1,5 +1,6 @@
 import { signal } from '@preact/signals';
 import { listenMedia, mediaState, type MediaState } from './media';
+import { isNativeApp } from './platform';
 
 interface InstallPrompt extends Event {
   prompt(): Promise<unknown>;
@@ -101,6 +102,15 @@ export function createInstallController(
 }
 let controller: ReturnType<typeof createInstallController> | undefined;
 export function startInstall() {
+  if (isNativeApp) {
+    installState.value = {
+      available: false,
+      installed: true,
+      pending: false,
+      message: '',
+    };
+    return;
+  }
   controller ??= createInstallController(
     window,
     mediaState('(display-mode: standalone)'),

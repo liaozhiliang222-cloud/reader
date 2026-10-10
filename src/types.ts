@@ -80,6 +80,8 @@ export interface ReadingSettings {
   showHeaderFooter: boolean;
   wakeLock: 'off' | 'idle5m' | 'always';
   quietHint: boolean;
+  /** 音量键翻页；仅安卓 App 生效，默认关闭 */
+  volumeKeys?: boolean;
 }
 export interface AppSettings {
   shelfSort: 'recent' | 'imported' | 'title';

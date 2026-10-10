@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { environment } from '@/app/environment';
 import { installState, requestInstall } from '@/app/install';
+import { isNativeApp } from '@/app/platform';
 import { settings } from '@/app/settings';
 import { saveSettings } from '@/db/settings';
 import { EnvironmentNotice } from '@/components/EnvironmentNotice';
 
-const titles = ['你的书只在这台设备上', '添加到主屏幕', '读书时，打开勿扰模式'];
+const titles = isNativeApp
+  ? ['你的书只在这台设备上', '从网页版迁移数据', '读书时，打开勿扰模式']
+  : ['你的书只在这台设备上', '添加到主屏幕', '读书时，打开勿扰模式'];
 export function Onboarding({
   first = false,
   onDone,
@@ -61,14 +64,32 @@ export function Onboarding({
             width="72"
             height="72"
           />
-          <p>书籍、进度与笔记只保存在当前浏览器，不需要注册。</p>
+          {isNativeApp ? (
+            <>
+              <p>书籍、进度与笔记只保存在这台设备上，不需要注册。</p>
+              <p>卸载应用会删除它们。请在“设置 → 备份与恢复”中定期导出。</p>
+            </>
+          ) : (
+            <>
+              <p>书籍、进度与笔记只保存在当前浏览器，不需要注册。</p>
+              <p>
+                清除浏览器数据或系统回收空间可能删除它们。请在“设置 →
+                备份与恢复”中定期导出，并保存到浏览器之外。
+              </p>
+            </>
+          )}
+        </>
+      )}
+      {step === 1 && isNativeApp && (
+        <>
+          <p>App 与网页版的书籍互不相通，各存各的。</p>
           <p>
-            清除浏览器数据或系统回收空间可能删除它们。请在“设置 →
-            备份与恢复”中定期导出，并保存到浏览器之外。
+            如果你在用网页版静页：在网页版“设置 → 备份与恢复”中导出完整备份，
+            再回到这里“设置 → 备份与恢复”选择该文件恢复。
           </p>
         </>
       )}
-      {step === 1 && (
+      {step === 1 && !isNativeApp && (
         <>
           {install.installed ? (
             <p>已安装，可从主屏幕打开。</p>

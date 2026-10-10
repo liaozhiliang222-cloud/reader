@@ -58,6 +58,7 @@
 .reader-content[data-format='markdown'] [data-preformatted] {
   padding: 0.6em;
   border: 1px solid var(--line);
+  border-radius: 4px;
   text-align: left;
   overflow-wrap: anywhere;
   hyphens: none;
@@ -77,8 +78,6 @@
 }
 .reader-content a[data-md-link] {
   display: inline;
-  min-width: 44px;
-  min-height: 44px;
   max-width: 100%;
   padding: calc((44px - 1em) / 2);
   border: 0;
@@ -86,35 +85,11 @@
   color: var(--accent);
   font: inherit;
   text-decoration: underline;
+  text-underline-offset: 3px;
   text-align: inherit;
   line-height: max(44px, 1.8em);
   cursor: pointer;
   overflow-wrap: anywhere;
-}
-.draft-format {
-  border: 1px solid var(--line);
-  padding: 8px 12px;
-  margin: 0;
-}
-.draft-format-options {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.draft-format label {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  gap: 8px;
-  white-space: nowrap;
-}
-.paste-page .draft-format input[type='radio'] {
-  width: 18px;
-  height: 18px;
-  min-height: 18px;
-  flex-shrink: 0;
-  padding: 0;
-  border: 0;
 }
 .import-button {
   margin-top: 28px;

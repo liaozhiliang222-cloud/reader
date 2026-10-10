@@ -38,7 +38,9 @@ test('线上 HTTPS：真实 Worker/IDB、进度书签重载；Chromium 断网重
     workers.some((url) => url.startsWith(`${origin}/assets/parse.worker-`)),
   ).toBe(true);
   await expect
-    .poll(() => page.evaluate(() => !!navigator.serviceWorker.controller))
+    .poll(() => page.evaluate(() => !!navigator.serviceWorker.controller), {
+      timeout: 60_000,
+    })
     .toBe(true);
   const sw = await page.evaluate(async () => {
     const registration = await navigator.serviceWorker.ready;

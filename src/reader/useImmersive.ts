@@ -1,25 +1,34 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { ReaderWakeLock } from './WakeLock';
+import { ReaderWakeLock, type ScreenLock } from './WakeLock';
+import { isNativeApp, nativeApp, nativeImmersive } from '@/app/platform';
 import type { ReadingSettings } from '@/types';
 export function useImmersive(mode: ReadingSettings['wakeLock']) {
   const [wakeStatus, setWakeStatus] = useState('');
   const [fullscreen, setFullscreen] = useState(!!document.fullscreenElement);
   const controller = useRef<ReaderWakeLock | undefined>(undefined);
   useEffect(() => {
-    const lock = new ReaderWakeLock(
-      () =>
-        navigator.wakeLock?.request('screen') ??
-        Promise.reject(new Error('Unsupported')),
-      (status) =>
-        setWakeStatus(
-          {
-            off: '',
-            active: '屏幕常亮中',
-            idle: '五分钟未操作，已恢复自动熄屏',
-            released: '常亮已由系统释放',
-            unavailable: '当前浏览器或系统未允许常亮',
-          }[status],
-        ),
+    const request = isNativeApp
+      ? async (): Promise<ScreenLock> => {
+          try {
+            return await navigator.wakeLock!.request('screen');
+          } catch {
+            const native = await nativeApp();
+            return native.nativeScreenLock();
+          }
+        }
+      : () =>
+          navigator.wakeLock?.request('screen') ??
+          Promise.reject(new Error('Unsupported'));
+    const lock = new ReaderWakeLock(request, (status) =>
+      setWakeStatus(
+        {
+          off: '',
+          active: '屏幕常亮中',
+          idle: '五分钟未操作，已恢复自动熄屏',
+          released: '常亮已由系统释放',
+          unavailable: '当前浏览器或系统未允许常亮',
+        }[status],
+      ),
     );
     controller.current = lock;
     lock.setVisible(document.visibilityState === 'visible');
@@ -41,14 +50,26 @@ export function useImmersive(mode: ReadingSettings['wakeLock']) {
       document.removeEventListener('pointerdown', activity);
       document.removeEventListener('keydown', activity);
       document.removeEventListener('fullscreenchange', change);
+      if (isNativeApp)
+        void nativeApp()
+          .then((native) => native.setImmersive(false))
+          .catch(() => {});
       if (document.fullscreenElement)
         void document.exitFullscreen().catch(() => {});
     };
   }, []);
   useEffect(() => controller.current?.setMode(mode), [mode]);
-  return { wakeStatus, fullscreen };
+  return {
+    wakeStatus,
+    fullscreen: isNativeApp ? nativeImmersive.value : fullscreen,
+  };
 }
 export async function toggleFullscreen() {
+  if (isNativeApp) {
+    const native = await nativeApp();
+    await native.setImmersive(!nativeImmersive.value);
+    return;
+  }
   if (document.fullscreenElement) {
     await document.exitFullscreen();
     return;
@@ -61,6 +82,11 @@ export async function toggleFullscreen() {
   await document.documentElement.requestFullscreen();
 }
 export function tryReaderFullscreen() {
+  if (isNativeApp) {
+    if (navigator.userActivation?.isActive && !nativeImmersive.value)
+      void nativeApp().then((native) => native.setImmersive(true));
+    return;
+  }
   if (
     /Android/i.test(navigator.userAgent) &&
     navigator.userActivation?.isActive &&

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { trackNavPush } from './platform/nav';
 
 export type Route =
   | { page: 'shelf' }
@@ -33,7 +34,11 @@ export function navigate(hash: string, replace = false) {
   if (replace) {
     history.replaceState(null, '', hash);
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-  } else location.hash = hash;
+  } else {
+    if (location.hash === hash) return;
+    trackNavPush();
+    location.hash = hash;
+  }
 }
 export function useRoute() {
   const [route, setRoute] = useState(() => parseRoute(location.hash));

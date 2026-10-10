@@ -14,6 +14,7 @@ export const defaultReading: Readonly<ReadingSettings> = Object.freeze({
   showHeaderFooter: true,
   wakeLock: 'off',
   quietHint: true,
+  volumeKeys: false,
 });
 export function initialSettings(): AppSettings {
   return {

@@ -2,6 +2,25 @@ import { expect, it } from 'vitest';
 import { validateBackup, parseBackupJson, validateReading } from './validate';
 import { newest } from './merge';
 import { fixturePayload } from './fixtures';
+it('音量键设置可随备份恢复，旧备份默认关闭，非法值拒绝', async () => {
+  const { backup } = await fixturePayload();
+  const restored = validateBackup({
+    ...backup,
+    settings: { reading: { volumeKeys: true } },
+    books: backup.books.map((book) => ({
+      ...book,
+      settingsOverride: { volumeKeys: true },
+    })),
+  });
+  expect(restored.settings.reading.volumeKeys).toBe(true);
+  expect(restored.books[0]!.settingsOverride?.volumeKeys).toBe(true);
+  expect(parseBackupJson(JSON.stringify(restored))).toEqual(restored);
+  expect(
+    validateBackup({ ...backup, settings: { reading: {} } }).settings.reading
+      .volumeKeys,
+  ).toBe(false);
+  expect(() => validateReading({ volumeKeys: 'true' })).toThrow('volumeKeys');
+});
 it('关闭提醒只作用于记录的周期，备份白名单保留时间和周期，非法值拒绝', async () => {
   const { backup } = await fixturePayload();
   const result = validateBackup({

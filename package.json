@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:android": "tsc --noEmit && vite build --mode android && cap sync android",
     "preview": "vite preview",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
@@ -34,6 +35,8 @@
     "check:markdown-v2": "pnpm build && playwright test --config playwright.markdown-v2.config.ts"
   },
   "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
     "@preact/signals": "^2.11.3",
     "@xmldom/xmldom": "^0.9.12",
     "comlink": "^4.4.2",
@@ -48,6 +51,8 @@
     "preact": "^11.0.0"
   },
   "devDependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/cli": "8.5.3",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@preact/preset-vite": "^2.10.6",

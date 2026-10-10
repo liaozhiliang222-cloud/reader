@@ -15,6 +15,7 @@ import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { EnvironmentNotice } from '@/components/EnvironmentNotice';
 import { OptionalFontPanel } from '@/components/OptionalFontPanel';
 import { useBackClose } from '@/app/useBackClose';
+import { isNativeApp } from '@/app/platform';
 
 export function SettingsPage({
   initialSection,
@@ -45,7 +46,7 @@ export function SettingsPage({
       .then(({ usage, quota, persisted }) => {
         setPersisted(persisted);
         setStorage(
-          `${usage === undefined ? '用量不可用' : `已用 ${(usage / 1024 / 1024).toFixed(1)} MB`}${quota === undefined ? '' : ` / 可用配额 ${(quota / 1024 / 1024).toFixed(1)} MB`} · ${persisted === undefined ? '持久化状态不可用' : persisted ? '已持久化' : '未持久化'}`,
+          `${usage === undefined ? '用量不可用' : `已用 ${(usage / 1024 / 1024).toFixed(1)} MB`}${quota === undefined ? '' : ` / 可用配额 ${(quota / 1024 / 1024).toFixed(1)} MB`} · ${isNativeApp ? '应用私有存储' : persisted === undefined ? '持久化状态不可用' : persisted ? '已持久化' : '未持久化'}`,
         );
       })
       .catch(() => setStorage('当前浏览器无法提供存储信息'));
@@ -137,7 +138,7 @@ export function SettingsPage({
         <section>
           <h3>本地存储</h3>
           <p>{storage}</p>
-          {persisted !== true && (
+          {persisted !== true && !isNativeApp && (
             <button
               disabled={busy}
               onClick={() =>
@@ -157,7 +158,9 @@ export function SettingsPage({
             </button>
           )}
           <p>
-            书籍和进度仅存于本机，清除浏览器数据会删除它们。持久化也不能替代备份。
+            {isNativeApp
+              ? '书籍和进度仅存于应用私有存储，卸载应用会删除它们。请定期导出备份。'
+              : '书籍和进度仅存于本机，清除浏览器数据会删除它们。持久化也不能替代备份。'}
           </p>
         </section>
         <section ref={backupSection} tabIndex={-1} aria-label="备份与恢复">
@@ -171,7 +174,10 @@ export function SettingsPage({
         </section>
         <section>
           <h3>清空数据</h3>
-          <p>删除这台浏览器中的书架、原文、进度、书签、划线笔记和设置。</p>
+          <p>
+            删除{isNativeApp ? '应用内' : '这台浏览器中'}
+            的书架、原文、进度、书签、划线笔记和设置。
+          </p>
           <button
             disabled={busy}
             onClick={() =>
@@ -192,35 +198,49 @@ export function SettingsPage({
         <h2>应用</h2>
         <section>
           <h3>离线与更新</h3>
-          <p>
-            {import.meta.env.DEV
-              ? '开发预览不启用离线缓存。安装与离线功能请使用正式构建。'
-              : pwaState.value.offlineReady
-                ? '应用资源已就绪，可离线打开。'
-                : '正在准备离线资源，请保持联网。'}
-          </p>
-          <label class="check-row">
-            <input
-              disabled={busy}
-              type="checkbox"
-              checked={settings.value.checkUpdates}
-              onChange={(e) =>
-                void save({ checkUpdates: e.currentTarget.checked })
-              }
-            />
-            自动检查应用更新
-          </label>
-          <p>
-            发现新版本后只在书架提示，点击更新才重新打开。关闭后静页不主动定时检查，浏览器仍可能检查应用资源。
-          </p>
-          <button
-            disabled={busy || pwaState.value.checking || import.meta.env.DEV}
-            onClick={() => void checkPwaUpdate()}
-          >
-            {pwaState.value.checking ? '正在检查…' : '检查更新'}
-          </button>
-          {pwaState.value.error && <p role="status">{pwaState.value.error}</p>}
-          {pwaState.value.available && <p>新版本已下载，返回书架即可更新。</p>}
+          {isNativeApp ? (
+            <p>
+              应用资源已内置在安装包中，可随时离线阅读。新版本通过应用更新提供。
+            </p>
+          ) : (
+            <>
+              <p>
+                {import.meta.env.DEV
+                  ? '开发预览不启用离线缓存。安装与离线功能请使用正式构建。'
+                  : pwaState.value.offlineReady
+                    ? '应用资源已就绪，可离线打开。'
+                    : '正在准备离线资源，请保持联网。'}
+              </p>
+              <label class="check-row">
+                <input
+                  disabled={busy}
+                  type="checkbox"
+                  checked={settings.value.checkUpdates}
+                  onChange={(e) =>
+                    void save({ checkUpdates: e.currentTarget.checked })
+                  }
+                />
+                自动检查应用更新
+              </label>
+              <p>
+                发现新版本后只在书架提示，点击更新才重新打开。关闭后静页不主动定时检查，浏览器仍可能检查应用资源。
+              </p>
+              <button
+                disabled={
+                  busy || pwaState.value.checking || import.meta.env.DEV
+                }
+                onClick={() => void checkPwaUpdate()}
+              >
+                {pwaState.value.checking ? '正在检查…' : '检查更新'}
+              </button>
+              {pwaState.value.error && (
+                <p role="status">{pwaState.value.error}</p>
+              )}
+              {pwaState.value.available && (
+                <p>新版本已下载，返回书架即可更新。</p>
+              )}
+            </>
+          )}
         </section>
         <section>
           <h3>使用引导</h3>

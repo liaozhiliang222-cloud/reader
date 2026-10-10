@@ -18,6 +18,8 @@ import { installFileConsumer, type LaunchHost } from './fileLaunch';
 import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { restoreOptionalFont } from './optionalFont';
 import { AboutPage } from '@/pages/About/AboutPage';
+import { isNativeApp, nativeApp } from './platform';
+import type { IncomingData } from './incomingData';
 
 export function App() {
   const route = useRoute();
@@ -34,23 +36,42 @@ export function App() {
   }, [ready, checkUpdates]);
   useEffect(() => {
     if (!ready) return;
-    installFileConsumer(
-      window as Window & LaunchHost,
-      async (data) => {
-        const id = crypto.randomUUID();
-        await incomingStore().put(id, data);
-        incomingChanged();
-        const current = parseRoute(location.hash);
-        if (current.page !== 'incoming' && current.page !== 'paste')
-          navigate('#/incoming/' + id);
-      },
-      () => setError('未能接收系统打开的文件，请从书架重新选择。'),
+    const deliver = async (data: IncomingData) => {
+      const id = crypto.randomUUID();
+      await incomingStore().put(id, data);
+      incomingChanged();
+      const current = parseRoute(location.hash);
+      if (current.page !== 'incoming' && current.page !== 'paste')
+        navigate('#/incoming/' + id);
+    };
+    installFileConsumer(window as Window & LaunchHost, deliver, () =>
+      setError('未能接收系统打开的文件，请从书架重新选择。'),
     );
+    if (!isNativeApp) return;
+    // App：接管返回键、处理冷启动/热启动传入的文件。
+    let disposeIncoming: (() => void) | undefined;
+    let cancelled = false;
+    void nativeApp().then((native) => {
+      if (cancelled) return;
+      void native.cleanupServiceWorkers();
+      native.installBackButton();
+      disposeIncoming = native.listenIncoming(deliver, () =>
+        setError('未能接收系统打开的文件，请从书架重新选择。'),
+      );
+      void native
+        .launchIncoming()
+        .then((data) => (data ? deliver(data) : undefined))
+        .catch(() => setError('未能接收系统打开的文件，请从书架重新选择。'));
+    });
+    return () => {
+      cancelled = true;
+      disposeIncoming?.();
+    };
   }, [ready]);
   useEffect(() => {
     let cancelled = false;
     const hash = location.hash;
-    void requestPersistence();
+    if (!isNativeApp) void requestPersistence();
     void restoreOptionalFont();
     void loadStartup(hash)
       .then((value) => {

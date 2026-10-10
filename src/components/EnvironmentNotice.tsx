@@ -2,12 +2,14 @@ import { useState } from 'preact/hooks';
 import { environment } from '@/app/environment';
 import { settings } from '@/app/settings';
 import { saveSettings } from '@/db/settings';
+import { isNativeApp } from '@/app/platform';
 
 export function EnvironmentNotice() {
   const { inApp, ios, olderIos } = environment();
   // 按提示内容记忆关闭状态：换到另一种受限环境时仍会提示一次。
   const kind = inApp ? `inApp:${inApp}` : olderIos ? 'olderIos' : undefined;
   const [dismissed, setDismissed] = useState(false);
+  if (isNativeApp) return null;
   if (!kind || dismissed || settings.value.environmentNoticeDismissed === kind)
     return null;
   return (

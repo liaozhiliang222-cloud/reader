@@ -25,3 +25,15 @@ artifacts/pagination-mutation-report.json
 .review/
 artifacts/*
 !artifacts/.gitkeep
+
+# Android 签名材料（本地文件，绝不入库）
+android/keystore.properties
+*.keystore
+*.jks
+
+# 发布产物
+release/
+*.apk
+*.aab
+*.pem
+*.p12
