@@ -15,7 +15,10 @@ export default defineConfig(({ mode }) => ({
           ).match(/versionName "([^"]+)"/)?.[1]
         : mode === 'ios'
           ? readFileSync(
-              new URL('./ios/App/App.xcodeproj/project.pbxproj', import.meta.url),
+              new URL(
+                './ios/App/App.xcodeproj/project.pbxproj',
+                import.meta.url,
+              ),
               'utf8',
             ).match(/MARKETING_VERSION = ([^;]+);/)?.[1]
           : JSON.parse(
