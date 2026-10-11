@@ -7,6 +7,7 @@ export default tseslint.config(
     ignores: [
       'dist/**',
       'android/**',
+      'ios/**',
       'coverage/**',
       'node_modules/**',
       'test-books/**',

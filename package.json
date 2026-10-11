@@ -11,6 +11,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "build:android": "tsc --noEmit && vite build --mode android && cap sync android",
+    "build:ios": "tsc --noEmit && vite build --mode ios && cap sync ios",
     "preview": "vite preview",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
@@ -53,6 +54,7 @@
   "devDependencies": {
     "@capacitor/android": "8.5.3",
     "@capacitor/cli": "8.5.3",
+    "@capacitor/ios": "8.5.3",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@preact/preset-vite": "^2.10.6",
