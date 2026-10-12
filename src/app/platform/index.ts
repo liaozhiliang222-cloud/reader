@@ -4,9 +4,7 @@ import { Capacitor } from '@capacitor/core';
 /** 当前运行在 Capacitor 原生壳内（Android/iOS App），还是普通浏览器/PWA。 */
 export const isNativeApp = Capacitor.isNativePlatform();
 export const platformKind = Capacitor.getPlatform() as
-  | 'web'
-  | 'android'
-  | 'ios';
+  'web' | 'android' | 'ios';
 
 /** 原生沉浸模式状态（隐藏系统状态栏与导航栏）。 */
 export const nativeImmersive = signal(false);
