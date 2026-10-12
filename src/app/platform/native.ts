@@ -83,7 +83,9 @@ async function systemShareFile(blob: Blob, name: string): Promise<void> {
   });
   if (!navigator.canShare?.({ files: [file] }))
     throw new Error('当前系统不支持分享文件。');
-  await navigator.share({ files: [file], title: name });
+  // iOS 会把 title 当成第二个分享条目（落出一个只含文件名的 text.txt），
+  // 文件名已经在 File 上，分享时不再附带 title。
+  await navigator.share({ files: [file] });
 }
 
 export async function saveFile(blob: Blob, name: string): Promise<void> {
