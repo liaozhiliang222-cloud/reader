@@ -85,14 +85,13 @@ export async function decodeIncoming(record: unknown): Promise<IncomingData> {
       ? (record.value as { names?: unknown }).names
       : undefined;
   if (Array.isArray(names))
-    parsed.files = parsed.files.map(
-      (file, index) =>
-        typeof names[index] === 'string' && names[index]
-          ? new File([file], names[index], {
-              type: file.type,
-              lastModified: file.lastModified,
-            })
-          : file,
+    parsed.files = parsed.files.map((file, index) =>
+      typeof names[index] === 'string' && names[index]
+        ? new File([file], names[index], {
+            type: file.type,
+            lastModified: file.lastModified,
+          })
+        : file,
     );
   return parsed;
 }
