@@ -76,6 +76,21 @@ it('保留大小写敏感multipart边界，不依赖Blob.type的自动小写', a
   } as { id: string; data: Blob });
   expect((await store.get(id)).text).toBe('字节保真');
 });
+it('非 ASCII 文件名以占位名存储、读回恢复原名（WKWebView multipart quirk）', async () => {
+  const data = sample();
+  await store.put(id, data);
+  const record = (await database.blobs.get('incoming:%2Freader%2F:' + id)) as {
+    data: Blob;
+  };
+  const body = await record.data.text();
+  // WKWebView 把非 ASCII 文件名编成 filename*= 且解析不回，存储必须用占位名。
+  expect(body).not.toContain('分享.txt');
+  expect(body).toContain('file-0');
+  const restored = await store.get(id);
+  expect(restored.files.map((file) => file.name)).toEqual(
+    data.files.map((file) => file.name),
+  );
+});
 it('失败写入不覆盖已有分享；清空七表同时清除暂存，单份删除不碰正式书原文', async () => {
   await store.put(id, sample());
   const write = vi
