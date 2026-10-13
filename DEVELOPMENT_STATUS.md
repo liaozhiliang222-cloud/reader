@@ -723,3 +723,12 @@
 - 升级与数据保留：code 1 → code 2 同签名 `install -r` 成功；升级前写入的「墨黑夜读」设置在升级后保留，直入书架无引导——IndexedDB 数据完整。最终发布包重载后手机上运行的即发布文件。
 - 注意：release 构建的 WebView 不可远程调试（CDP 无响应），真机验证以 `input tap` + 截图进行；后续真机回归用 debug 包。
 - 未完成：GitHub Releases 发布待 `gh auth` 与用户确认；签名密钥两份离线备份需用户执行；A1-06 全量回归继续观察。
+
+## iOS 听书 TTS（2026-10-12，Devin，模拟器验收）
+
+- 按 dIOS_TTS_PLAN 完成 iOS 离线听书，与安卓计划共享 SpeechBackend 协议（会话/批次 ≤128KiB·256 句/命令幂等/快照恢复）。
+- 原生层 ios/App/App/Speech/：JySpeechPlugin 桥 + SpeechController（单会话状态机、代际标记回调、窗口化缓冲、monotonic 定时、打断拔线只暂停）+ SpeechQueueStore（批次幂等校验、excludeFromBackup、64MiB 上限）+ SpeechAudioSession + SpeechRemoteControls；ReaderBridgeViewController 注册插件；Info.plist UIBackgroundModes audio。
+- Web 层：src/reader/speech/（分句、章节抽取含 sourceRanges UTF-16 映射、组批、高亮标记）、src/app/speech/coordinator.ts（状态机+唯一进度写方+手动翻页暂停+删书/还原前停止）、SpeechBar（控制+语速 0.75–2×+定时含读完本章+语音中/英/其他分组）、阅读页「更多」入口。
+- 验证：lint/test(+18)/build/build:ios 全过；xcodebuild 模拟器 Debug 与 iphoneos Release 均过；iPhone 17 模拟器端到端验收全过（入口/控制/高亮跟随/翻页暂停/后台播放至章末/选项面板/分组/删书），修复面板溢出（.speech-more 限高可滚）；PR #3。
+- 产物：reader-ios-unsigned.ipa（含 TTS），Sideloadly 自签安装。
+- 真机待验：锁屏/控制中心媒体键、可闻音频、来电/拔耳机打断、长队列耗时。
