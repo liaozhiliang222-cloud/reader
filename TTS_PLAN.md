@@ -5,7 +5,7 @@
 > 开发前基线：Android 1.0.1（versionCode 4），minSdk 24 / targetSdk 36。现已增加 TTS 服务、媒体会话与听书 UI，测试包 versionCode 5；已有 Android 验收缺项见 `DEVELOPMENT_STATUS.md`，不能按代码完成推断全部机型通过。
 > 范围：首先交付安卓本地听书；锁屏续读须通过真机门槛。静页不上传正文，只调用标记为无需联网且已安装的系统语音，独立引擎的隐私边界见第 2 节。
 > 任务卡格式、复杂度定义与工作流沿用 `DEV_PLAN.md` 第 0 章。
-> iOS 原生 App 已有独立的 [iOS 听书开发计划](./IOS_TTS_PLAN.md)，复用本文公共协议和文本规则；本文 T3 只指 Safari 等浏览器及 PWA，不代表原生 iOS 只能前台朗读。
+> iOS 原生 App 已有独立的本地规划 `IOS_TTS_PLAN.md`（本次仅上传安卓更新，该文档保留在本地），复用本文公共协议和文本规则；本文 T3 只指 Safari 等浏览器及 PWA，不代表原生 iOS 只能前台朗读。
 
 ---
 

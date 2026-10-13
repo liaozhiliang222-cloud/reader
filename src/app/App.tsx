@@ -18,7 +18,7 @@ import { installFileConsumer, type LaunchHost } from './fileLaunch';
 import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { restoreOptionalFont } from './optionalFont';
 import { AboutPage } from '@/pages/About/AboutPage';
-import { isNativeApp, nativeApp } from './platform';
+import { isNativeApp, isAndroidApp, nativeApp } from './platform';
 import type { IncomingData } from './incomingData';
 import { validIncomingId } from './incomingData';
 import type { NativeImportProgress } from './platform/native';
@@ -74,7 +74,7 @@ export function App() {
         if (cancelled) return;
         void native.cleanupServiceWorkers();
         native.installBackButton();
-        disposeSpeechOpen = native.listenSpeechOpen();
+        if (isAndroidApp) disposeSpeechOpen = native.listenSpeechOpen();
         disposeIncoming = native.listenIncoming(deliver, fail, progress);
         const data = await native.launchIncoming(progress);
         if (data && !cancelled) await deliver(data);

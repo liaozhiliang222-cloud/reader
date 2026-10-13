@@ -15,7 +15,7 @@ import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { EnvironmentNotice } from '@/components/EnvironmentNotice';
 import { OptionalFontPanel } from '@/components/OptionalFontPanel';
 import { useBackClose } from '@/app/useBackClose';
-import { isNativeApp } from '@/app/platform';
+import { isNativeApp, isAndroidApp } from '@/app/platform';
 import { openSpeechSettings, resetSpeechData } from '@/app/speech/coordinator';
 
 export function SettingsPage({
@@ -75,7 +75,7 @@ export function SettingsPage({
         <h1>设置</h1>
       </header>
       <EnvironmentNotice />
-      {isNativeApp && (
+      {isAndroidApp && (
         <section class="settings-group">
           <h2>听书</h2>
           <p>

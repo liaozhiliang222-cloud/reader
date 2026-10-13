@@ -17,7 +17,7 @@ import { AnnotationMenu } from './AnnotationMenu';
 import { NoteEditor } from './NoteEditor';
 import { useAnnotations } from '@/reader/useAnnotations';
 import { toggleFullscreen, useImmersive } from '@/reader/useImmersive';
-import { isNativeApp, nativeApp } from '@/app/platform';
+import { isNativeApp, isAndroidApp, nativeApp } from '@/app/platform';
 import { addBookmark, listBookmarks, removeBookmark } from '@/db/bookmarks';
 import { QuietHint } from '@/components/QuietHint';
 import { TapHint } from '@/components/TapHint';
@@ -99,7 +99,7 @@ export function ReaderView({
     ['preparing', 'ready', 'speaking', 'paused'].includes(speech.status);
   const flushManual = useRef<() => Promise<void>>(async () => {});
   useEffect(() => {
-    if (isNativeApp) void connectSpeech();
+    if (isAndroidApp) void connectSpeech();
   }, []);
   const beginSpeech = async (engine: string, voice: string) => {
     const start = engineRef.current?.currentLocator;
@@ -722,7 +722,7 @@ export function ReaderView({
             )}
             {panel === 'more' && (
               <section class="more-panel" aria-label="更多">
-                {isNativeApp && (
+                {isAndroidApp && (
                   <button
                     onClick={() => {
                       setMenu(false);

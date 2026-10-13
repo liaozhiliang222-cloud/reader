@@ -10,7 +10,7 @@ import {
 } from '@/db/speech';
 import { settings } from '@/app/settings';
 import { saveSettings } from '@/db/settings';
-import { isNativeApp } from '@/app/platform';
+import { isAndroidApp } from '@/app/platform';
 import { prepareSpeech } from '@/reader/speech/batch';
 import { openEpubSpeechSource } from '@/reader/speech/epubSource';
 import {
@@ -126,9 +126,9 @@ async function syncNow() {
   if (inactive) await releaseOrphanedSpeech();
 }
 export const refreshSpeech = () =>
-  isNativeApp ? serial(syncNow).catch(showError) : Promise.resolve();
+  isAndroidApp ? serial(syncNow).catch(showError) : Promise.resolve();
 export async function connectSpeech() {
-  if (!isNativeApp || installed) return;
+  if (!isAndroidApp || installed) return;
   installed = true;
   try {
     const api = await backend();
@@ -365,7 +365,7 @@ export async function speechControl(
 }
 export async function manualSpeechNavigation(bookId: string) {
   if (
-    !isNativeApp ||
+    !isAndroidApp ||
     speechView.value.bookId !== bookId ||
     !['preparing', 'ready', 'speaking', 'paused'].includes(
       speechView.value.status,
@@ -383,7 +383,7 @@ export async function manualSpeechNavigation(bookId: string) {
   speechView.value = { ...speechView.value, detached: true };
 }
 export async function stopSpeech() {
-  if (!isNativeApp) return;
+  if (!isAndroidApp) return;
   preparation?.abort();
   if (preparedIdentity)
     await (await backend()).request('cancel', preparedIdentity).catch(() => {});
@@ -409,7 +409,7 @@ export async function stopSpeech() {
   });
 }
 export async function resetSpeechData(clearPreferences = false) {
-  if (!isNativeApp) return;
+  if (!isAndroidApp) return;
   await stopSpeech();
   await (await backend()).request('reset', { clearPreferences });
   seen = '';
