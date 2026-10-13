@@ -54,12 +54,12 @@ describe('听书准备组批', () => {
   it('从锚点起读：锚点前的句子不进入批次', async () => {
     chapters.set(0, chapterAt(0, ['甲。乙。丙。']));
     const backend = new FakeBackend();
-    const total = await prepareSpeech(book(1), backend, {
+    const result = await prepareSpeech(book(1), backend, {
       chapterIndex: 0,
       paragraphIndex: 0,
       charOffset: 2, // 在「乙。」中
     });
-    expect(total).toBe(2);
+    expect(result.total).toBe(2);
     expect(backend.batches.at(-1)!.sentences.map((s) => s.text)).toEqual([
       '乙。',
       '丙。',
@@ -72,12 +72,12 @@ describe('听书准备组批', () => {
     chapters.set(0, chapterAt(0, ['   ']));
     chapters.set(2, chapterAt(2, ['好。']));
     const backend = new FakeBackend();
-    const total = await prepareSpeech(book(3), backend, {
+    const result = await prepareSpeech(book(3), backend, {
       chapterIndex: 0,
       paragraphIndex: 0,
       charOffset: 0,
     });
-    expect(total).toBe(1);
+    expect(result.total).toBe(1);
     expect(backend.batches.at(-1)!.sentences[0]!.chapterIndex).toBe(2);
   });
 
@@ -85,11 +85,13 @@ describe('听书准备组批', () => {
     chapters.set(0, chapterAt(0, ['   ']));
     const backend = new FakeBackend();
     expect(
-      await prepareSpeech(book(1), backend, {
-        chapterIndex: 0,
-        paragraphIndex: 0,
-        charOffset: 0,
-      }),
+      (
+        await prepareSpeech(book(1), backend, {
+          chapterIndex: 0,
+          paragraphIndex: 0,
+          charOffset: 0,
+        })
+      ).total,
     ).toBe(0);
   });
 
@@ -97,12 +99,12 @@ describe('听书准备组批', () => {
     const many = Array.from({ length: 300 }, (_, i) => `句${i}。`);
     chapters.set(0, chapterAt(0, many));
     const backend = new FakeBackend();
-    const total = await prepareSpeech(book(1), backend, {
+    const result = await prepareSpeech(book(1), backend, {
       chapterIndex: 0,
       paragraphIndex: 0,
       charOffset: 0,
     });
-    expect(total).toBe(300);
+    expect(result.total).toBe(300);
     expect(backend.batches.length).toBe(2);
     expect(backend.batches[0]!.sentences).toHaveLength(256);
     expect(backend.batches[1]!.firstSentenceIndex).toBe(256);
@@ -139,5 +141,38 @@ describe('听书准备组批', () => {
     controller.abort();
     await expect(promise).rejects.toThrow();
     expect(backend.committed).toBe(-1);
+  });
+});
+
+describe('会话段预算', () => {
+  it('字节预算打满时提前收尾并给出下段锚点', async () => {
+    const many = Array.from({ length: 100 }, (_, i) => `句子内容${i}。`);
+    chapters.set(0, chapterAt(0, many));
+    const probeBackend = new FakeBackend();
+    // 估算单句成本后给一个只能容纳约一半的预算。
+    const probe = await prepareSpeech(
+      book(1),
+      probeBackend,
+      { chapterIndex: 0, paragraphIndex: 0, charOffset: 0 },
+      { byteBudget: 1 << 30 },
+    );
+    expect(probe.hasMore).toBe(false);
+    const per =
+      JSON.stringify(probeBackend.batches[0]!.sentences[0]).length + 64;
+    const backend2 = new FakeBackend();
+    const r = await prepareSpeech(
+      book(1),
+      backend2,
+      { chapterIndex: 0, paragraphIndex: 0, charOffset: 0 },
+      { byteBudget: per * 50 },
+    );
+    expect(r.hasMore).toBe(true);
+    expect(r.total).toBeLessThan(100);
+    expect(r.nextFrom).toBeDefined();
+    // 续段从下一段锚点起读，不漏不重。
+    const r2 = await prepareSpeech(book(1), new FakeBackend(), r.nextFrom!, {
+      byteBudget: 1 << 30,
+    });
+    expect(r2.total).toBe(100 - r.total);
   });
 });

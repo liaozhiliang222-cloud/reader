@@ -66,6 +66,17 @@ interface ActiveSession {
   chapters: Map<number, Promise<import('@/types').StoredChapter | undefined>>;
   abort: AbortController;
   unsubscribe: () => void;
+  /** 大书分段：本段是否提前收尾，下段起读锚点与原始选项。 */
+  hasMore?: boolean;
+  nextFrom?: Locator;
+  options?: {
+    book: Book;
+    from: Locator;
+    untilChapter?: number;
+    rate?: number;
+    voiceId?: string;
+    timer?: SpeechTimerMode;
+  };
 }
 
 let active: ActiveSession | null = null;
@@ -184,6 +195,17 @@ function applySnapshot(session: ActiveSession, snapshot: SpeechSnapshot) {
       speechActive.value = true;
       break;
     case 'ended':
+      if (session.hasMore && session.nextFrom && session.options) {
+        // 大书分段：段尾自动续备下一段，界面回到「准备中」。
+        const { book, nextFrom, options } = {
+          book: session.book,
+          nextFrom: session.nextFrom,
+          options: session.options,
+        };
+        teardown(session, false);
+        void startSpeech({ ...options, book, from: nextFrom });
+        break;
+      }
       speechUi.value = { phase: 'ended', total: snapshot.total };
       speechActive.value = false;
       break;
@@ -295,7 +317,7 @@ export async function startSpeech(options: {
     // 「读完本章」同时收窄预排范围：原生按边界停，队列也不越界。
     const untilChapter =
       options.timer === 'chapter' ? from.chapterIndex : options.untilChapter;
-    const total = await prepareSpeech(book, backend, from, {
+    const prepared = await prepareSpeech(book, backend, from, {
       signal: session.abort.signal,
       untilChapter,
       onProgress: (progress) => {
@@ -303,7 +325,11 @@ export async function startSpeech(options: {
           speechUi.value = { phase: 'preparing', progress };
       },
     });
-    session.total = total;
+    session.total = prepared.total;
+    session.hasMore = prepared.hasMore;
+    session.nextFrom = prepared.nextFrom;
+    session.options = options;
+    const total = prepared.total;
     if (active !== session) return;
     if (!total) {
       teardown(session, true);
