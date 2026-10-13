@@ -448,6 +448,9 @@
   color: var(--fg);
   text-align: center;
 }
+.toc-nav[hidden] {
+  display: none;
+}
 .toc-viewport {
   flex: 1;
   min-height: 0;

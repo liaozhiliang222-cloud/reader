@@ -13,16 +13,25 @@ export default defineConfig(({ mode }) => ({
             new URL('./android/app/build.gradle', import.meta.url),
             'utf8',
           ).match(/versionName "([^"]+)"/)?.[1]
-        : JSON.parse(
-            readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
-          ).version,
+        : mode === 'ios'
+          ? readFileSync(
+              new URL(
+                './ios/App/App.xcodeproj/project.pbxproj',
+                import.meta.url,
+              ),
+              'utf8',
+            ).match(/MARKETING_VERSION = ([^;]+);/)?.[1]
+          : JSON.parse(
+              readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+            ).version,
     ),
   },
   plugins: [
     productionSecurity(),
     preact(),
-    // 安卓 App 构建内嵌全部资源，不生成 Service Worker 与 manifest。
+    // 原生 App 构建内嵌全部资源，不生成 Service Worker 与 manifest。
     mode !== 'android' &&
+      mode !== 'ios' &&
       VitePWA({
         strategies: 'injectManifest',
         srcDir: 'src',

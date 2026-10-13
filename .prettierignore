@@ -35,4 +35,5 @@ artifacts/markdown-v2-deployment-results.json
 artifacts/deployment-history/
 artifacts/experience-browser-results.json
 android/
+ios/
 capacitor.config.json
