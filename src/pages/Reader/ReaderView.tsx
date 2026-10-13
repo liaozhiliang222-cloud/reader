@@ -235,6 +235,9 @@ export function ReaderView({
     let resizeFrame = 0;
     const persist = () => {
       clearTimeout(timer);
+      // 朗读中进度由听书协调器按句首写入；latest 停留在起读前，
+      // 此时落盘会覆盖语点，iOS 挂起中的 IndexedDB 事务还会误报失败。
+      if (speechActive.value && speechUi.value.phase === 'speaking') return;
       if (latest)
         void saveProgress(latest, book.contentRevision ?? 0).catch(() => {
           if (!disposed) setError('进度未能保存，请检查浏览器存储空间。');
@@ -514,7 +517,13 @@ export function ReaderView({
             },
           ],
     });
-    if (!engine.onCurrentPage(now.start)) engine.jump(now.start, false);
+    // 锚定句尾：长句尾部流出屏幕时也要翻页跟随（句长必有界，尾页含全句）。
+    const tail = {
+      chapterIndex: now.end.chapterIndex,
+      paragraphIndex: now.end.paragraphIndex,
+      charOffset: Math.max(0, now.end.charOffset - 1),
+    };
+    if (!engine.onCurrentPage(tail)) engine.jump(tail, false);
   }, [speech]);
   useEffect(() => {
     engineRef.current?.configure(reading);

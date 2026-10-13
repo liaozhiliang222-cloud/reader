@@ -85,32 +85,37 @@ function chapterOf(session: ActiveSession, index: number) {
   return entry;
 }
 
+function flushSave(session: ActiveSession) {
+  if (session.saveTimer) {
+    clearTimeout(session.saveTimer);
+    session.saveTimer = undefined;
+  }
+  const target = session.pendingLocator;
+  session.pendingLocator = undefined;
+  if (!target || active !== session) return;
+  const key = locatorKey(target);
+  if (key === session.savedKey) return;
+  session.savedKey = key;
+  void chapterOf(session, target.chapterIndex).then((chapter) => {
+    if (active !== session || !chapter) return;
+    const percent = percentOf(chapter, target, session.book.charCount);
+    void saveProgress(
+      {
+        bookId: session.book.id,
+        locator: target,
+        percent,
+        updatedAt: Date.now(),
+      },
+      session.book.contentRevision ?? 0,
+    ).catch(() => setNotice('进度未能保存，请检查本地存储。'));
+  });
+}
+
 /** 按句首写阅读进度；节流 800ms 保留最新。 */
 function persistLocator(session: ActiveSession, locator: Locator) {
   session.pendingLocator = locator;
   if (session.saveTimer) return;
-  session.saveTimer = setTimeout(() => {
-    session.saveTimer = undefined;
-    const target = session.pendingLocator;
-    session.pendingLocator = undefined;
-    if (!target || active !== session) return;
-    const key = locatorKey(target);
-    if (key === session.savedKey) return;
-    session.savedKey = key;
-    void chapterOf(session, target.chapterIndex).then((chapter) => {
-      if (active !== session || !chapter) return;
-      const percent = percentOf(chapter, target, session.book.charCount);
-      void saveProgress(
-        {
-          bookId: session.book.id,
-          locator: target,
-          percent,
-          updatedAt: Date.now(),
-        },
-        session.book.contentRevision ?? 0,
-      ).catch(() => setNotice('进度未能保存，请检查本地存储。'));
-    });
-  }, 800);
+  session.saveTimer = setTimeout(() => flushSave(session), 800);
 }
 
 export function setNotice(message: string) {
@@ -248,9 +253,18 @@ export async function startSpeech(options: {
     abort: new AbortController(),
     unsubscribe: () => {},
   };
-  session.unsubscribe = backend.on((event) =>
+  const offState = backend.on((event) =>
     applySnapshot(session, event.snapshot),
   );
+  // 切入后台立即落盘最新语点；800ms 节流在 iOS 挂起后不再可靠。
+  const onHide = () => {
+    if (document.visibilityState === 'hidden') flushSave(session);
+  };
+  document.addEventListener('visibilitychange', onHide);
+  session.unsubscribe = () => {
+    offState();
+    document.removeEventListener('visibilitychange', onHide);
+  };
   active = session;
   speechUi.value = {
     phase: 'preparing',
