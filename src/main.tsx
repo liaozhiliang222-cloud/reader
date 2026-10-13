@@ -6,6 +6,7 @@ import '@/styles/reader.css';
 import '@/styles/settings.css';
 import '@/styles/import.css';
 import '@/styles/onboarding.css';
+import '@/styles/speech.css';
 import '@/styles/motion.css';
 import { startInstall } from '@/app/install';
 

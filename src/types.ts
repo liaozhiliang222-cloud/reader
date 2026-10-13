@@ -83,6 +83,11 @@ export interface ReadingSettings {
   /** 音量键翻页；仅安卓 App 生效，默认关闭 */
   volumeKeys?: boolean;
 }
+/** 听书偏好：语速/定时随设置进入备份；设备语音 id 仅存本机不进备份。 */
+export interface SpeechSettings {
+  rate: number;
+  timer: 'off' | '15m' | '30m' | '60m' | 'chapter';
+}
 export interface AppSettings {
   shelfSort: 'recent' | 'imported' | 'title';
   reading: ReadingSettings;
@@ -95,6 +100,7 @@ export interface AppSettings {
   backupReminderDismissed?: { baseline: number; cycle: number };
   environmentNoticeDismissed?: string;
   tapHintSeen?: boolean;
+  speech?: SpeechSettings;
 }
 export interface Progress {
   bookId: string;

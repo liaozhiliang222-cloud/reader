@@ -165,6 +165,21 @@ function readSettings(value: unknown): AppSettings {
       cycle: number(dismissed.cycle, '提醒周期'),
     };
   }
+  if (data.speech !== undefined) {
+    const speech = record(data.speech, '听书偏好');
+    result.speech = { rate: 1, timer: 'off' };
+    if (speech.rate !== undefined)
+      result.speech.rate = Math.min(
+        2,
+        Math.max(0.75, number(speech.rate, '听书语速')),
+      );
+    if (speech.timer !== undefined)
+      result.speech.timer = choice(
+        speech.timer,
+        ['off', '15m', '30m', '60m', 'chapter'],
+        '听书定时',
+      );
+  }
   return result;
 }
 function readBook(value: unknown): BackupBook {

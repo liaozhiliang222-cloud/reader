@@ -9,6 +9,11 @@ const paths = {
   exitFullscreen: 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5',
   more: 'M6 12h.01M12 12h.01M18 12h.01',
   done: 'M5 12l5 5 9-10',
+  play: 'M8 5l11 7-11 7z',
+  pause: 'M8 5h3v14H8zM13 5h3v14h-3z',
+  stop: 'M6 6h12v12H6z',
+  listen:
+    'M4 14a8 8 0 0 1 16 0M4 14v4a2 2 0 0 0 2 2h1v-6H5M20 14v4a2 2 0 0 1-2 2h-1v-6h2',
 } as const;
 export type IconName = keyof typeof paths;
 

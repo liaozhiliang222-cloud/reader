@@ -80,6 +80,9 @@ export const restoreFromBackup = async (
   signal?: AbortSignal,
 ) => {
   signal?.throwIfAborted();
+  // 恢复前先停止原生听书会话，旧会话回调不得落进新数据。
+  const { stopSpeech } = await import('@/app/speech/coordinator');
+  await stopSpeech();
   const controller = new AbortController();
   const abort = () => controller.abort();
   signal?.addEventListener('abort', abort, { once: true });

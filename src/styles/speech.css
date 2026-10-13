@@ -1,0 +1,124 @@
+/* 听书播放条与当前句高亮：沿用纸感主题变量，底部安全区留空。 */
+
+.speech-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  color: var(--fg);
+  border-top: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  box-shadow: 0 -4px 16px rgb(0 0 0 / 0.06);
+  -webkit-tap-highlight-color: transparent;
+}
+.speech-bar-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 0;
+  min-height: 44px;
+}
+.speech-info {
+  flex: 1;
+  min-width: 0;
+}
+.speech-title {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.speech-timer {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+.speech-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.speech-controls .icon-button,
+.speech-more button,
+.speech-resume-row .text-button,
+.speech-stop {
+  min-width: 44px;
+  min-height: 44px;
+}
+.speech-play {
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.speech-stop {
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  padding: 0 12px;
+}
+.speech-resume-row {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px 8px;
+}
+.speech-more {
+  padding: 4px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.speech-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.speech-option > span {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  padding-top: 10px;
+  min-width: 4em;
+}
+.speech-rate,
+.speech-voices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+.speech-rate button,
+.speech-voices button {
+  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  border-radius: 8px;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0 12px;
+}
+.speech-rate button[aria-pressed='true'],
+.speech-voices button[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: var(--fg);
+}
+.speech-voice-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* 正在朗读的句子：淡色底，不遮挡注记 mark。 */
+mark[data-jingye-speech] {
+  background: color-mix(in srgb, var(--fg) 12%, transparent);
+  color: inherit;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .speech-bar {
+    box-shadow: none;
+  }
+}

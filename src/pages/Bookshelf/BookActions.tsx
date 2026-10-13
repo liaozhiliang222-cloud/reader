@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { countAnnotations, deleteBook, renameBook } from '@/db/repository';
+import { speechBookRemoved } from '@/app/speech/coordinator';
 import { navigate } from '@/app/router';
 import type { Book } from '@/types';
 
@@ -169,7 +170,13 @@ export function BookActions({
             </button>
             <button
               disabled={busy || !counts}
-              onClick={() => void commit(() => deleteBook(book.id))}
+              onClick={() =>
+                void commit(() => {
+                  // 删除前先结束该书听书会话并作废旧回调。
+                  speechBookRemoved(book.id);
+                  return deleteBook(book.id);
+                })
+              }
             >
               确认删除
             </button>
