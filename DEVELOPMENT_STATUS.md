@@ -8,8 +8,9 @@
 - 修复为原生按批 GZIP 私有落盘，按实际文件与清单占用限制 64 MiB；桥消息仍不超过 128 KiB/256 句、最多 10000 批次，SHA 校验后有界解压且只缓存一批。传输协议、原文、定位与完整剩余章节不改变，锁屏仍不靠 JS 补货；旧未压缩格式可读，无新增运行依赖。
 - 旧代码的回归先失败，修复后通过；原生原创 204800 句累计 JSON 78438002 字节，实际批次缓存 2963092 字节，跨批/章定位、重开与清理通过。新增旧格式读取/重复 ACK 与解压超限回归通过，产品 JVM 共 24 项；准备逻辑专项 7 项通过。
 - 完整 lint、95 文件 / 435 单测、strict 网页/Android 构建、产品 JVM 24 项、Gradle lintRelease/assembleRelease/assembleReleaseAndroidTest，以及双浏览器听书专项 4 项全部通过。实际问题的纯逻辑回归先失败、修复后通过，不重新做用户已放宽的长时锁屏测试。
-- 修复包 `release/jingye-reader-1.1.1-preview.apk`，code6 / 1.1.1-preview，6475886 字节，SHA `b97860f2304da586ee2784fb87f165408c27e0ac0922ea20f9cfc93e93b62020`；原证书 `c666e187…22949`，Manifest/全部 DEX/网页资源隔离与无 INTERNET 检查通过。手机仍未连接 ADB，未覆盖安装或冒充本轮真机检查通过；用户可直接同签名覆盖安装，保留数据。
-- 本次补丁继续更新现有 PR #4（`codex/android-tts`），没有合并 main、部署网页或公开发布 APK。此前 82be3e8 的 push/PR 两轮 checks/android CI 均通过；本次新提交的 CI 独立运行。交付时撤销构建 J: 临时映射。
+- 修复包 `release/jingye-reader-1.1.1-preview.apk`，code6 / 1.1.1-preview，6475886 字节，SHA `b97860f2304da586ee2784fb87f165408c27e0ac0922ea20f9cfc93e93b62020`；原证书 `c666e187…22949`，Manifest/全部 DEX/网页资源隔离与无 INTERNET 检查通过。用户重新连接后，16:25 已同签名覆盖安装；firstInstallTime 保持 2026-10-10 18:22:42，安装的 base.apk SHA 与本地修复包相同，原书架与当前续读点保留。
+- 已在用户此前出错的阅读位置实际复核：剩余章节准备成功，正式服务与媒体 session 进入 PLAYING，原上限提示消失，句子完成后页面继续跟随。短时复核后通过 App 暂停，UI 与媒体状态均为 PAUSED，保留会话供用户点“继续听书”；本轮不重跑长时锁屏或将状态回调冒充听觉确认。仅本地忽略目录保存设备证据，未上传用户书名/正文。
+- 本次补丁继续更新现有 PR #4（`codex/android-tts`），没有合并 main、部署网页或公开发布 APK。代码提交 `04a9f57` 的 push/PR 两轮 checks/android CI 全部通过（38364945783 / 38364949946），deploy 均 skipped。构建 J: 临时映射已撤销。
 
 ## GitHub 安卓听书源码更新（2026-10-13）
 
