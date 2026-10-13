@@ -66,6 +66,21 @@ it('accounts for actual UTF-8 JSON bytes including metadata, escapes and source 
   expect(batches.every((b) => utf8Size(b) <= 128 * 1024)).toBe(true);
   expect(batches.flatMap((b) => b.sentences)).toHaveLength(300);
 });
+it('prepares a large short-sentence book without treating repeated wire metadata as disk usage', async () => {
+  const input = options([['春雨。'.repeat(220000)]]);
+  let bytes = 0,
+    count = 0,
+    finals = 0;
+  for await (const batch of prepareSpeech(input)) {
+    bytes += utf8Size(batch);
+    count += batch.sentences.length;
+    finals += Number(batch.final);
+    expect(utf8Size(batch)).toBeLessThanOrEqual(SPEECH_LIMITS.batchBytes);
+  }
+  expect(bytes).toBeGreaterThan(SPEECH_LIMITS.queueBytes);
+  expect(count).toBe(220000);
+  expect(finals).toBe(1);
+}, 20000);
 it('does not read the next chapter until the caller acknowledges a yielded batch', async () => {
   const input = options([['正文。'.repeat(600)], ['下章。']]);
   const stream = prepareSpeech(input);

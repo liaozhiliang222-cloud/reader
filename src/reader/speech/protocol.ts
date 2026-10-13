@@ -6,7 +6,8 @@ export const SPEECH_PROTOCOL = 1;
 export const SPEECH_LIMITS = {
   batchBytes: 128 * 1024,
   batchSentences: 256,
-  queueBytes: 64 * 1024 * 1024,
+  queueBytes: 64 * 1024 * 1024, // Actual native disk cache, including its manifest.
+  queueBatches: 10000,
   sentenceUnits: 120,
 } as const;
 export interface SpeechIdentity {

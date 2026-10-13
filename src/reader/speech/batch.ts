@@ -41,8 +41,7 @@ export async function* prepareSpeech(
   const total = lastChapter - start.chapterIndex;
   const check = () => signal.throwIfAborted();
   let batchIndex = 0,
-    firstSentenceIndex = 0,
-    bytes = 0;
+    firstSentenceIndex = 0;
   let sentences: SpeechSentence[] = [];
   const message = (final: boolean): SpeechBatch => ({
     ...identity,
@@ -57,12 +56,12 @@ export async function* prepareSpeech(
   let sentenceBytes = 0;
   const account = (batch: SpeechBatch) => {
     const size = utf8Size(batch);
-    if (
-      size > SPEECH_LIMITS.batchBytes ||
-      bytes + size > SPEECH_LIMITS.queueBytes
-    )
-      throw new Error('听书准备内容过大，请从较后的章节开始。');
-    bytes += size;
+    if (size > SPEECH_LIMITS.batchBytes)
+      throw new Error('单批听书数据过大，无法准备。');
+    // The native store bounds actual compressed disk usage. Wire messages
+    // repeat IDs/titles/ranges and are not a measure of that private cache.
+    if (batchIndex >= SPEECH_LIMITS.queueBatches)
+      throw new Error('本次待朗读句数过多，可改为“读完本章”后重试。');
     return batch;
   };
   for (let index = start.chapterIndex; index < lastChapter; index++) {

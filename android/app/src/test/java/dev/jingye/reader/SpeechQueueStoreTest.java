@@ -8,6 +8,10 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.io.ByteArrayOutputStream;
+import java.security.MessageDigest;
+import java.util.HexFormat;
+import java.util.zip.GZIPOutputStream;
 import static org.junit.Assert.*;
 
 public class SpeechQueueStoreTest {
@@ -93,7 +97,7 @@ public class SpeechQueueStoreTest {
     @Test public void corruptedBatchAndMissingFileAreErrorsNotNormalCompletion() throws Exception {
         SpeechQueueStore store = SpeechQueueStore.prepare(temp.getRoot(), identity());
         store.append(batch(0, 0, 1, false)); store.append(batch(1, 1, 1, true)); store.commit(2);
-        File file = new File(temp.getRoot(), "test/batch-00001.json");
+        File file = new File(temp.getRoot(), "test/batch-00001.json.gz");
         Files.write(file.toPath(), "{}".getBytes(StandardCharsets.UTF_8));
         SpeechQueueStore opened = SpeechQueueStore.open(temp.getRoot(), identity());
         assertEquals("你好。", opened.sentence(0).getString("text"));
@@ -107,7 +111,7 @@ public class SpeechQueueStoreTest {
         File unrelated = temp.newFile("user-data.txt");
         File root = temp.newFolder("speech-queues");
         SpeechQueueStore store = SpeechQueueStore.prepare(root, identity());
-        File obstruct = new File(root, "test/batch-00000.json.pending");
+        File obstruct = new File(root, "test/batch-00000.json.gz.pending");
         assertTrue(obstruct.mkdir());
         assertThrows(Exception.class, () -> store.append(batch(0, 0, 1, true)));
         assertThrows(Exception.class, () -> store.commit(1));
@@ -126,5 +130,68 @@ public class SpeechQueueStoreTest {
         assertTrue(new File(root, "active").exists());
         SpeechQueueStore.cleanupOrphans(root, null);
         assertEquals(0, root.listFiles().length);
+    }
+    @Test public void largeShortSentenceBookUsesCompressedDiskBudgetAndKeepsAllLocations() throws Exception {
+        SpeechQueueStore store = SpeechQueueStore.prepare(temp.getRoot(), identity());
+        long wireBytes = 0;
+        final int batches = 800;
+        for (int i = 0; i < batches; i++) {
+            JSONObject value = batch(i, i * 256, 256, i == batches - 1);
+            JSONArray rows = value.getJSONArray("sentences");
+            for (int j = 0; j < rows.length(); j++) rows.getJSONObject(j).put("chapterTitle", "原创大书短句定位与压缩回归测试");
+            wireBytes += value.toString().getBytes(StandardCharsets.UTF_8).length;
+            store.append(value);
+        }
+        assertTrue("Fixture must reproduce the old 64 MiB wire limit", wireBytes > SpeechProtocol.MAX_QUEUE_BYTES);
+        assertTrue(store.bytes() < wireBytes / 3);
+        System.out.println("Large original queue: wireBytes=" + wireBytes + ", storedBytes=" + store.bytes() + ", sentences=" + batches * 256);
+        store.commit(batches * 256);
+        SpeechQueueStore reopened = SpeechQueueStore.open(temp.getRoot(), identity());
+        for (int index : new int[]{0, 256, 300, batches * 256 - 1, 1}) {
+            JSONObject actual = reopened.sentence(index);
+            assertEquals(sentence(index).getString("id"), actual.getString("id"));
+            assertEquals("你好。", actual.getString("text"));
+            assertEquals("原创大书短句定位与压缩回归测试", actual.getString("chapterTitle"));
+        }
+        reopened.discard();
+        assertFalse(new File(temp.getRoot(), "test").exists());
+    }
+    @Test public void legacyUncompressedQueueCanStillBeReadAndRetried() throws Exception {
+        File dir = temp.newFolder("test");
+        JSONObject value = batch(0, 0, 2, true);
+        byte[] data = value.toString().getBytes(StandardCharsets.UTF_8);
+        Files.write(new File(dir, "batch-00000.json").toPath(), data);
+        JSONObject entry = new JSONObject().put("first", 0).put("count", 2).put("bytes", data.length)
+            .put("sha256", HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(data)));
+        JSONObject manifest = new JSONObject().put("identity", identity()).put("entries", new JSONArray().put(entry))
+            .put("count", 2).put("bytes", data.length);
+        Files.write(new File(dir, "committed.json").toPath(), manifest.toString().getBytes(StandardCharsets.UTF_8));
+        SpeechQueueStore store = SpeechQueueStore.open(temp.getRoot(), identity());
+        assertEquals("你好。", store.sentence(1).getString("text"));
+        store.append(value);
+        assertEquals(2, store.count());
+        store.discard();
+    }
+    @Test public void compressedExpansionIsBoundedEvenWithAValidStoredHash() throws Exception {
+        SpeechQueueStore store = SpeechQueueStore.prepare(temp.getRoot(), identity());
+        store.append(batch(0, 0, 1, true)); store.commit(1);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (GZIPOutputStream output = new GZIPOutputStream(bytes)) {
+            output.write(new byte[SpeechProtocol.MAX_BATCH_BYTES + 1]);
+        }
+        byte[] data = bytes.toByteArray();
+        File dir = new File(temp.getRoot(), "test");
+        Files.write(new File(dir, "batch-00000.json.gz").toPath(), data);
+        File manifestFile = new File(dir, "committed.json");
+        JSONObject manifest = new JSONObject(new String(Files.readAllBytes(manifestFile.toPath()), StandardCharsets.UTF_8));
+        manifest.put("bytes", data.length);
+        manifest.getJSONArray("entries").getJSONObject(0).put("bytes", data.length)
+            .put("sha256", HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(data)));
+        Files.write(manifestFile.toPath(), manifest.toString().getBytes(StandardCharsets.UTF_8));
+        SpeechQueueStore reopened = SpeechQueueStore.open(temp.getRoot(), identity());
+        Exception error = assertThrows(Exception.class, () -> reopened.sentence(0));
+        assertEquals("queue_batch_expands_too_large", error.getMessage());
+        assertThrows(Exception.class, () -> reopened.sentence(0));
+        reopened.discard();
     }
 }

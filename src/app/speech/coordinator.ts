@@ -65,9 +65,12 @@ const showError = (error: unknown) => {
     error instanceof Error ? error.message : '听书未能完成，请重试。';
   speechView.value = {
     ...speechView.value,
-    error: /^[\x20-\x7e_]+$/.test(detail)
-      ? '听书暂不可用，请检查离线语音后重试。'
-      : detail,
+    error:
+      detail === 'queue_too_large'
+        ? '本次听书内容超出设备缓存上限，可选择“读完本章”后重试。'
+        : /^[\x20-\x7e_]+$/.test(detail)
+          ? '听书暂不可用，请检查离线语音后重试。'
+          : detail,
   };
 };
 function readSnapshot(value: unknown): NativeSpeechSnapshot | undefined {
