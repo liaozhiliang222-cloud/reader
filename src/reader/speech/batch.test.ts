@@ -46,10 +46,8 @@ class FakeBackend implements SpeechBackend {
 
 beforeEach(() => {
   chapters.clear();
-  vi.mocked(getChapter).mockImplementation(
-    ((_id: string, index: number) =>
-      Promise.resolve(chapters.get(index))) as never,
-  );
+  vi.mocked(getChapter).mockImplementation(((_id: string, index: number) =>
+    Promise.resolve(chapters.get(index))) as never);
 });
 
 describe('听书准备组批', () => {
@@ -122,9 +120,9 @@ describe('听书准备组批', () => {
       charOffset: 0,
     });
     expect(backend.batches).toHaveLength(1);
-    expect(
-      backend.batches[0]!.sentences.map((s) => s.chapterIndex),
-    ).toEqual([0, 1]);
+    expect(backend.batches[0]!.sentences.map((s) => s.chapterIndex)).toEqual([
+      0, 1,
+    ]);
   });
 
   it('取消时抛出且不发 commit', async () => {

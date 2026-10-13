@@ -3,10 +3,7 @@ import type { SafeNode } from '@/parsers/epub/sanitize';
 import type { StoredChapter } from '@/types';
 import { analyzeChapter, chapterSentences } from './extract';
 
-const chapter = (
-  paragraphs: string[],
-  nodes?: SafeNode[],
-): StoredChapter => ({
+const chapter = (paragraphs: string[], nodes?: SafeNode[]): StoredChapter => ({
   bookId: 'b1',
   index: 0,
   title: '章',
@@ -62,11 +59,14 @@ describe('可朗读抽取', () => {
 
   it('rt 注音不读且 sourceRanges 指回原文区间', () => {
     // 段落原文含注音字 "漢(かん)"。
-    const c = chapter(['漢かん字。'], [
-      el('p', [el('ruby', ['漢', el('rt', ['かん'])]), '字。'], {
-        paragraphIndex: 0,
-      }),
-    ]);
+    const c = chapter(
+      ['漢かん字。'],
+      [
+        el('p', [el('ruby', ['漢', el('rt', ['かん'])]), '字。'], {
+          paragraphIndex: 0,
+        }),
+      ],
+    );
     const out = chapterSentences(c);
     expect(out.map((s) => s.text)).toEqual(['漢字。']);
     expect(out[0]!.sourceRanges).toEqual([
@@ -76,26 +76,33 @@ describe('可朗读抽取', () => {
   });
 
   it('链接元素只读显示文字', () => {
-    const c = chapter(['点这里继续。'], [
-      el('p', ['点', el('a', ['这里'], { link: 'https://x' }), '继续。'], {
-        paragraphIndex: 0,
-      }),
-    ]);
+    const c = chapter(
+      ['点这里继续。'],
+      [
+        el('p', ['点', el('a', ['这里'], { link: 'https://x' }), '继续。'], {
+          paragraphIndex: 0,
+        }),
+      ],
+    );
     expect(chapterSentences(c).map((s) => s.text)).toEqual(['点这里继续。']);
   });
 
   it('整章无可读内容时返回空数组', () => {
-    const c = chapter(['   ', 'code'], [
-      el('p', ['   '], { paragraphIndex: 0 }),
-      el('pre', ['code'], { paragraphIndex: 1, preformatted: true }),
-    ]);
+    const c = chapter(
+      ['   ', 'code'],
+      [
+        el('p', ['   '], { paragraphIndex: 0 }),
+        el('pre', ['code'], { paragraphIndex: 1, preformatted: true }),
+      ],
+    );
     expect(chapterSentences(c)).toEqual([]);
   });
 
   it('句子 locator 与 sourceRanges 均为 UTF-16 原文字符偏移', () => {
-    const c = chapter(['😀甲。乙。'], [
-      el('p', ['😀甲。乙。'], { paragraphIndex: 0 }),
-    ]);
+    const c = chapter(
+      ['😀甲。乙。'],
+      [el('p', ['😀甲。乙。'], { paragraphIndex: 0 })],
+    );
     const out = chapterSentences(c);
     expect(out[0]!.text).toBe('😀甲。');
     expect(out[0]!.start.charOffset).toBe(0);
