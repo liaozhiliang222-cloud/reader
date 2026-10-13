@@ -307,6 +307,73 @@
   overflow: hidden;
   touch-action: pan-y pinch-zoom;
 }
+.reader-with-speech .reader-viewport {
+  height: calc(100% - var(--speech-height, 144px));
+}
+.reader-with-speech .reader-footer {
+  bottom: calc(
+    max(18px, env(safe-area-inset-bottom)) + var(--speech-height, 144px)
+  );
+}
+.speech-bar {
+  position: absolute;
+  bottom: env(safe-area-inset-bottom);
+  left: max(8px, env(safe-area-inset-left));
+  right: max(8px, env(safe-area-inset-right));
+  padding: 6px 8px;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.speech-status {
+  display: block;
+  color: var(--fg-muted);
+  margin-bottom: 4px;
+}
+.speech-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.speech-bar :is(button, select) {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 6px 8px;
+}
+.speech-rate {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.speech-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-block: 16px;
+}
+.speech-field select {
+  min-height: 44px;
+  max-width: 100%;
+  flex: 1;
+}
+::highlight(jingye-speech) {
+  background-color: rgba(128, 128, 64, 0.18);
+  background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+[data-speech-overlay] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+[data-speech-overlay] i {
+  position: absolute;
+  background-color: rgba(128, 128, 64, 0.18);
+  background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+}
 .reader-content {
   position: absolute;
   top: 0;

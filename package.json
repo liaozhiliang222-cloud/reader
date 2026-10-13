@@ -32,7 +32,8 @@
     "check:interactions": "pnpm build && playwright test --config playwright.interactions.config.ts && node scripts/check-interactions.mjs",
     "check:experience": "pnpm build && playwright test --config playwright.experience.config.ts",
     "check:markdown": "pnpm build && playwright test --config playwright.markdown.config.ts",
-    "check:markdown-v2": "pnpm build && playwright test --config playwright.markdown-v2.config.ts"
+    "check:markdown-v2": "pnpm build && playwright test --config playwright.markdown-v2.config.ts",
+    "check:speech-ui": "pnpm build && playwright test --config playwright.speech.config.ts"
   },
   "dependencies": {
     "@capacitor/app": "8.1.2",

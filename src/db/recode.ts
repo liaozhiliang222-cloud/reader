@@ -34,12 +34,14 @@ export async function applyEncoding(
       database.blobs,
       database.bookmarks,
       database.highlights,
+      database.speech,
     ],
     async () => {
       const current = await database.books.get(source.id);
       if (!current || current.type !== 'txt' || current.missingFile)
         throw new Error('书籍已不可用，未修改本地数据。');
       assertContentRevision(current, contentRevision(source));
+      await database.speech.delete(source.id);
       if (!(await database.blobs.get(current.fileBlobId ?? current.id)))
         throw new Error('原文件已不可用，未修改书籍。');
       // 仅完整章节文本和标题均未改变时保留定位，避免把旧笔记画到相似短句上。

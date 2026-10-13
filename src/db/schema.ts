@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable, type Table } from 'dexie';
+import type { StoredSpeechLease } from './speech';
 import type {
   AppSettings,
   Book,
@@ -13,6 +14,7 @@ export function createDatabase(name = 'jingye') {
     books: EntityTable<Book, 'id'>;
     chapters: Table<StoredChapter, [string, number]>;
     progress: EntityTable<Progress, 'bookId'>;
+    speech: EntityTable<StoredSpeechLease, 'bookId'>;
     blobs: EntityTable<{ id: string; data: Blob }, 'id'>;
     bookmarks: EntityTable<Bookmark, 'id'>;
     highlights: EntityTable<Highlight, 'id'>;
@@ -42,5 +44,6 @@ export function createDatabase(name = 'jingye') {
             book.fileBlobId = book.id;
         });
     });
+  database.version(3).stores({ speech: 'bookId' });
   return database;
 }

@@ -40,6 +40,7 @@
     "playwright.markdown-v2.config.ts",
     "playwright.markdown-deployment.config.ts",
     "playwright.experience.config.ts",
-    "playwright.pagination.config.ts"
+    "playwright.pagination.config.ts",
+    "playwright.speech.config.ts"
   ]
 }

@@ -16,6 +16,7 @@ import { EnvironmentNotice } from '@/components/EnvironmentNotice';
 import { OptionalFontPanel } from '@/components/OptionalFontPanel';
 import { useBackClose } from '@/app/useBackClose';
 import { isNativeApp } from '@/app/platform';
+import { openSpeechSettings, resetSpeechData } from '@/app/speech/coordinator';
 
 export function SettingsPage({
   initialSection,
@@ -74,6 +75,47 @@ export function SettingsPage({
         <h1>设置</h1>
       </header>
       <EnvironmentNotice />
+      {isNativeApp && (
+        <section class="settings-group">
+          <h2>听书</h2>
+          <p>
+            只使用系统中已安装的离线语音。系统语音引擎是独立应用，正文由它处理；它可能拥有联网权限。
+          </p>
+          <label class="speech-field">
+            默认语速
+            <input
+              type="number"
+              min="0.75"
+              max="2"
+              step="0.05"
+              value={settings.value.speech?.rate ?? 1}
+              onChange={(e) => {
+                const rate = Number(e.currentTarget.value);
+                if (
+                  rate >= 0.75 &&
+                  rate <= 2 &&
+                  Math.abs(rate * 20 - Math.round(rate * 20)) < 0.000001
+                )
+                  void save({
+                    speech: {
+                      rate,
+                      timer: settings.value.speech?.timer ?? 'off',
+                    },
+                  });
+              }}
+            />
+          </label>
+          <button
+            onClick={() =>
+              void openSpeechSettings().catch(() =>
+                setMessage('请手动打开系统中的文字转语音设置。'),
+              )
+            }
+          >
+            系统语音设置
+          </button>
+        </section>
+      )}
       {guide && (
         <Modal
           title="静页使用引导"
@@ -292,7 +334,8 @@ export function SettingsPage({
               onClick={() => {
                 if (confirmText !== '清空' || busy) return;
                 setBusy(true);
-                void clearAllData()
+                void resetSpeechData(true)
+                  .then(() => clearAllData())
                   .then(() => {
                     settings.value = initialSettings();
                     setClearDialog(false);

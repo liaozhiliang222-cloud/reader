@@ -84,6 +84,7 @@ export interface ReadingSettings {
   volumeKeys?: boolean;
 }
 export interface AppSettings {
+  speech?: { rate: number; timer: 'off' | '15m' | '30m' | '60m' | 'chapter' };
   shelfSort: 'recent' | 'imported' | 'title';
   reading: ReadingSettings;
   autoResume: boolean;

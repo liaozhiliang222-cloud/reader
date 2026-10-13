@@ -1,5 +1,19 @@
 # Android 预览版
 
+## 本地听书测试版 1.1.0-preview（2026-10-13，未公开发布）
+
+本地安装包为 `release/jingye-reader-1.1.0-preview.apk`，versionCode 5、6475630 字节，SHA-256 `81fe3f5530ef732ae2befa239aea897ff0a6cab500e323706e6876ada2a1022b`。签名证书沿用 `c666e187df75ec1d2d61ac7ea73f64d88a0d6f4a5dad22938b7dd23b05e22949`。已经同签名覆盖安装到连接的荣耀 PTP-AN10 / Android 16，四本原有书籍及进度保留；已安装 base.apk 与交付文件哈希一致。
+
+使用：打开书籍 → 阅读菜单 → 更多 → 听书，选择已安装的离线语音，再点「从本页听」。播放条提供暂停/继续、上下句、语速与定时；手动翻页会暂停，继续听书回到原朗读句。返回书架或关闭听书停止声音。锁屏后由原生服务自行读私有队列；锁屏媒体信息隐藏书名与章节名。
+
+正文由独立的系统语音引擎处理，静页只允许标记为无需联网且已安装的语音。静页没有 INTERNET 权限，但这不代表引擎没有联网能力。首次选择和设置页说明此边界；停止、取消、失败清理私有临时正文和单句音频。未新增运行依赖；探针与测试替身不进入正式 APK。
+
+本轮内部验收：431 项 Vitest、21 项产品 JVM、6 项实际 Android instrumentation、4 项 Chromium/WebKit 界面测试通过；后者仅使用无音频原生后端替身。正式 App 实际引擎的离线合成/播放、章末定时和缓存清理通过；实际阅读页播放/媒体暂停/手动翻页/同句回跳/读完停止通过。独立探针的中文声音与后台朗读由用户两次听觉确认。用户明确接受已有测试，取消反复重计连续 60 分钟及缺少耳机/第二台电话的内部验收阻断，因此这些严格场景未标为通过；旧 API、其他品牌、长时分钟定时与 200 万字真机性能仍待扩大验证。T2 选区起读/继续浏览、网页/iOS 听书按各自后续计划推进。本轮没有上传或公开发布。
+
+重现听书检查：`pnpm check:speech-ui`；产品 Java 用 `testReleaseUnitTest -PsignedDeviceTest`，真机用同签名 `assembleReleaseAndroidTest -PsignedDeviceTest` 与 `SpeechAcceptanceTest`。隔离核查脚本 `node scripts/check-tts-probe-isolation.mjs <APK路径>` 检查 Manifest、全部 DEX 和网页资源。完整源码路径与结果见 `DEVELOPMENT_STATUS.md`。
+
+## 公开版本 1.0.1
+
 当前修复版为 `1.0.1`，包名 `dev.jingye.reader`，versionCode `4`，支持 Android 7.0（API 24）及以上。网页版本继续为 `0.0.1` 预览版，两者共用源码，各自保存数据。
 
 包含导入、按钮和启动优化的本地签名 APK 为 6394187 字节，SHA-256：`db3ebbc910f3114530b39c904d2d0045cb3b0f8e04bc13aae825cd16785c8d2c`。签名证书 SHA-256 为 `c666e187df75ec1d2d61ac7ea73f64d88a0d6f4a5dad22938b7dd23b05e22949`，与此前 code 2 / 3 相同。校验文件位于 `release/jingye-reader-1.0.1.apk.sha256`。
@@ -52,4 +66,4 @@ bash ./gradlew lintRelease assembleRelease
 
 新增回归覆盖超过 512 KB 的原生分块导入、批量导入部分失败、停滞响应、音量键设置备份、退出阅读页恢复系统栏和常亮申请失败。Java 测试覆盖不支持 skip 的 provider、文件变短和精确 EOF。CI 同时检查网页和 Android，CI 不使用发布密钥。
 
-既有荣耀 Android 16 真机记录保留在 `ANDROID_PLAN.md`；本次复核不代替完整物理手机回归。30 MB 以上备份保存/恢复、微信/QQ 的真实 content URI、旧 Android/WebView、长时间常亮与完整迁移链路仍需验证，因此本次标记为预览发布。TTS 仅有计划，尚未实现；项目许可证待定。
+既有荣耀 Android 16 真机记录保留在 `ANDROID_PLAN.md`；1.0.1 的复核不代替完整物理手机回归。30 MB 以上备份保存/恢复、微信/QQ 的真实 content URI、旧 Android/WebView、长时间常亮与完整迁移链路仍需验证，因此公开版标记为预览发布。1.0.1 没有 TTS，听书由上述本地 1.1.0-preview 提供；项目许可证待定。

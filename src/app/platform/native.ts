@@ -28,6 +28,11 @@ interface JyNativePlugin {
   openUrl(options: { uri: string }): Promise<void>;
   statusBar(options: { color?: string; dark?: boolean }): Promise<void>;
   setVolumeKeys(options: { enabled: boolean }): Promise<void>;
+  speechLaunch(): Promise<{ bookId: string | null }>;
+  addListener(
+    event: 'speechOpen',
+    listener: (event: { bookId: string }) => void,
+  ): Promise<{ remove: () => Promise<void> }>;
   consumeLaunchFile(): Promise<IncomingPayload>;
   readUriChunk(options: {
     uri: string;
@@ -59,6 +64,33 @@ export interface NativeImportProgress {
 type ImportProgress = (progress: NativeImportProgress | undefined) => void;
 
 const Jy = registerPlugin<JyNativePlugin>('JyNative');
+
+export function listenSpeechOpen() {
+  let disposed = false;
+  let remove: (() => Promise<void>) | undefined;
+  const open = async ({ bookId }: { bookId: string | null }) => {
+    if (disposed || typeof bookId !== 'string') return;
+    const { getBook } = await import('@/db/repository');
+    const book = await getBook(bookId);
+    if (!disposed && book && !book.missingFile)
+      navigate('#/read/' + encodeURIComponent(bookId));
+  };
+  void Jy.addListener('speechOpen', (event) => {
+    void open(event).catch(() => {});
+  })
+    .then((handle) => {
+      if (disposed) void handle.remove();
+      else remove = handle.remove;
+    })
+    .catch(() => {});
+  void Jy.speechLaunch()
+    .then(open)
+    .catch(() => {});
+  return () => {
+    disposed = true;
+    if (remove) void remove();
+  };
+}
 
 const CHUNK = 512 * 1024;
 

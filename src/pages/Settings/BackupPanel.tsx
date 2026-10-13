@@ -15,6 +15,12 @@ import { isNativeApp } from '@/app/platform';
 import { settings } from '@/app/settings';
 import { markBackupSaved } from '@/db/backupReminder';
 import { Modal } from '@/components/Modal';
+import {
+  speechView,
+  speechControl,
+  refreshSpeech,
+  resetSpeechData,
+} from '@/app/speech/coordinator';
 
 export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
   const input = useRef<HTMLInputElement>(null),
@@ -78,6 +84,9 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
       setGenerated(undefined);
       setPreview(undefined);
       report({ percent: 0, message: '正在读取本机数据…' });
+      if (isNativeApp && speechView.value.status === 'speaking')
+        await speechControl('pause');
+      if (isNativeApp) await refreshSpeech();
       const payload = await createSnapshot(kind);
       if (!live.current) return;
       const blob =
@@ -135,6 +144,7 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
   const restore = () =>
     void run(async () => {
       if (!preview || (mode === 'overwrite' && !confirmed)) return;
+      await resetSpeechData();
       report({ percent: 0, message: '正在验证原文与位置…' });
       const result = await restoreFromBackup(
         preview,

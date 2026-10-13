@@ -21,6 +21,7 @@ vi.mock('./platform', () => ({
   nativeApp: async () => ({
     cleanupServiceWorkers: vi.fn(),
     installBackButton: vi.fn(),
+    listenSpeechOpen: () => () => {},
     launchIncoming: mocks.launch,
     listenIncoming: mocks.listen,
   }),

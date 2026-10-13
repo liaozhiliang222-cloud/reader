@@ -3,3 +3,8 @@ include ':capacitor-cordova-android-plugins'
 project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
 
 apply from: 'capacitor.settings.gradle'
+
+// T0 独立 debug 探针：不依赖 app，正式构建不包含其源码或组件。
+if (providers.gradleProperty('ttsProbe').isPresent()) {
+    include ':tts-probe'
+}

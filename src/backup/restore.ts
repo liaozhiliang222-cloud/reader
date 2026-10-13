@@ -90,6 +90,8 @@ export async function restoreBackup(
       );
       const global = await database.settings.get('global');
       const incomingBooks: Book[] = [];
+      // Device-local listening ownership never survives backup restoration.
+      await database.speech.clear();
       const keepBlobs = new Set<string>();
       if (mode === 'overwrite') {
         // Keep original chapters/blobs available for light backups until every book

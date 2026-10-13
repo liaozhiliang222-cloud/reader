@@ -24,5 +24,6 @@ export function initialSettings(): AppSettings {
     followSystemTheme: false,
     checkUpdates: true,
     onboarded: false,
+    speech: { rate: 1, timer: 'off' },
   };
 }

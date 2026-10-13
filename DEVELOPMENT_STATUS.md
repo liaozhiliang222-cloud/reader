@@ -1,6 +1,54 @@
 # 开发进度
 
-更新日期：2026-10-10。
+更新日期：2026-10-13。
+
+## 当前 Goal：安卓听书开发至验收通过（2026-10-13，已完成）
+
+- 安卓 P0（TTS-01–17）已实现并完成用户认可范围的内部验收；主模型单代理执行。用户明确“刚才测试过了就行”，不再重计连续 60 分钟或因没有耳机/第二台电话阻断；未将这些严格场景冒充通过。T2/网页/iOS 与公开发布是后续范围。
+- 最终正式服务使用已安装离线 TTS 合成私有短句音频，再由 App 的 MediaPlayer 播放；解决直接 TTS 出声导致媒体键归属引擎的问题。原生队列不依赖后台 JS 补货，媒体 session/FGS/焦点/唤醒锁/章末与分钟定时、取消与错误清理已接。锁屏隐藏书名/章名；无新运行依赖和 INTERNET 权限。
+- 431 项 Vitest（94 文件）、21 项产品 JVM、6 项实际 Android instrumentation、4 项 Chromium/WebKit UI 测试通过；lint、strict 网页/Android 构建、Gradle lintRelease/assembleRelease 通过。浏览器仅把原生后端作为无音频测试替身，真实组件/Worker/IDB/分批照常运行，不进入 release。
+- 荣耀 PTP-AN10 / Android 16，荣耀离线引擎 11.0.34.2。正式服务在 `Active default network: none` 时实际合成/MediaPlayer 播放、章末停止、临时正文/音频清理和冷恢复不自动播放通过（`android-offline-instrumentation.txt`）；探针真实中文声音由用户两次确认。
+- 正式 ReaderView→桥→服务播放、系统媒体暂停、手动翻页暂停、同句继续回跳、自然读完 100% 停止实机通过。修复跟随缓存未重置导致同句续听不立即回跳；最终证据 `follow-before.xml` 8/10·79.4% → `follow-detached.xml` 7/10·62.5% → `follow-resumed.xml` 8/10·79.4%。修复服务已消失时残留进度许可、末句跳过状态与恢复终态原因。
+- 原签名 code4→5 覆盖升级，原有四本书和进度保留，未卸载主 App 或清数据。最终 `release/jingye-reader-1.1.0-preview.apk`：6475630 字节，SHA `81fe3f5530ef732ae2befa239aea897ff0a6cab500e323706e6876ada2a1022b`，证书 `c666e187…22949`；已安装 base.apk 哈希一致。Manifest/全部 DEX/网页资源无探针、测试替身与 INTERNET，相比 1.0.1 APK 增加 81443 字节。
+- 最终规定检查再次通过：pnpm lint、431 项 test、strict build、build:android；Gradle 产品 JVM/lintRelease/assembleRelease 通过，最终 APK 哈希和证书不变。停止听书后实际返回书架通过；仅删除本次原创验收文稿，原四本书保留。手机探针/测试包已卸载、ADB 无转发、网络恢复飞行模式关/Wi-Fi 开/移动数据开；构建 J: 临时映射在交付时撤销。
+- 详细证据在忽略的 `artifacts/tts-probe/`，UI 原始结果在 `artifacts/speech-ui-results.json`；本地原创验收文稿与用户原书均未上传。分支 `codex/android-tts`；Git 作者未配置，未伪造身份提交，未推送或发布。Goal 按用户认可的内部验收范围完成；后续需要时进入 T2 或扩大机型验证。
+
+### 本次开发历史检查点（以下不是最终状态）
+
+- 最新实现检查点（13:22）：T1 正式服务/桥/协调器/入口已接入。`SpeechRuntime` 串行准备私有队列与持久续读，`SpeechService` 离线合成单句 WAV 后用 MediaPlayer 出声、框架 MediaSession/静默通知/焦点/耳机路由/原生定时/唤醒锁。没有新增依赖、INTERNET 或通知运行时权限。原生短句缓存 16MiB 上限，停止与失败清理。媒体键路线尚待正式 App 实机验证。
+- 阅读页「更多 → 听书」提供离线引擎/语音选择与隐私说明；播放条上一/下一句、暂停/继续、0.75–2.0×、定时、关闭；动态预留高度、当前句高亮与跟随。手动导航前暂停并移交进度权，退出阅读页/回书架停止。设备语音偏好只在原生，备份仅含语速/定时。备份/恢复/改编码/清空/删除已接停止或清理。
+- 数据库 v3 新增仅本机 `speech` 进度许可表，事务检查内容版本、leaseId、序号、原进度基线，ACK 在事务后；删除重导/恢复/重解析撤销许可，原页首写入受保护。5 项真实 IndexedDB 事务回归通过，已有迁移与阅读回归保留。通知冷/热打开对应书的桥已接，实际行为待验。
+- 当前完整检查：pnpm lint、93 文件 / 427 单测、pnpm build、pnpm build:android、Java 20 项、Gradle lintRelease / assembleRelease 全部通过；构建仅有已有大分块提示。已修测试夹具重开 DB、原生通知接口测试替身和 strict Range/设置类型。预览 `release/jingye-reader-1.1.0-preview.apk`，6474202 字节、code5 / 1.1.0-preview、SHA `ac9088ccd06ebd174f66d77cb26a3e7fdc4d65bfa355791002b6e914da182eb7`，正式证书 `c666e187…22949`；Manifest/全部 DEX/网页资源无探针与 INTERNET。
+- 下一具体动作：同签名覆盖安装正式预览包（尚未安装），用原创测试文稿完成实际 ReaderView→桥→服务→播放/暂停/续听/手动翻页/回书架流程，检查媒体键路由和位置保存；发现问题修复，再补必要的 UI/协调器验证并交付。不要重新启动 60 分钟硬性计时；用户已明确放宽。Goal 仍 active；未声称正式功能实机验收通过，未提交/推送/发布。J: 临时映射仍用于构建，最终收尾撤销。
+
+- 最新用户调整（13:02）：明确“不要那么严谨，刚才测试过了就行”。接受本次离线真实出声、后台跨批次/跨章及暂停记录作为 T0 内部开发依据，取消反复重计 60 分钟和缺耳机/电话的阻断条件，继续 T1；不把未完成的连续 60 分钟写成通过。手机网络已恢复测试前设置，探针已停止，监测进程已结束。Goal 继续 active，正式听书功能仍须实现并验证。
+- 全量 lint、92 文件 / 422 单测、strict build 已通过；新增纯进度仲裁 8 项。探针/正式 JVM 10 / 20 项通过。正式 APK 的 Manifest、全部 DEX、网页资源无探针/INTERNET，报告绑定 SHA 3bf971097dec09ccd3aa0f8b8bab922df000e637efb3f592a2644ad5bbd223eb（非最终听书包）。WebView→Java 10 万字实际 1194ms / 3082915 字节，队列清理成功；200 万字尚未手机实测。分支 `codex/android-tts`，保留原有修改，未提交/推送。
+- 查明直接 TTS 出声归属荣耀引擎 UID，媒体键 session 为 null；增加独立探针短句 synthesizeToFile→MediaPlayer 路径待试，正式实现须解决控制路由。原生短句音频只在私有目录，单句上限 16MiB，停止/取消清理，无新增依赖。
+
+- 用户要求按照开发计划开发安卓听书，并明确创建 Goal；Goal 已 active，当前主模型单代理执行，未切换模型/未委派。保留原有 TTS/iOS 计划未提交修改。
+- 从 TTS-01 开始，新增物理隔离模块 `android/tts-probe`，包名 `dev.jingye.ttsprobe`，只在 `-PttsProbe` 时包含且禁用 release variant。正式 `:app` 不依赖探针。实现原创文本私有分批队列、框架 TTS/媒体会话/前台服务、暂停与回调代次、音频焦点/路由监听及原生定时；仍没有正式听书入口。
+- 已连接荣耀 PTP-AN10 / Android 16。荣耀引擎 `com.hihonor.voiceengine` 11.0.34.2 有标记为离线、无缺数据标记的 zh/en 语音；Google 472 个语音全部不可选（联网或 notInstalled）。两引擎均拥有 INTERNET；探针不申请 INTERNET。清单在 `artifacts/tts-probe/voices-*.json`。
+- 用户明确允许暂时断网和锁屏 60 分钟，并确认中文声音正常。测试前状态：飞行模式关、Wi-Fi 开、移动数据开、蓝牙关；USB 充电、电量 90%。当前飞行模式开、Wi-Fi 关，系统 Active default network: none。测试后须恢复原网络状态，不更改其他用户设置。
+- 10 万字原生原创队列：1370 句、350321 字节、25ms；仅原生生成，不是 TS→桥全链路或峰值内存。用户确认多次手动查看手机，此前区间不计连续锁屏。再次熄屏后首个检查点 wallMs `1791866208880`、elapsedMs `8800899`（北京时间 12:36:48），session `13d613f3-5dd5-4f2a-a12a-5b02241b4ac3`、generation 7、句 101；需至少到 13:36:48 且日志无中断才计 60 分钟。`scripts/tts-probe-monitor.ps1` 每 30 秒只读保存屏幕/网络/原生状态。真实耳机/电话、媒体键路由、15 分钟定时、200 万字性能等仍待验。
+- JVM 10 项通过，探针 lintDebug/assembleDebug 通过。中文路径最初造成 Java ClassNotFoundException，临时 `subst J: D:\电子书阅读器` 后成功；J: 映射仍在使用，收尾须撤销。Lint 仅对有效 MediaSession 通知加局部 NotificationPermission 豁免注释（官方规则），没有新增通知运行时权限。日志 `artifacts/tts-probe/jvm-lint-build.log`。
+- 下一步：长时测试期间完成可独立验证的分句/过滤/协议纯逻辑；持续核对原生检查点，随后完成 T0 其他项目与 Go/No-Go。未通过 T0 前不将产品听书标为完成，最终还需正式 APK TTS-17 验收。不得把探针测试替代产品验收。
+- 已补 TS 分句、UTF-16 多区间映射、MD 过滤、EPUB 原件语义掩码（不改变既有版本化段落）、逐章有界批次生成；新增 26 项纯逻辑测试通过。原生产品侧仅有未接入的协议、队列和状态机纯类，`:app:testDebugUnitTest` 20 项通过（原有 6 + 队列 7 + 状态 7）。尚未接入正式桥、服务、UI、进度仲裁；T0 通过后再接入。最近 pnpm lint 通过，全量 test/build 待本轮最终运行。
+
+本次任务（2026-10-13，iOS 听书开发计划，仅文档）：新增 `IOS_TTS_PLAN.md` v1，基于同仓库远端 main 的 iOS 工程（f01086b）和后续 iOS 适配分支（ce05539），结合用户提供 IPA 的只读核查结果编写。现有平台分流、文件导入/分享和状态栏适配按已有实现复用；不从旧本地 Android-only 基线误判为尚无 iOS 应用。原生 iOS 听书与 Safari/PWA 前台降级明确分开，并在安卓计划补交叉引用。
+
+计划内容：11 项任务，依次整合现有基线、真机探针、共享协议、文本抽取、Swift 私有队列/合成器/音频会话/媒体控制、进度协调、UI 与验收。首版使用系统离线语音，支持锁屏续听、来电/耳机中断、原生定时和句级续读；正文和缓存只在本机。IPA 与源码 Bundle ID 不同、具体提交无法由包确定，列为升级核验项；不直接修改应用身份。最低 iOS 15、飞行模式、锁屏跨章 60 分钟、文件保护和覆盖升级均有待执行验收标准。
+
+本轮边界：只读取/更新远端引用并编写文档，未合并 iOS 分支、修改运行代码、实现听书、构建/签署 IPA 或发布。保留已有安卓计划和进度的未提交修改。下一项为 IOS-TTS-01 对齐现有 iOS 基线。
+
+本轮文档检查：`pnpm lint`、88 文件 / 388 单测、`pnpm build` 全部通过，构建仅有既有大分块提示；11 个任务编号及执行依赖已核对，`git diff --check` 通过。检查基于本地现有代码，不代表远端 iOS 分支已编译或真机听书通过。工作区仅新增 iOS 计划并修改两份关联文档，未提交或推送。
+
+本次任务（2026-10-13，完善安卓听书计划，仅文档）：在已有未提交的 `TTS_PLAN.md` v2 与本文件记录上继续修订，保留安卓原生优先、网页后续和 TTS 任务编号；计划升级为 v3。此次不实现听书，不改 PRD 已交付范围，不生成/上传 APK。
+
+主要完善：前台分块准备私有临时文本队列，原生锁屏独立读队列，不以有限缓冲时长冒充持续后台；补 TextToSpeech 的 stop/句首续播、离线语音/缺数据处理、target 36 前台服务与音频焦点、暂停释放唤醒锁、原生定时和回调代次。对照现有 ReaderView 500ms 页首保存、contentRevision 和备份快照，设计唯一进度写入权、数据库基线与 ACK，明确手动跳转/重解析/删除/恢复的冲突处理。Markdown 代码/公式等过滤提前至 P0；入口建议放「更多」，沿用 BookLoading，避免准备时错误页闪现；语速统一 0.75–2.0，补临时文件清理与备份设备设置隔离。
+
+验收计划：保留 T0–T4、18 张任务卡，补准备性能预算、锁屏跨批次/跨章 60 分钟、真实音频/焦点、数据冲突、升级与设备矩阵；自动化、测试替身和真实出声分开记录。官方平台出处已写入计划，所有真机 TTS 结论均为待测，不沿用既有阅读器验收作为听书证据。下一项为 TTS-01 独立 debug 真机探针，再按 TTS-02 门槛决定是否进入产品开发；暂无需用户逐项确认常规 UI 偏好。
+
+本轮检查：`pnpm lint`、88 文件 / 388 单测、`pnpm build`（严格类型与生产构建）全部通过；构建仍有既有大分块体积提示，本轮未改依赖或运行代码。18 个任务编号无重复、依赖顺序与 P0/P1 行为已复核，`git diff --check` 通过。仅 `TTS_PLAN.md` 和本文件有改动，保留原先 v2 的未提交内容与历史记录；未提交、推送、发布或进行真机听书验收。
 
 本次任务完成（2026-10-10，Android 1.0.1 启动与导入修复）：最终运行代码 b35e4b2e9ef608d8f133c18fea6bb08564078147；[1.0.1 预览 Release](https://github.com/liaozhiliang222-cloud/reader/releases/tag/android-v1.0.1) 已于 20:47（UTC+8）公开，Release 408916430，draft=false / prerelease=true。发布前用精确 lease 将尚未公开的 android-v1.0.1 对齐该提交，注解对象 68059462e4647314d6150c8078ee9fe41f118890；旧按钮版草稿附件已替换，当前公开源码与最终 APK 对齐。本轮仅发布 Android，没有部署网页，也没有 Goal、子代理或模型切换。
 
@@ -723,3 +771,9 @@
 - 升级与数据保留：code 1 → code 2 同签名 `install -r` 成功；升级前写入的「墨黑夜读」设置在升级后保留，直入书架无引导——IndexedDB 数据完整。最终发布包重载后手机上运行的即发布文件。
 - 注意：release 构建的 WebView 不可远程调试（CDP 无响应），真机验证以 `input tap` + 截图进行；后续真机回归用 debug 包。
 - 未完成：GitHub Releases 发布待 `gh auth` 与用户确认；签名密钥两份离线备份需用户执行；A1-06 全量回归继续观察。
+
+## 听书计划 v2（2026-10-10，Devin，仅文档）
+
+- `TTS_PLAN.md` 改写为 v2：安卓原生 `TextToSpeech` + 前台媒体服务为主线（锁屏/后台、通知与锁屏控制条、耳机键），网页 Web Speech 降为 T3 仅前台降级。架构为“原生负责读、网页负责排”：TS 分句定位并按批交给原生，原生按句暂存进度，前台/冷启动对账，以应对锁屏期间 WebView JS 可能冻结。
+- 不新增第三方依赖（框架 MediaSession / Notification.MediaStyle）；仍不申请 INTERNET，新增权限限于前台服务、mediaPlayback、WAKE_LOCK 与 TTS 引擎 `<queries>`。隐私边界如实写明：TTS 引擎为独立 App，只选 `isNetworkConnectionRequired()==false` 的语音并显示引擎名称。
+- 阶段：T0 真机探针 2 项、T1 安卓 MVP 8 项、T2 打磨与 1.1.0 发布 5 项、T3 网页降级 2 项、T4 神经语音可选 1 项。6 项待用户决策见第 9 节。未写产品代码；手机本轮未连接，引擎与语音清单留待 TTS-01。
