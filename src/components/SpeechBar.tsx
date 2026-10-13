@@ -47,7 +47,10 @@ function persistPrefs(patch: { rate?: number; timer?: SpeechTimerMode }) {
 }
 
 function voiceLang(voice: SpeechVoice) {
-  return voice.language.toLowerCase().startsWith('zh') ? '中文' : '英文';
+  const language = voice.language.toLowerCase();
+  if (language.startsWith('zh')) return '中文';
+  if (language.startsWith('en')) return '英文';
+  return '其他';
 }
 
 function SpeechMore({ ui, onClose }: { ui: SpeechUi; onClose: () => void }) {
@@ -64,7 +67,7 @@ function SpeechMore({ ui, onClose }: { ui: SpeechUi; onClose: () => void }) {
     };
   }, []);
   const chosenVoice = localStorage.getItem('jingye.speech.voice') ?? '';
-  const languages = ['中文', '英文'].filter((lang) =>
+  const languages = ['中文', '英文', '其他'].filter((lang) =>
     voices.some((voice) => voiceLang(voice) === lang),
   );
   return (
@@ -127,7 +130,7 @@ function SpeechMore({ ui, onClose }: { ui: SpeechUi; onClose: () => void }) {
       ))}
       {!languages.length && (
         <p class="speech-voice-empty">
-          没有找到中文或英文语音，请在系统「设置 → 辅助功能 →
+          没有找到可用语音，请在系统「设置 → 辅助功能 →
           朗读内容」中下载语音后重试。
         </p>
       )}

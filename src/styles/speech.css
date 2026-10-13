@@ -70,6 +70,11 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* 语音多时面板可滚动，语速/定时永远可达。 */
+  max-height: min(60vh, 480px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .speech-option {
   display: flex;
