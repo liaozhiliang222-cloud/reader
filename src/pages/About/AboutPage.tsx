@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { navigate } from '@/app/router';
 import { copyText } from '@/app/files';
-import { isNativeApp } from '@/app/platform';
+import { isNativeApp, isAndroidApp } from '@/app/platform';
 const version = import.meta.env.VITE_APP_VERSION;
 
 export function AboutPage() {
@@ -24,6 +24,11 @@ export function AboutPage() {
       </section>
       <section aria-labelledby="privacy-title">
         <h2 id="privacy-title">隐私与本地数据</h2>
+        {isAndroidApp && (
+          <p>
+            听书只选择已安装、标记为无需联网的系统语音。正文交给独立的语音引擎处理，引擎可能拥有联网权限。临时文本和短句音频只在本机，停止听书后删除。用户主动听书期间显示静默媒体控制通知。
+          </p>
+        )}
         <p>
           我们不收集任何阅读数据。书籍原文、阅读进度、书签、划线、笔记和设置只保存在
           {isNativeApp ? '应用私有存储' : '当前浏览器的本地存储'}

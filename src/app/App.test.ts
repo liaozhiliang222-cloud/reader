@@ -18,9 +18,11 @@ const mocks = vi.hoisted(() => ({
 vi.mock('./startup', () => ({ loadStartup: mocks.startup }));
 vi.mock('./platform', () => ({
   isNativeApp: true,
+  isAndroidApp: true,
   nativeApp: async () => ({
     cleanupServiceWorkers: vi.fn(),
     installBackButton: vi.fn(),
+    listenSpeechOpen: () => () => {},
     launchIncoming: mocks.launch,
     listenIncoming: mocks.listen,
   }),

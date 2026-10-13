@@ -1,5 +1,7 @@
 # 本地浏览器验收
 
+`pnpm check:speech-ui` 运行听书专项四项（Chromium/WebKit 各两项）：使用真实组件、解析 Worker、IndexedDB 和文本分批，只有原生 SpeechBackend 由 Playwright 启动脚本提供无声音测试替身；源码与 release 没有测试入口。覆盖外部暂停、手动浏览后同句续听立即回跳、语速/章末定时设置、320px 控件热区、停止，以及无离线语音的禁用和设置入口。结果在 `artifacts/speech-ui-results.json`。这不证明实际声音、焦点、锁屏或 iOS 原生听书；Android 真机证据单列于 `DEVELOPMENT_STATUS.md`。
+
 `pnpm check:experience` 运行 17 项独立用例：两个引擎各七项引导/环境检查，Chromium 另三项通过 CDP 发送可信触摸，覆盖慢拖、取消、竖向滑动和选区/菜单冲突。没有 CDP 能力的 WebKit 不执行触摸拖动。三屏键盘操作、Tab/Shift+Tab 循环、Escape/浏览器返回、触发按钮焦点恢复、历史记录撤回、320px 布局与重载均有原生检查。模拟 UA、受控安装事件及 IDB 写入故障各有明确标记，不能记为系统浏览器、真实安装或手机系统故障验收。生产 HTML SHA、页面错误与外部请求附在每项原始结果中；结果保存在忽略的 `artifacts/experience-browser-results.json`，测试截图另行查看。
 
 GitHub CI 使用 Windows Server 2025 与默认系统字体运行完整套件，通过 `JINGYE_PIXEL_BASELINE=windows-2025` 选择该环境独立的六张基线。本机原六张基线保持不变；首次 CI 的布局/换行一致但字形绘制不同，已确认两端 SimSun 文件 SHA 完全一致。按 [Playwright 环境要求](https://playwright.dev/docs/test-snapshots)，在独立诊断分支采集运行器图像并逐张查看后纳入 `pagination.spec.ts-snapshots/windows-2025/`，来源、环境、几何和六张 SHA 见 `review.json`；采集运行不计完整 CI 通过。报告作为对应 Actions 附件保留，不提交本机报告。完整套件要求全部 spec 和两个引擎（触摸仅 Chromium）齐备；不得自动更新基线、使用重试掩盖失败或引用上次成功报告。未知基线环境会立即报错。

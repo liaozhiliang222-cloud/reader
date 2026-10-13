@@ -11,6 +11,8 @@ import { EPUB_PARSER_VERSION, type EpubParserVersion } from './version';
 export interface SafeElement {
   tag: string;
   children: SafeNode[];
+  /** Ephemeral speech preparation metadata; never changes canonical text. */
+  speechSkip?: boolean;
   paragraphIndex?: number;
   align?: 'left' | 'center' | 'right' | 'justify';
   imageId?: string;

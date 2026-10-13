@@ -3,6 +3,7 @@ import { Modal } from '@/components/Modal';
 import { countAnnotations, deleteBook, renameBook } from '@/db/repository';
 import { navigate } from '@/app/router';
 import type { Book } from '@/types';
+import { resetSpeechData } from '@/app/speech/coordinator';
 
 export function BookActions({
   book,
@@ -169,7 +170,12 @@ export function BookActions({
             </button>
             <button
               disabled={busy || !counts}
-              onClick={() => void commit(() => deleteBook(book.id))}
+              onClick={() =>
+                void commit(async () => {
+                  await resetSpeechData();
+                  await deleteBook(book.id);
+                })
+              }
             >
               确认删除
             </button>

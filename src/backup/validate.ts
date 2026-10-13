@@ -1,4 +1,5 @@
 import { initialSettings } from '@/app/defaults';
+import { validRate, validTimer } from '@/reader/speech/protocol';
 import { comparePosition } from '@/reader/annotation';
 import { bookIdForHash } from '@/parsers/identity';
 import {
@@ -141,6 +142,12 @@ function readSettings(value: unknown): AppSettings {
     ...defaults,
     reading: { ...defaults.reading, ...validateReading(data.reading ?? {}) },
   };
+  if (data.speech !== undefined) {
+    const speech = record(data.speech, '听书设置');
+    if (!validRate(speech.rate) || !validTimer(speech.timer))
+      return error('听书设置');
+    result.speech = { rate: speech.rate, timer: speech.timer };
+  }
   if (data.shelfSort !== undefined)
     result.shelfSort = choice(
       data.shelfSort,

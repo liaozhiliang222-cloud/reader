@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'dev.jingye.ttsprobe'
+    compileSdk rootProject.ext.compileSdkVersion
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    defaultConfig {
+        applicationId 'dev.jingye.ttsprobe'
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName '0.1-probe'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    sourceSets.main.java.srcDir layout.buildDirectory.dir('generated/source/speech')
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('generated/tts-web')
+    // No probe release artifact can be built, even with -PttsProbe.
+    androidComponents {
+        beforeVariants(selector().withBuildType('release')) { variant -> variant.enable = false }
+    }
+}
+
+// Compile exactly the two pure queue classes into this isolated diagnostic app.
+// There is no :app dependency and no probe source enters the reader application.
+def copySpeechCore = tasks.register('copySpeechProbeCore', Copy) {
+    from('../app/src/main/java') {
+        include 'dev/jingye/reader/SpeechProtocol.java'
+        include 'dev/jingye/reader/SpeechQueueStore.java'
+    }
+    into layout.buildDirectory.dir('generated/source/speech')
+}
+tasks.named('preBuild').configure { dependsOn copySpeechCore }
+
+dependencies {
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation 'org.json:json:20250517'
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+}
