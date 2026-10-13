@@ -107,7 +107,17 @@ function flushSave(session: ActiveSession) {
         updatedAt: Date.now(),
       },
       session.book.contentRevision ?? 0,
-    ).catch(() => setNotice('进度未能保存，请检查本地存储。'));
+    ).catch(() => {
+      if (active !== session) return;
+      // iOS 挂起中的 IndexedDB 事务必败：退回待写队列，回前台再补，
+      // 不弹误报；只有前台真失败才提示。
+      if (document.visibilityState === 'hidden') {
+        session.savedKey = '';
+        session.pendingLocator = target;
+        return;
+      }
+      setNotice('进度未能保存，请检查本地存储。');
+    });
   });
 }
 
@@ -256,10 +266,8 @@ export async function startSpeech(options: {
   const offState = backend.on((event) =>
     applySnapshot(session, event.snapshot),
   );
-  // 切入后台立即落盘最新语点；800ms 节流在 iOS 挂起后不再可靠。
-  const onHide = () => {
-    if (document.visibilityState === 'hidden') flushSave(session);
-  };
+  // 切入后台立即落盘最新语点；挂起中写失败的语点回前台再补。
+  const onHide = () => flushSave(session);
   document.addEventListener('visibilitychange', onHide);
   session.unsubscribe = () => {
     offState();
