@@ -7,7 +7,7 @@ const bridge = vi.hoisted(() => ({
   addListener: vi.fn(),
 }));
 vi.mock('@capacitor/core', () => ({
-  Capacitor: { isNativePlatform: () => false },
+  Capacitor: { isNativePlatform: () => true, getPlatform: () => 'android' },
   registerPlugin: () => bridge,
 }));
 vi.mock('@capacitor/app', () => ({ App: {} }));

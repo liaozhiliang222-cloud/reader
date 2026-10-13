@@ -38,6 +38,7 @@
   "dependencies": {
     "@capacitor/app": "8.1.2",
     "@capacitor/core": "8.5.3",
+    "@capacitor/status-bar": "^8.0.4",
     "@preact/signals": "^2.11.3",
     "@xmldom/xmldom": "^0.9.12",
     "comlink": "^4.4.2",

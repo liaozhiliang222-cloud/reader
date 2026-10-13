@@ -7,6 +7,7 @@ import { navigate } from '@/app/router';
 import type { AppSettings, ReadingSettings } from '@/types';
 import { requestPersistence, storageInfo } from '@/app/storage';
 import { dataCounts, clearAllData } from '@/db/data';
+import { stopSpeech } from '@/app/speech/coordinator';
 import { initialSettings } from '@/app/settings';
 import { Modal } from '@/components/Modal';
 import { BackupPanel } from './BackupPanel';
@@ -292,15 +293,18 @@ export function SettingsPage({
               onClick={() => {
                 if (confirmText !== '清空' || busy) return;
                 setBusy(true);
-                void clearAllData()
-                  .then(() => {
-                    settings.value = initialSettings();
-                    setClearDialog(false);
-                    setResetKey((key) => key + 1);
-                    setMessage('本地数据已清空。');
-                  })
-                  .catch(() => setMessage('清空失败，本地数据未被部分删除。'))
-                  .finally(() => setBusy(false));
+                // 清空前先停止听书会话并作废旧回调。
+                void stopSpeech().then(() =>
+                  clearAllData()
+                    .then(() => {
+                      settings.value = initialSettings();
+                      setClearDialog(false);
+                      setResetKey((key) => key + 1);
+                      setMessage('本地数据已清空。');
+                    })
+                    .catch(() => setMessage('清空失败，本地数据未被部分删除。'))
+                    .finally(() => setBusy(false)),
+                );
               }}
             >
               {busy ? '清空中…' : '确认清空'}

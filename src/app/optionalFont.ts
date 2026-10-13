@@ -1,4 +1,6 @@
+import { Capacitor } from '@capacitor/core';
 import { signal } from '@preact/signals';
+import { db } from '@/db/index';
 import { file, size, sha256 } from './fontAsset.json';
 
 export const fontState = signal<{
@@ -12,10 +14,14 @@ let downloading: Promise<void> | undefined;
 const url = () => new URL(import.meta.env.BASE_URL + file, location.origin);
 const cacheName = () =>
   'jingye-font-' + new URL(import.meta.env.BASE_URL, location.origin).pathname;
+// iOS 的 Capacitor WebView 用 capacitor:// 自定义 scheme，Cache API 的 put
+// 只允许 http(s) 请求，字体缓存写不进去——改存 IndexedDB 的 blobs 表。
+const useIdb = () => Capacitor.getPlatform() === 'ios';
+const fontId = () => 'font:' + url().href;
+const storable = () =>
+  useIdb() ? typeof indexedDB !== 'undefined' : typeof caches !== 'undefined';
 const available = () =>
-  typeof caches !== 'undefined' &&
-  typeof FontFace !== 'undefined' &&
-  !!crypto.subtle;
+  storable() && typeof FontFace !== 'undefined' && !!crypto.subtle;
 
 async function verified(response: Response) {
   if (!response.ok || response.type === 'opaque')
@@ -28,6 +34,26 @@ async function verified(response: Response) {
     .join('');
   if (hash !== sha256) throw new Error('字体文件校验失败，请重新下载。');
   return bytes;
+}
+async function savedFont() {
+  if (useIdb()) {
+    const row = await db.blobs.get(fontId());
+    return row?.data ? new Response(row.data) : undefined;
+  }
+  const saved = await (await caches.open(cacheName())).match(url().href);
+  return saved ?? undefined;
+}
+async function storeFont(bytes: ArrayBuffer) {
+  if (useIdb()) {
+    await db.blobs.put({ id: fontId(), data: new Blob([bytes]) });
+    return;
+  }
+  await (
+    await caches.open(cacheName())
+  ).put(
+    url().href,
+    new Response(bytes, { headers: { 'Content-Type': 'font/woff2' } }),
+  );
 }
 async function load(bytes: ArrayBuffer) {
   const next = await new FontFace('JingyeWenkai', bytes, {
@@ -47,8 +73,7 @@ export function restoreOptionalFont() {
     }
     fontState.value = { phase: 'checking' };
     try {
-      const cache = await caches.open(cacheName());
-      const saved = await cache.match(url().href);
+      const saved = await savedFont();
       if (saved) {
         await load(await verified(saved));
         fontState.value = { phase: 'ready' };
@@ -83,7 +108,7 @@ export function downloadOptionalFont() {
       // Load before caching so unsupported/corrupt fonts are never marked ready.
       await load(bytes);
       try {
-        await (await caches.open(cacheName())).put(url().href, response);
+        await storeFont(bytes);
         fontState.value = { phase: 'ready' };
       } catch {
         if (face) document.fonts.delete(face);
@@ -107,6 +132,7 @@ export async function removeOptionalFont() {
   if (downloading) return;
   try {
     if (typeof caches !== 'undefined') await caches.delete(cacheName());
+    await db.blobs.delete(fontId());
     if (face) document.fonts.delete(face);
     face = undefined;
     restoring = undefined;

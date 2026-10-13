@@ -18,6 +18,16 @@ import { NoteEditor } from './NoteEditor';
 import { useAnnotations } from '@/reader/useAnnotations';
 import { toggleFullscreen, useImmersive } from '@/reader/useImmersive';
 import { isNativeApp, nativeApp } from '@/app/platform';
+import {
+  speechUi,
+  speechNotice,
+  speechActive,
+  speechManualTurn,
+  speechPageLeft,
+  speechSupported,
+  startSpeech,
+} from '@/app/speech/coordinator';
+import { SpeechBar } from '@/components/SpeechBar';
 import { addBookmark, listBookmarks, removeBookmark } from '@/db/bookmarks';
 import { QuietHint } from '@/components/QuietHint';
 import { TapHint } from '@/components/TapHint';
@@ -82,6 +92,9 @@ export function ReaderView({
     locator: { chapterIndex: 0, paragraphIndex: 0, charOffset: 0 },
   });
   const [error, setError] = useState('');
+  // 听书会话状态（信号驱动）：入口、跟随、提示共用。
+  const speech = speechUi.value;
+  const speechError = speechNotice.value;
   const annotations = useAnnotations(book, engineRef, setError, () => {
     setMenu(false);
     setDrawer(false);
@@ -138,7 +151,7 @@ export function ReaderView({
     void nativeApp().then((native) => {
       if (cancelled) return;
       dispose = native.listenVolumeKey((direction) =>
-        engineRef.current?.turn(direction === 'next' ? 1 : -1),
+        manualTurn(direction === 'next' ? 1 : -1),
       );
     });
     return () => {
@@ -159,6 +172,28 @@ export function ReaderView({
     };
   }, [reading.volumeKeys, overlayOpen]);
   const followSystemTheme = settings.value.followSystemTheme;
+  const flushProgress = useRef<() => void>(() => {});
+  // 手动翻页统一入口：朗读中先暂停、保留听书点。
+  const manualTurn = (direction: number) => {
+    speechManualTurn();
+    engineRef.current?.turn(direction);
+  };
+  const listenFromPage = () => {
+    // 先把阅读页排队中的进度写回，再由听书从句首接管。
+    flushProgress.current();
+    const prefs = settings.value.speech;
+    void startSpeech({
+      book,
+      from: engineRef.current?.currentLocator ?? {
+        chapterIndex: 0,
+        paragraphIndex: 0,
+        charOffset: 0,
+      },
+      rate: prefs?.rate,
+      voiceId: localStorage.getItem('jingye.speech.voice') ?? undefined,
+      timer: prefs?.timer,
+    });
+  };
   const changeReading = (patch: Partial<ReadingSettings>) => {
     setReading((current) => ({ ...current, ...themePatch(patch, current) }));
     void saveBookSettings(book.id, patch).catch(() =>
@@ -200,6 +235,9 @@ export function ReaderView({
     let resizeFrame = 0;
     const persist = () => {
       clearTimeout(timer);
+      // 朗读中进度由听书协调器按句首写入；latest 停留在起读前，
+      // 此时落盘会覆盖语点，iOS 挂起中的 IndexedDB 事务还会误报失败。
+      if (speechActive.value && speechUi.value.phase === 'speaking') return;
       if (latest)
         void saveProgress(latest, book.contentRevision ?? 0).catch(() => {
           if (!disposed) setError('进度未能保存，请检查浏览器存储空间。');
@@ -214,6 +252,8 @@ export function ReaderView({
         if (disposed) return;
         annotations.onLocation(value.locator);
         setInfo(value);
+        // 朗读中进度由听书协调器按句首写入，跟随翻页不覆盖。
+        if (speechActive.value && speechUi.value.phase === 'speaking') return;
         latest = {
           bookId: book.id,
           locator: value.locator,
@@ -231,6 +271,7 @@ export function ReaderView({
       },
     );
     engineRef.current = engine;
+    flushProgress.current = persist;
     void engine.start(
       getProgress(book.id).then((progress) => progress?.locator),
     );
@@ -267,7 +308,7 @@ export function ReaderView({
         )
       ) {
         event.preventDefault();
-        engine.turn(['ArrowLeft', 'PageUp'].includes(event.key) ? -1 : 1);
+        manualTurn(['ArrowLeft', 'PageUp'].includes(event.key) ? -1 : 1);
       }
       if (event.key === 'Escape') setMenu((value) => !value);
     };
@@ -301,6 +342,7 @@ export function ReaderView({
       )
         return;
       engine.stopMotion();
+      // 拖动翻页的先记一次手动操作，end 里按 turn 路径再记。
       if (event.isPrimary && !selected())
         down = {
           x: event.clientX,
@@ -376,7 +418,7 @@ export function ReaderView({
         x >= 0 && x < 56 && y >= 0 && y < 56,
       );
       if (action === 'next' || action === 'previous')
-        engine.turn(action === 'next' ? 1 : -1);
+        manualTurn(action === 'next' ? 1 : -1);
       else {
         engine.cancelDrag();
         if (action === 'menu') {
@@ -432,6 +474,7 @@ export function ReaderView({
     return () => {
       persist();
       disposed = true;
+      speechPageLeft();
       clearTimeout(timer);
       cancelAnimationFrame(resizeFrame);
       observer.disconnect();
@@ -453,6 +496,35 @@ export function ReaderView({
   useEffect(() => {
     engineRef.current?.setPageAnimation(reading.pageAnimation);
   }, [reading.pageAnimation]);
+  // 听书跟随：朗读中的句子上高亮、句不在视口内时翻页；暂停后交还阅读。
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    const now = speech.phase === 'speaking' ? speech.now : undefined;
+    if (!now) {
+      engine.speechSpan(null);
+      return;
+    }
+    engine.speechSpan({
+      chapterIndex: now.chapterIndex,
+      ranges: now.ranges.length
+        ? now.ranges
+        : [
+            {
+              paragraphIndex: now.start.paragraphIndex,
+              start: now.start.charOffset,
+              end: now.end.charOffset,
+            },
+          ],
+    });
+    // 锚定句尾：长句尾部流出屏幕时也要翻页跟随（句长必有界，尾页含全句）。
+    const tail = {
+      chapterIndex: now.end.chapterIndex,
+      paragraphIndex: now.end.paragraphIndex,
+      charOffset: Math.max(0, now.end.charOffset - 1),
+    };
+    if (!engine.onCurrentPage(tail)) engine.jump(tail, false);
+  }, [speech]);
   useEffect(() => {
     engineRef.current?.configure(reading);
   }, [
@@ -539,7 +611,7 @@ export function ReaderView({
                 window.getSelection()?.toString()
               )
                 return;
-              engineRef.current?.turn(-1);
+              manualTurn(-1);
             }}
           >
             ‹
@@ -559,6 +631,12 @@ export function ReaderView({
           {error}
         </p>
       )}
+      {speechError && (
+        <p class="reader-error" role="alert">
+          {speechError}
+        </p>
+      )}
+      <SpeechBar onListenHere={listenFromPage} />
       <button
         class="reader-menu-toggle"
         aria-label="阅读菜单"
@@ -640,6 +718,21 @@ export function ReaderView({
             )}
             {panel === 'more' && (
               <section class="more-panel" aria-label="更多">
+                {speechSupported() && (
+                  <button
+                    onClick={() => {
+                      setMenu(false);
+                      if (speech.phase === 'off' || speech.phase === 'ended')
+                        listenFromPage();
+                    }}
+                  >
+                    {speech.phase === 'preparing'
+                      ? '听书准备中…'
+                      : speech.phase === 'speaking' || speech.phase === 'paused'
+                        ? '听书中'
+                        : '听书'}
+                  </button>
+                )}
                 <label class="check-row">
                   安静提示
                   <input
@@ -673,7 +766,7 @@ export function ReaderView({
                 <button
                   class="icon-button"
                   aria-label="上一页"
-                  onClick={() => engineRef.current?.turn(-1)}
+                  onClick={() => manualTurn(-1)}
                 >
                   <Icon name="previous" />
                 </button>
@@ -688,7 +781,7 @@ export function ReaderView({
                 <button
                   class="icon-button"
                   aria-label="下一页"
-                  onClick={() => engineRef.current?.turn(1)}
+                  onClick={() => manualTurn(1)}
                 >
                   <Icon name="next" />
                 </button>

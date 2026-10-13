@@ -5,6 +5,7 @@ import { pageCount, pageGeometry } from './paginator';
 import { getLocator, pageOf } from './locator';
 import { currentSection } from './currentSection';
 import { HighlightLayer } from './highlight';
+import { SpeechMarker, type SpeechMark } from './speech/marker';
 import { PageMotion } from './PageMotion';
 import {
   chapterChunks,
@@ -83,6 +84,8 @@ export class ReaderEngine {
   private queue: Navigation[] = [];
   private highlights: Highlight[] = [];
   private highlightLayer = new HighlightLayer();
+  private speechMarker = new SpeechMarker();
+  private speechMark: SpeechMark | null = null;
   private motion = new PageMotion();
   private visibilityChanged = () => {
     if (document.visibilityState === 'hidden') this.cancelMeasurement();
@@ -114,6 +117,16 @@ export class ReaderEngine {
   get currentLocator(): Locator | undefined {
     return this.active ? { ...this.anchor } : undefined;
   }
+  /** 指定位置是否落在当前可见页（听书跟随翻页用）。 */
+  onCurrentPage(locator: Locator): boolean {
+    const active = this.active;
+    return (
+      !!active &&
+      active.chapter.index === locator.chapterIndex &&
+      inChunk(active.chunk, locator, active.source.chunks) &&
+      pageOf(active.root, locator, active.stride) === this.page
+    );
+  }
   setHighlights(items: Highlight[]) {
     if (this.disposed) return;
     this.highlights = items.filter((item) => !item.unanchored);
@@ -122,6 +135,17 @@ export class ReaderEngine {
   private paintHighlights() {
     if (!this.disposed)
       this.highlightLayer.render(this.window.values(), this.highlights);
+    this.paintSpeech();
+  }
+  /** 听书当前句区间；null 清除。排版重排后随窗口重绘。 */
+  speechSpan(mark: SpeechMark | null) {
+    if (this.disposed) return;
+    this.speechMark = mark;
+    this.paintSpeech();
+  }
+  private paintSpeech() {
+    if (!this.disposed)
+      this.speechMarker.render(this.window.values(), this.speechMark);
   }
   selectedText() {
     const active = this.active,
@@ -729,6 +753,7 @@ export class ReaderEngine {
     document.removeEventListener('visibilitychange', this.visibilityChanged);
     this.queue = [];
     this.highlightLayer.dispose();
+    this.speechMarker.dispose();
     this.motion.dispose();
     this.window.dispose();
     this.sources.dispose();
