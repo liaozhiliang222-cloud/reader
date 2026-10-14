@@ -15,7 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         #if DEBUG && canImport(StoreKitTest)
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil,
+        if (ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            || ProcessInfo.processInfo.environment["JY_SK_TEST"] == "1"),
            #available(iOS 15.4, *) {
             storeKitTestSession = try? SKTestSession(configurationFileNamed: "JingyePro")
             (storeKitTestSession as? SKTestSession)?.disableDialogs = true
