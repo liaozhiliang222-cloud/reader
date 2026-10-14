@@ -25,6 +25,8 @@
 		A00000000000000000000001 /* JyReaderPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* JyReaderPlugin.swift */; };
 		A00000000000000000000002 /* ProStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* ProStore.swift */; };
 B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
+C10000000000000000000001 = {isa = PBXBuildFile; fileRef = C10000000000000000000002; };
+C10000000000000000000003 = {isa = PBXBuildFile; fileRef = C10000000000000000000004; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@ B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B100000000000000000000
 		A00000000000000000000101 /* JyReaderPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JyReaderPlugin.swift; sourceTree = "<group>"; };
 		A00000000000000000000102 /* ProStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStore.swift; sourceTree = "<group>"; };
 B10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechQueueStoreTests.swift; sourceTree = "<group>"; };
+C10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStoreTests.swift; sourceTree = "<group>"; };
+C10000000000000000000004 = {isa = PBXFileReference; lastKnownFileType = file.storekit; path = JingyePro.storekit; sourceTree = "<group>"; };
 B10000000000000000000003 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -103,7 +107,7 @@ B10000000000000000000003,
 			path = App;
 			sourceTree = "<group>";
 		};
-B10000000000000000000004 = {isa = PBXGroup; children = (B10000000000000000000002,); path = AppTests; sourceTree = "<group>"; };
+B10000000000000000000004 = {isa = PBXGroup; children = (B10000000000000000000002,C10000000000000000000002,); path = AppTests; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -186,7 +190,7 @@ B1000000000000000000000a,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (C10000000000000000000003,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 		9E5A10072C4E000000000002 /* Speech */ = {
@@ -221,7 +225,7 @@ B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-B10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B10000000000000000000001,); runOnlyForDeploymentPostprocessing = 0; };
+B10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B10000000000000000000001,C10000000000000000000001,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
