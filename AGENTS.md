@@ -13,6 +13,7 @@
 - 开发前阅读 PRD.md、DEV_PLAN.md 和 DEVELOPMENT_STATUS.md。
 - 无注册、无推荐、无 AI、无追踪；书籍和用户数据只在本地。
 - 不引入第三方 CDN、统计 SDK、字体服务或运行时联网请求。加载应用资源与未来的 Service Worker 更新遵循 PRD；开发服务器的 HMR 仅限开发环境。
+- iOS R2 的唯一新增联网例外为用户主动使用 Apple StoreKit 购买服务及系统交易更新，边界见 PRD。阅读、正文、笔记和备份仍只在本地；不因此授权 iCloud/WebDAV/OPDS。
 - 技术栈：Vite、Preact、TypeScript strict、Preact Signals；后续按计划引入 Dexie、Worker、EPUB 解析和 PWA。
 - 新依赖必须说明理由及 gzip 体积；开发依赖不计入浏览器交付包，实际体积以构建为准。
 - UI 在 src/pages 与 src/components；应用状态在 src/app；分页与定位在 src/reader；解析器在 src/parsers；存储在 src/db；线程在 src/workers；备份在 src/backup；主题在 src/styles。

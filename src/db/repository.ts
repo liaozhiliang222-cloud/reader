@@ -1,3 +1,4 @@
+import { sourceFingerprint } from './identity';
 import { db } from './index';
 import { contentRevision } from './revision';
 import type { Book, ChapterSummary, Progress } from '@/types';
@@ -44,6 +45,8 @@ export async function saveBook(
       await db.books.put({
         ...book,
         ...existing,
+        sourceFingerprint: sourceFingerprint(book),
+        identityVersion: 1,
         chapterCount: book.chapterCount,
         charCount: book.charCount,
         size: book.size,
@@ -84,13 +87,13 @@ export async function saveProgress(progress: Progress, expectedRevision = 0) {
   });
 }
 
-async function deleteBookRecords(book: Book) {
+async function deleteBookRecords(book: Book, keepNotes = false) {
   await db.books.delete(book.id);
   await db.chapters.where('bookId').equals(book.id).delete();
   await db.progress.delete(book.id);
   await db.speech.delete(book.id);
   await db.bookmarks.where('bookId').equals(book.id).delete();
-  await db.highlights.where('bookId').equals(book.id).delete();
+  if (!keepNotes) await db.highlights.where('bookId').equals(book.id).delete();
   const ids = [
     book.fileBlobId ?? book.id,
     book.draftBlobId,
@@ -143,6 +146,8 @@ export async function saveDraft(
       const draft: Book = {
         ...book,
         ...existing,
+        sourceFingerprint: sourceFingerprint(book),
+        identityVersion: 1,
         title:
           existing?.missingFile && !editingId ? existing.title : book.title,
         type: 'paste',
@@ -239,7 +244,7 @@ export async function renameBook(id: string, title: string) {
   if (!(await db.books.update(id, { title: value })))
     throw new Error('这本书已不存在。');
 }
-export async function deleteBook(id: string) {
+export async function deleteBook(id: string, keepNotes = false) {
   await db.transaction(
     'rw',
     [
@@ -255,7 +260,22 @@ export async function deleteBook(id: string) {
     async () => {
       const book = await db.books.get(id);
       if (!book) return;
-      await deleteBookRecords(book);
+      if (keepNotes)
+        await db.highlights
+          .where('bookId')
+          .equals(id)
+          .modify((item) => {
+            item.archivedSource = {
+              title: book.title,
+              chapterTitle:
+                book.chapterSummaries?.find(
+                  (chapter) => chapter.index === item.chapterIndex,
+                )?.title ?? `第 ${item.chapterIndex + 1} 节`,
+            };
+            item.unanchored = true;
+            item.updatedAt = Date.now();
+          });
+      await deleteBookRecords(book, keepNotes);
       const global = await db.settings.get('global');
       if (global?.value.lastBookId === id)
         await db.settings.put({

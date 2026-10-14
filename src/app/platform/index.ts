@@ -1,12 +1,17 @@
 import { signal } from '@preact/signals';
 import { Capacitor } from '@capacitor/core';
 
-/** 当前运行在 Capacitor 原生壳内（Android App），还是普通浏览器/PWA。 */
+/** 当前运行在 Capacitor 原生壳内，还是普通浏览器/PWA。 */
 export const isNativeApp = Capacitor.isNativePlatform();
-/** 当前听书后端只在 Android 原生壳提供。 */
 export const isAndroidApp =
   isNativeApp && Capacitor.getPlatform() === 'android';
-export const platformKind: 'web' | 'android' = isNativeApp ? 'android' : 'web';
+export const isIosApp = isNativeApp && Capacitor.getPlatform() === 'ios';
+export const hasNativeSpeech = isAndroidApp || isIosApp;
+export const platformKind: 'web' | 'android' | 'ios' = isIosApp
+  ? 'ios'
+  : isAndroidApp
+    ? 'android'
+    : 'web';
 
 /** 原生沉浸模式状态（隐藏系统状态栏与导航栏）。 */
 export const nativeImmersive = signal(false);

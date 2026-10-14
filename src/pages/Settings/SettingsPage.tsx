@@ -1,3 +1,4 @@
+import { ProPanel } from '@/components/ProPanel';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { settings } from '@/app/settings';
@@ -15,7 +16,7 @@ import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { EnvironmentNotice } from '@/components/EnvironmentNotice';
 import { OptionalFontPanel } from '@/components/OptionalFontPanel';
 import { useBackClose } from '@/app/useBackClose';
-import { isNativeApp, isAndroidApp } from '@/app/platform';
+import { isNativeApp, hasNativeSpeech, isIosApp } from '@/app/platform';
 import { openSpeechSettings, resetSpeechData } from '@/app/speech/coordinator';
 
 export function SettingsPage({
@@ -29,6 +30,7 @@ export function SettingsPage({
     }
   }, [initialSection]);
   const [message, setMessage] = useState('');
+  const [pro, setPro] = useState(false);
   const [storage, setStorage] = useState('正在读取存储信息…');
   const [persisted, setPersisted] = useState<boolean>();
   const [busy, setBusy] = useState(false);
@@ -75,11 +77,20 @@ export function SettingsPage({
         <h1>设置</h1>
       </header>
       <EnvironmentNotice />
-      {isAndroidApp && (
+      {isIosApp && (
+        <section>
+          <h2>静页 Pro</h2>
+          <button onClick={() => setPro(true)}>购买与恢复购买</button>
+        </section>
+      )}
+      {pro && <ProPanel onClose={() => setPro(false)} />}
+      {hasNativeSpeech && (
         <section class="settings-group">
           <h2>听书</h2>
           <p>
-            只使用系统中已安装的离线语音。系统语音引擎是独立应用，正文由它处理；它可能拥有联网权限。
+            {isIosApp
+              ? '请在系统设置中下载声音，关闭网络试读，确认所选声音可离线使用。'
+              : '只使用系统中已安装的离线语音。系统语音引擎是独立应用，正文由它处理；它可能拥有联网权限。'}
           </p>
           <label class="speech-field">
             默认语速

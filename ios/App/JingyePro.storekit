@@ -1,0 +1,18 @@
+{
+  "identifier": "B18B1549-82F2-4C18-9A15-220A10E7CF21",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "1.00",
+      "familyShareable": false,
+      "internalID": "100001",
+      "localizations": [{ "description": "仅用于本地测试的静页 Pro 商品", "displayName": "静页 Pro（测试）", "locale": "zh_CN" }],
+      "productID": "dev.jingye.reader.pro",
+      "referenceName": "Jingye Pro Local Test",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": { "_failTransactionsEnabled": false, "_locale": "zh_CN", "_storefront": "CHN" },
+  "subscriptionGroups": [],
+  "version": { "major": 3, "minor": 0 }
+}

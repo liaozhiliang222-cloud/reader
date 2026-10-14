@@ -2,7 +2,7 @@ import { useId } from 'preact/hooks';
 import type { ReadingSettings } from '@/types';
 import { lightTheme } from '@/app/themePreference';
 import { fontState } from '@/app/optionalFont';
-import { isNativeApp } from '@/app/platform';
+import { isAndroidApp } from '@/app/platform';
 
 type Option<T> = { value: T; label: string; disabled?: boolean };
 
@@ -186,7 +186,7 @@ export function ReadingControls({
           两侧点按下一页，左上角返回上一页，中间打开菜单；滑动方向保持不变。
         </p>
       )}
-      {isNativeApp && (
+      {isAndroidApp && (
         <Segmented
           legend="音量键翻页"
           value={value.volumeKeys ? 'on' : 'off'}
@@ -197,7 +197,7 @@ export function ReadingControls({
           ]}
         />
       )}
-      {isNativeApp && value.volumeKeys && (
+      {isAndroidApp && value.volumeKeys && (
         <p class="tap-mode-help">
           阅读页中音量下键下一页、上键上一页；菜单和浮层打开时音量键照常调节音量。
         </p>

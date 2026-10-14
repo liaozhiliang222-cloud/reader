@@ -6,7 +6,7 @@ import type {
   Progress,
   StoredChapter,
 } from '@/types';
-export const BACKUP_VERSION = 4;
+export const BACKUP_VERSION = 5;
 export type BackupBook = Omit<
   Book,
   'fileBlobId' | 'coverBlobId' | 'draftBlobId'

@@ -1,13 +1,15 @@
 import { registerPlugin } from '@capacitor/core';
 import { App } from '@capacitor/app';
-import { navigate, parseRoute } from '@/app/router';
-import { nativeImmersive } from './index';
+import { navigate, parseRoute, noteLinkRoute } from '@/app/router';
+import { isAndroidApp, isIosApp, nativeImmersive } from './index';
 import { navDepth, trackNavPop, trackNavPush } from './nav';
 import type { IncomingData } from '@/app/incomingData';
 import { incomingData, incomingForm, incomingLimit } from '@/app/incomingData';
 import type { ScreenLock } from '@/reader/WakeLock';
 
 interface JyNativePlugin {
+  pickFiles(): Promise<IncomingPayload>;
+  releaseImport(options: { uri: string }): Promise<void>;
   pickSaveTarget(options: {
     name: string;
     mime: string;
@@ -64,6 +66,10 @@ export interface NativeImportProgress {
 type ImportProgress = (progress: NativeImportProgress | undefined) => void;
 
 const Jy = registerPlugin<JyNativePlugin>('JyNative');
+const FileBridge = isIosApp ? registerPlugin<JyNativePlugin>('JyReader') : Jy;
+export async function pickIncoming() {
+  return payloadToIncoming(await FileBridge.pickFiles());
+}
 
 export function listenSpeechOpen() {
   let disposed = false;
@@ -105,6 +111,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 }
 
 export async function saveFile(blob: Blob, name: string): Promise<void> {
+  if (isIosApp) return shareFile(blob, name);
   const { uri } = await Jy.pickSaveTarget({
     name,
     mime: blob.type || 'application/octet-stream',
@@ -117,25 +124,27 @@ export async function saveFile(blob: Blob, name: string): Promise<void> {
 
 export async function shareFile(blob: Blob, name: string): Promise<void> {
   const mime = blob.type || 'application/octet-stream';
-  if (!blob.size) await Jy.shareChunk({ name, data: '', append: false });
+  if (!blob.size)
+    await FileBridge.shareChunk({ name, data: '', append: false });
   for (let offset = 0; offset < blob.size; offset += CHUNK) {
     const data = await blobToBase64(blob.slice(offset, offset + CHUNK));
-    await Jy.shareChunk({ name, data, append: offset > 0 });
+    await FileBridge.shareChunk({ name, data, append: offset > 0 });
   }
-  await Jy.shareCacheFile({ name, mime });
+  await FileBridge.shareCacheFile({ name, mime });
 }
 
 // ---- 沉浸模式与常亮 ----
 
 export async function setImmersive(enabled: boolean): Promise<void> {
-  await Jy.setImmersive({ enabled });
+  await FileBridge.setImmersive({ enabled });
   nativeImmersive.value = enabled;
 }
-export const keepAwake = (enabled: boolean) => Jy.keepAwake({ enabled });
+export const keepAwake = (enabled: boolean) =>
+  FileBridge.keepAwake({ enabled });
 
 /** 原生 WakeLock 兜底：WebView 的 Wake Lock 已可用，失败时退到窗口常亮标志。 */
 export async function nativeScreenLock(): Promise<ScreenLock> {
-  await Jy.keepAwake({ enabled: true });
+  await FileBridge.keepAwake({ enabled: true });
   let released = false;
   const listeners = new Set<EventListener>();
   return {
@@ -145,7 +154,7 @@ export async function nativeScreenLock(): Promise<ScreenLock> {
     async release() {
       if (released) return;
       released = true;
-      await Jy.keepAwake({ enabled: false }).catch(() => {});
+      await FileBridge.keepAwake({ enabled: false }).catch(() => {});
       for (const listener of [...listeners])
         listener.call(null, new Event('release'));
     },
@@ -161,7 +170,7 @@ export async function nativeScreenLock(): Promise<ScreenLock> {
 // ---- 状态栏配色 ----
 
 export function syncStatusBar(color: string, dark: boolean): void {
-  void Jy.statusBar({ color, dark }).catch(() => {});
+  void FileBridge.statusBar({ color, dark }).catch(() => {});
 }
 
 // ---- 返回键 ----
@@ -191,6 +200,20 @@ let backInstalled = false;
 export function installBackButton(): void {
   if (backInstalled) return;
   backInstalled = true;
+  if (!isAndroidApp) {
+    installLinkRouting();
+    const open = (value: string) => {
+      const hash = noteLinkRoute(value);
+      if (hash) navigate(hash);
+    };
+    void App.addListener('appUrlOpen', ({ url }) => open(url));
+    void App.getLaunchUrl()
+      .then((value) => {
+        if (value) open(value.url);
+      })
+      .catch(() => {});
+    return;
+  }
   const push = history.pushState.bind(history);
   history.pushState = (state, unused, url) => {
     trackNavPush();
@@ -232,7 +255,7 @@ function installLinkRouting(): void {
       return;
     }
     event.preventDefault();
-    void Jy.openUrl({ uri: url.href }).catch(() => {});
+    void FileBridge.openUrl({ uri: url.href }).catch(() => {});
   });
 }
 
@@ -247,7 +270,7 @@ async function readUriFile(
   const parts: Uint8Array<ArrayBuffer>[] = [];
   let offset = 0;
   for (;;) {
-    const chunk = await Jy.readUriChunk({ uri, offset, length: CHUNK });
+    const chunk = await FileBridge.readUriChunk({ uri, offset, length: CHUNK });
     // 每块有独立的 Base64 padding，必须分别解码，再组合原始字节。
     const binary = atob(chunk.data);
     if (binary.length > CHUNK || offset + binary.length > limit)
@@ -298,6 +321,7 @@ async function payloadToIncoming(
         Math.min(50 * 1024 * 1024, incomingLimit - used),
         update,
       );
+      if (isIosApp) await FileBridge.releaseImport({ uri: item.uri });
       files.push(file);
       used += file.size;
     } catch (cause) {
@@ -314,7 +338,7 @@ export async function launchIncoming(
   progress?: ImportProgress,
 ): Promise<IncomingData | undefined> {
   try {
-    const pending = await Jy.consumeLaunchFile();
+    const pending = await FileBridge.consumeLaunchFile();
     return await payloadToIncoming(pending, progress);
   } finally {
     progress?.(undefined);
@@ -327,9 +351,14 @@ export function listenIncoming(
   progress?: ImportProgress,
 ) {
   let queue = Promise.resolve();
-  const sub = Jy.addListener('incomingFile', (payload) => {
+  const sub = FileBridge.addListener('incomingFile', (payload) => {
     queue = queue
-      .then(() => payloadToIncoming(payload, progress))
+      .then(async () =>
+        payloadToIncoming(
+          isIosApp ? await FileBridge.consumeLaunchFile() : payload,
+          progress,
+        ),
+      )
       .then((data) => (data ? handler(data) : undefined))
       .catch(onError)
       .finally(() => progress?.(undefined));
@@ -342,9 +371,12 @@ export function listenIncoming(
 // ---- 音量键翻页 ----
 
 export const setVolumeKeys = (enabled: boolean) =>
-  Jy.setVolumeKeys({ enabled }).catch(() => {});
+  isAndroidApp
+    ? Jy.setVolumeKeys({ enabled }).catch(() => {})
+    : Promise.resolve();
 
 export function listenVolumeKey(handler: (direction: 'prev' | 'next') => void) {
+  if (!isAndroidApp) return () => {};
   const sub = Jy.addListener('volumeKey', (event) => handler(event.direction));
   return () => {
     void sub.then((listener) => listener.remove());

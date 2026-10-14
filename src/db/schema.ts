@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable, type Table } from 'dexie';
 import type { StoredSpeechLease } from './speech';
+import { sourceFingerprint } from './identity';
 import type {
   AppSettings,
   Book,
@@ -19,6 +20,7 @@ export function createDatabase(name = 'jingye') {
     bookmarks: EntityTable<Bookmark, 'id'>;
     highlights: EntityTable<Highlight, 'id'>;
     settings: EntityTable<{ id: 'global'; value: AppSettings }, 'id'>;
+    localMeta: EntityTable<{ id: string; value: string }, 'id'>;
   };
   const version1 = {
     books: 'id,lastReadAt,importedAt',
@@ -45,5 +47,21 @@ export function createDatabase(name = 'jingye') {
         });
     });
   database.version(3).stores({ speech: 'bookId' });
+  database
+    .version(4)
+    .stores({ localMeta: 'id' })
+    .upgrade(async (transaction) => {
+      await transaction
+        .table<Book>('books')
+        .toCollection()
+        .modify((book) => {
+          book.sourceFingerprint = sourceFingerprint(book);
+          book.identityVersion = 1;
+          book.contentRevision ??= 0;
+        });
+      await transaction
+        .table('localMeta')
+        .put({ id: 'deviceId', value: crypto.randomUUID() });
+    });
   return database;
 }

@@ -19,4 +19,9 @@ it.each([
   const current = await import('./index');
   expect(current.isNativeApp).toBe(native);
   expect(current.isAndroidApp).toBe(android);
+  expect(current.isIosApp).toBe(native && name === 'ios');
+  expect(current.hasNativeSpeech).toBe(
+    native && (name === 'ios' || name === 'android'),
+  );
+  expect(current.platformKind).toBe(name);
 });

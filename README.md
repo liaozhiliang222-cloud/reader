@@ -1,5 +1,7 @@
 # 静页
 
+iOS R0–R2 源码测试候选位于 `codex/ios-r0-r2`，包含原生完整听书队列、Files/ZIP 导入、笔记整理与 StoreKit 买断入口。Windows 共享检查和 Mac 原生验收分开记录；从 [Mac 构建与验收交接](./IOS_MAC_HANDOFF.md) 接续，完整任务范围见 [iOS 迭代计划](./IOS_ITERATION_PLAN.md)。当前未发布新 IPA，未合并 main。
+
 纸感本地阅读器，产品需求见 [PRD.md](./PRD.md)，任务顺序见 [DEV_PLAN.md](./DEV_PLAN.md)。
 
 [打开静页](https://jingye-reader.pages.dev/) · [项目源码](https://github.com/liaozhiliang222-cloud/reader) · [问题反馈](https://github.com/liaozhiliang222-cloud/reader/issues) · [贡献说明](./CONTRIBUTING.md) · [变更记录](./CHANGELOG.md)

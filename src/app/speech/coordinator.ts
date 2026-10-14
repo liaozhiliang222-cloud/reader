@@ -8,9 +8,10 @@ import {
   releaseOrphanedSpeech,
   saveSpeechSnapshot,
 } from '@/db/speech';
+import { connectPro, canUsePro } from '@/app/pro';
 import { settings } from '@/app/settings';
 import { saveSettings } from '@/db/settings';
-import { isAndroidApp } from '@/app/platform';
+import { hasNativeSpeech, isIosApp } from '@/app/platform';
 import { prepareSpeech } from '@/reader/speech/batch';
 import { openEpubSpeechSource } from '@/reader/speech/epubSource';
 import {
@@ -43,9 +44,11 @@ export const speechView = signal<SpeechView>({
 });
 let backendPromise: Promise<SpeechBackend> | undefined;
 const backend = () =>
-  (backendPromise ??= import('@/reader/speech/NativeSpeech').then(
-    (module) => module.nativeSpeech,
-  ));
+  (backendPromise ??= isIosApp
+    ? import('@/reader/speech/IosSpeech').then((module) => module.iosSpeech)
+    : import('@/reader/speech/NativeSpeech').then(
+        (module) => module.nativeSpeech,
+      ));
 let tail = Promise.resolve();
 function serial<T>(work: () => Promise<T>): Promise<T> {
   const result = tail.then(work);
@@ -129,9 +132,9 @@ async function syncNow() {
   if (inactive) await releaseOrphanedSpeech();
 }
 export const refreshSpeech = () =>
-  isAndroidApp ? serial(syncNow).catch(showError) : Promise.resolve();
+  hasNativeSpeech ? serial(syncNow).catch(showError) : Promise.resolve();
 export async function connectSpeech() {
-  if (!isAndroidApp || installed) return;
+  if (!hasNativeSpeech || installed) return;
   installed = true;
   try {
     const api = await backend();
@@ -204,6 +207,13 @@ export async function startSpeech(
   engine: string,
   voice: string,
 ) {
+  if (isIosApp) {
+    await connectPro();
+    if (!canUsePro()) {
+      showError(new Error('请先解锁 Pro 本地听书。'));
+      return;
+    }
+  }
   await connectSpeech();
   await stopSpeech();
   const controller = new AbortController();
@@ -368,7 +378,7 @@ export async function speechControl(
 }
 export async function manualSpeechNavigation(bookId: string) {
   if (
-    !isAndroidApp ||
+    !hasNativeSpeech ||
     speechView.value.bookId !== bookId ||
     !['preparing', 'ready', 'speaking', 'paused'].includes(
       speechView.value.status,
@@ -386,7 +396,7 @@ export async function manualSpeechNavigation(bookId: string) {
   speechView.value = { ...speechView.value, detached: true };
 }
 export async function stopSpeech() {
-  if (!isAndroidApp) return;
+  if (!hasNativeSpeech) return;
   preparation?.abort();
   if (preparedIdentity)
     await (await backend()).request('cancel', preparedIdentity).catch(() => {});
@@ -412,7 +422,7 @@ export async function stopSpeech() {
   });
 }
 export async function resetSpeechData(clearPreferences = false) {
-  if (!isAndroidApp) return;
+  if (!hasNativeSpeech) return;
   await stopSpeech();
   await (await backend()).request('reset', { clearPreferences });
   seen = '';

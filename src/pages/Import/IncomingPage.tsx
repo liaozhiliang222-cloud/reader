@@ -1,3 +1,4 @@
+import { ArchivePicker } from '@/components/ArchivePicker';
 import { useEffect, useState } from 'preact/hooks';
 import { incomingStore, incomingChanged } from '@/app/incoming';
 import { validIncomingId } from '@/app/incomingData';
@@ -8,6 +9,7 @@ import { navigate } from '@/app/router';
 import { BookLoading } from '@/components/BookLoading';
 
 export function IncomingPage({ id }: { id?: string }) {
+  const [archive, setArchive] = useState<File>();
   const [data, setData] = useState<IncomingData>();
   const [items, setItems] = useState<ImportItem[]>([]);
   const [busy, setBusy] = useState(!!id && validIncomingId(id));
@@ -71,6 +73,17 @@ export function IncomingPage({ id }: { id?: string }) {
       setError('无法清理分享暂存，请稍后重试。');
     }
   };
+  if (archive)
+    return (
+      <ArchivePicker
+        file={archive}
+        onClose={() => setArchive(undefined)}
+        onComplete={(result) => {
+          setItems([...items, ...result]);
+          setArchive(undefined);
+        }}
+      />
+    );
   return (
     <main class="paste-page">
       <header class="panel-heading">
@@ -96,6 +109,17 @@ export function IncomingPage({ id }: { id?: string }) {
             : '分享内容只在本机处理。'}
         </p>
       )}
+      {data?.files
+        .filter(
+          (file) =>
+            /\.zip$/i.test(file.name) &&
+            !/\.(md|markdown)\.zip$/i.test(file.name),
+        )
+        .map((file) => (
+          <button key={file.name} onClick={() => setArchive(file)}>
+            选择 {file.name} 中的书籍
+          </button>
+        ))}
       {!!items.length && (
         <ol class="import-results">
           {items.map((item, index) => (

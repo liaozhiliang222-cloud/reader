@@ -8,8 +8,13 @@ export interface Locator {
   paragraphIndex: number;
   charOffset: number;
 }
+export type ReadingLocation =
+  | { kind: 'text'; locator: Locator }
+  | { kind: 'pdf'; pageIndex: number; x: number; y: number; scale: number };
 export interface Book {
   id: string;
+  sourceFingerprint?: string;
+  identityVersion?: 1;
   title: string;
   type: 'txt' | 'epub' | 'paste' | 'md';
   draftFormat?: 'markdown';
@@ -63,6 +68,9 @@ export interface Highlight {
   createdAt: number;
   updatedAt: number;
   unanchored?: boolean;
+  tags?: string[];
+  reviewPending?: boolean;
+  archivedSource?: { title: string; chapterTitle: string };
 }
 export interface ReadingSettings {
   fontSize: number;

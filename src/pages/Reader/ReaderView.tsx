@@ -17,7 +17,7 @@ import { AnnotationMenu } from './AnnotationMenu';
 import { NoteEditor } from './NoteEditor';
 import { useAnnotations } from '@/reader/useAnnotations';
 import { toggleFullscreen, useImmersive } from '@/reader/useImmersive';
-import { isNativeApp, isAndroidApp, nativeApp } from '@/app/platform';
+import { isNativeApp, hasNativeSpeech, nativeApp } from '@/app/platform';
 import { addBookmark, listBookmarks, removeBookmark } from '@/db/bookmarks';
 import { QuietHint } from '@/components/QuietHint';
 import { TapHint } from '@/components/TapHint';
@@ -50,8 +50,10 @@ export function ReaderView({
   book,
   onBack,
   onBookChanged,
+  initialHighlightId,
 }: {
   book: Book;
+  initialHighlightId?: string;
   onBack: () => void;
   onBookChanged: (book: Book) => void;
 }) {
@@ -99,7 +101,7 @@ export function ReaderView({
     ['preparing', 'ready', 'speaking', 'paused'].includes(speech.status);
   const flushManual = useRef<() => Promise<void>>(async () => {});
   useEffect(() => {
-    if (isAndroidApp) void connectSpeech();
+    if (hasNativeSpeech) void connectSpeech();
   }, []);
   const beginSpeech = async (engine: string, voice: string) => {
     const start = engineRef.current?.currentLocator;
@@ -293,7 +295,19 @@ export function ReaderView({
     );
     engineRef.current = engine;
     void engine.start(
-      getProgress(book.id).then((progress) => progress?.locator),
+      (async () => {
+        if (initialHighlightId) {
+          const { db } = await import('@/db');
+          const note = await db.highlights.get(initialHighlightId);
+          if (
+            note?.bookId === book.id &&
+            !note.unanchored &&
+            !note.archivedSource
+          )
+            return { chapterIndex: note.chapterIndex, ...note.start };
+        }
+        return (await getProgress(book.id))?.locator;
+      })(),
     );
     const resize = () => {
       cancelAnimationFrame(resizeFrame);
@@ -722,7 +736,7 @@ export function ReaderView({
             )}
             {panel === 'more' && (
               <section class="more-panel" aria-label="更多">
-                {isAndroidApp && (
+                {hasNativeSpeech && (
                   <button
                     onClick={() => {
                       setMenu(false);

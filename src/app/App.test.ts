@@ -19,6 +19,8 @@ vi.mock('./startup', () => ({ loadStartup: mocks.startup }));
 vi.mock('./platform', () => ({
   isNativeApp: true,
   isAndroidApp: true,
+  isIosApp: false,
+  hasNativeSpeech: true,
   nativeApp: async () => ({
     cleanupServiceWorkers: vi.fn(),
     installBackButton: vi.fn(),

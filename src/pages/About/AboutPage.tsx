@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { navigate } from '@/app/router';
 import { copyText } from '@/app/files';
-import { isNativeApp, isAndroidApp } from '@/app/platform';
+import { isNativeApp, isAndroidApp, isIosApp } from '@/app/platform';
 const version = import.meta.env.VITE_APP_VERSION;
 
 export function AboutPage() {
@@ -35,9 +35,11 @@ export function AboutPage() {
           中，不上传服务器。
         </p>
         <p>
-          {isNativeApp
-            ? '应用未申请联网权限，资源与可选字体均内置在安装包中；不参与系统云备份或自动换机传输。'
-            : '应用没有统计 SDK、广告、第三方 CDN 或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。'}
+          {isIosApp
+            ? '阅读资源与可选字体内置，书籍和笔记不上传。购买和恢复由 Apple StoreKit 按需联网，系统交易更新由系统处理；不提供应用云同步，设备的系统备份由你的设置决定。'
+            : isNativeApp
+              ? '应用未申请联网权限，资源与可选字体均内置在安装包中；不参与系统云备份或自动换机传输。'
+              : '应用没有统计 SDK、广告、第三方 CDN 或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。'}
         </p>
         <p>
           {isNativeApp

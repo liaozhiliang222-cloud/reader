@@ -22,6 +22,7 @@ export function BookActions({
     bookmarks: number;
     highlights: number;
   }>();
+  const [keepNotes, setKeepNotes] = useState(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   useEffect(() => {
@@ -158,10 +159,18 @@ export function BookActions({
       )}
       {page === 'delete' && (
         <>
+          <label class="check-row">
+            <input
+              type="checkbox"
+              checked={keepNotes}
+              onChange={(e) => setKeepNotes(e.currentTarget.checked)}
+            />
+            保留划线和想法副本（删除后不能回到原文）
+          </label>
           <p>
             确认删除《{book.title}》？原文件、阅读进度
             {counts &&
-              `、${counts.bookmarks} 个书签和 ${counts.highlights} 条划线笔记`}
+              `、${counts.bookmarks} 个书签${keepNotes ? '' : `和 ${counts.highlights} 条划线笔记`}`}
             将一起删除，此操作无法撤销。
           </p>
           <div class="panel-actions">
@@ -173,7 +182,7 @@ export function BookActions({
               onClick={() =>
                 void commit(async () => {
                   await resetSpeechData();
-                  await deleteBook(book.id);
+                  await deleteBook(book.id, keepNotes);
                 })
               }
             >

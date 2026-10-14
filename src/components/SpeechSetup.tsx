@@ -1,3 +1,6 @@
+import { canUsePro } from '@/app/pro';
+import { ProPanel } from './ProPanel';
+import { isIosApp } from '@/app/platform';
 import { useEffect, useState } from 'preact/hooks';
 import { Modal } from './Modal';
 import { BookLoading } from './BookLoading';
@@ -36,11 +39,14 @@ export function SpeechSetup({
   useEffect(() => {
     void load();
   }, []);
+  if (isIosApp && !canUsePro()) return <ProPanel onClose={onClose} />;
   return (
     <Modal title="本地听书" onDismiss={onClose}>
       <h2>本地听书</h2>
       <p>
-        正文交给系统语音引擎处理。只使用已安装、标记为无需联网的语音；引擎是独立应用，可能拥有联网权限。
+        {isIosApp
+          ? '请先在系统设置中下载声音，并关闭网络试读，确认所选声音可离线使用。'
+          : '正文交给系统语音引擎处理。只使用已安装、标记为无需联网的语音；引擎是独立应用，可能拥有联网权限。'}
       </p>
       {busy ? (
         <BookLoading title="正在检查离线语音" />
