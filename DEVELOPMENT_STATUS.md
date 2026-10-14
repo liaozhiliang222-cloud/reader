@@ -4,6 +4,8 @@
 
 ## iOS R0–R2 源码候选收尾（2026-10-14，Mac 原生待验）
 
+GitHub 已上传：源码合并提交 `1ea55448ccb97fafb208c0b4f814f98818ab14b0`，分支 [codex/ios-r0-r2](https://github.com/liaozhiliang222-cloud/reader/tree/codex/ios-r0-r2)，草稿 [PR #5](https://github.com/liaozhiliang222-cloud/reader/pull/5)。上传经本机现有 Git 凭据完成，PR 已附到本聊天；没有合并 main 或发布产物。后续记录提交只更新本文，不改变已验证应用代码。
+
 - 按用户选择推进到 R2，保留免费阅读、基础笔记导出与备份。分支 `codex/ios-r0-r2` 从安卓 `4958082` 整合 iOS `b6f14c0`：共享分句、EPUB 过滤、进度租约与回前台对账沿用已验证逻辑，Swift 接入同一版本化请求协议；接回中文文件名暂存与 iOS 文楷 IDB 缓存修复。Android 既有听书不受 iOS 购买门控影响；iOS 不显示安卓音量键控件。
 - IOS-R0-01/02/03：平台能力分路、身份字段/数据库 v4、兼容旧 UTF-16 定位的文本/PDF 类型与安全读取接口、本机身份表及迁移/备份检查、Xcode XCTest 目标与共享 Scheme、手动 macOS CI 已加入。文本阅读器未改为 PDF 模式，PDF 和同步留在后续阶段；本机身份不导出。
 - IOS-R1-01/02：Swift Files 多选/文件协调/私有句柄/分块读取/原生保存分享、冷热启动事件和 ZIP UTType 已接入。普通 ZIP 在 Worker 中有界扫描与逐条 CRC 解包，可选择 TXT/EPUB/MD、不递归，失败项与重复项有结果。系统提供者下载、权限、取消及实际文件落盘仍需 Mac/设备验证。
