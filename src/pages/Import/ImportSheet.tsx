@@ -1,3 +1,5 @@
+import { ArchivePicker } from '@/components/ArchivePicker';
+import { isIosApp, nativeApp } from '@/app/platform';
 import { useRef, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { importText } from '@/parsers/importText';
@@ -26,6 +28,8 @@ export function ImportSheet({
   onClose: () => void;
   onComplete: (items: ImportItem[]) => void;
 }) {
+  const [archives, setArchives] = useState<File[]>([]);
+  const [pickerError, setPickerError] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<ImportItem[]>([]);
   const [busy, setBusy] = useState(false);
@@ -33,11 +37,53 @@ export function ImportSheet({
     if (!files.length || busy) return;
     setBusy(true);
     try {
-      const result = await importBatch(files, importText, setItems);
-      onComplete(result);
+      const remainingArchives = files.filter(
+        (file) =>
+          /\.zip$/i.test(file.name) &&
+          !/\.(md|markdown)\.zip$/i.test(file.name),
+      );
+      const plain = files.filter(
+        (file) =>
+          !/\.zip$/i.test(file.name) ||
+          /\.(md|markdown)\.zip$/i.test(file.name),
+      );
+      const result = await importBatch(plain, importText, setItems);
+      setArchives(remainingArchives);
+      if (!remainingArchives.length) onComplete(result);
     } finally {
       setBusy(false);
       if (input.current) input.current.value = '';
+    }
+  };
+  if (archives[0])
+    return (
+      <ArchivePicker
+        file={archives[0]}
+        onClose={() => {
+          setArchives(archives.slice(1));
+          if (archives.length === 1) onComplete(items);
+        }}
+        onComplete={(result) => {
+          const combined = [...items, ...result];
+          setItems(combined);
+          if (archives.length === 1) onComplete(combined);
+          setArchives(archives.slice(1));
+        }}
+      />
+    );
+  const pick = async () => {
+    if (!isIosApp) {
+      input.current?.click();
+      return;
+    }
+    try {
+      const data = await (await nativeApp()).pickIncoming();
+      if (data) {
+        setPickerError(data.errors.join('；'));
+        await select(data.files);
+      }
+    } catch (cause) {
+      setPickerError(cause instanceof Error ? cause.message : '未能选择文件。');
     }
   };
   const finished = items.filter(
@@ -56,7 +102,7 @@ export function ImportSheet({
           关闭
         </button>
       </header>
-      <p class="muted">选择本机的 EPUB、TXT、Markdown，或把长文粘贴成文稿。</p>
+      <p class="muted">选择本机的 EPUB、TXT、Markdown 或 ZIP，也可粘贴长文。</p>
       <p class="muted">
         带图片的文章：把一个 Markdown 文件和图片文件夹一起压缩，命名为 .md.zip
         后导入。
@@ -74,7 +120,7 @@ export function ImportSheet({
         }
       />
       <div class="panel-actions">
-        <button disabled={busy} onClick={() => input.current?.click()}>
+        <button disabled={busy} onClick={() => void pick()}>
           选择文件
         </button>
         <button
@@ -87,6 +133,7 @@ export function ImportSheet({
           粘贴文本
         </button>
       </div>
+      {pickerError && <p role="alert">{pickerError}</p>}
       {!!items.length && (
         <>
           {busy ? (

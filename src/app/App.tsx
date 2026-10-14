@@ -17,8 +17,10 @@ import { incomingStore, incomingChanged } from './incoming';
 import { installFileConsumer, type LaunchHost } from './fileLaunch';
 import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { restoreOptionalFont } from './optionalFont';
+import { NotesPage } from '@/pages/Notes/NotesPage';
+import { connectPro } from './pro';
 import { AboutPage } from '@/pages/About/AboutPage';
-import { isNativeApp, nativeApp } from './platform';
+import { isNativeApp, isAndroidApp, nativeApp } from './platform';
 import type { IncomingData } from './incomingData';
 import { validIncomingId } from './incomingData';
 import type { NativeImportProgress } from './platform/native';
@@ -27,6 +29,9 @@ import { Modal } from '@/components/Modal';
 
 export function App() {
   const route = useRoute();
+  useEffect(() => {
+    void connectPro();
+  }, []);
   const [ready, setReady] = useState(false);
   const [nativeLaunching, setNativeLaunching] = useState(isNativeApp);
   const [receiving, setReceiving] = useState<NativeImportProgress>();
@@ -61,6 +66,7 @@ export function App() {
     if (!isNativeApp) return;
     // App：接管返回键、处理冷启动/热启动传入的文件。
     let disposeIncoming: (() => void) | undefined;
+    let disposeSpeechOpen: (() => void) | undefined;
     let cancelled = false;
     const fail = () => {
       if (!cancelled) setError('未能接收系统打开的文件，请从书架重新选择。');
@@ -73,6 +79,7 @@ export function App() {
         if (cancelled) return;
         void native.cleanupServiceWorkers();
         native.installBackButton();
+        if (isAndroidApp) disposeSpeechOpen = native.listenSpeechOpen();
         disposeIncoming = native.listenIncoming(deliver, fail, progress);
         const data = await native.launchIncoming(progress);
         if (data && !cancelled) await deliver(data);
@@ -84,6 +91,7 @@ export function App() {
     return () => {
       cancelled = true;
       disposeIncoming?.();
+      disposeSpeechOpen?.();
     };
   }, [ready]);
   useEffect(() => {
@@ -183,6 +191,7 @@ export function App() {
       );
     if (route.page === 'settings')
       return <SettingsPage initialSection={route.section} />;
+    if (route.page === 'notes') return <NotesPage />;
     if (route.page === 'about') return <AboutPage />;
     if (route.page === 'paste')
       return (
@@ -205,8 +214,9 @@ export function App() {
     if (route.page === 'reader' && active)
       return (
         <ReaderView
-          key={`${active.id}:${active.contentRevision ?? 0}`}
+          key={`${active.id}:${active.contentRevision ?? 0}:${route.noteId ?? ''}`}
           book={active}
+          initialHighlightId={route.noteId}
           onBookChanged={(book) => {
             const current = parseRoute(location.hash);
             if (current.page === 'reader' && current.bookId === book.id)

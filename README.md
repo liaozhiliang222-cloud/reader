@@ -1,12 +1,14 @@
 # 静页
 
+iOS R0–R2 源码测试候选位于 `codex/ios-r0-r2`，包含原生完整听书队列、Files/ZIP 导入、笔记整理与 StoreKit 买断入口。Windows 共享检查和 Mac 原生验收分开记录；从 [Mac 构建与验收交接](./IOS_MAC_HANDOFF.md) 接续，完整任务范围见 [iOS 迭代计划](./IOS_ITERATION_PLAN.md)。当前未发布新 IPA，未合并 main。
+
 纸感本地阅读器，产品需求见 [PRD.md](./PRD.md)，任务顺序见 [DEV_PLAN.md](./DEV_PLAN.md)。
 
 [打开静页](https://jingye-reader.pages.dev/) · [项目源码](https://github.com/liaozhiliang222-cloud/reader) · [问题反馈](https://github.com/liaozhiliang222-cloud/reader/issues) · [贡献说明](./CONTRIBUTING.md) · [变更记录](./CHANGELOG.md)
 
 当前为 0.0.1 预览版本，项目许可证待定。以下为隔离浏览器的实际界面截图，正文为原创验收文字，不代表物理手机验收。
 
-Android `1.0.1` 预览 APK 可从 [Release](https://github.com/liaozhiliang222-cloud/reader/releases/tag/android-v1.0.1) 下载，支持 Android 7.0 及以上。本版修复几 MB 文件的大小误报、启动时旧导入错误页闪现，并加入跟随主题的翻页加载反馈。资源内置、无联网权限，提供原生保存/分享、系统返回、沉浸阅读和音量键翻页。安装、网页版数据迁移、构建和验证范围见 [Android 发布说明](./ANDROID_RELEASE.md)；听书仍处于计划阶段。
+公开 Android `1.0.1` 预览 APK 可从 [Release](https://github.com/liaozhiliang222-cloud/reader/releases/tag/android-v1.0.1) 下载，支持 Android 7.0 及以上。该版修复几 MB 文件的大小误报、启动时旧导入错误页闪现，并加入跟随主题的翻页加载反馈。资源内置、无联网权限，提供原生保存/分享、系统返回、沉浸阅读和音量键翻页。安装、网页版数据迁移、构建和验证范围见 [Android 发布说明](./ANDROID_RELEASE.md)。新增本地 `1.1.0-preview` 听书测试包尚未公开发布：阅读页「更多 → 听书」选择已安装离线语音即可开始，支持锁屏播放、句级续听、媒体控制、语速和定时。
 
 <img src="docs/screenshots/reading.png" alt="静页纸感分页正文" width="240"> <img src="docs/screenshots/install-guide.png" alt="320px iOS 安装图示与旧系统提示" width="240">
 

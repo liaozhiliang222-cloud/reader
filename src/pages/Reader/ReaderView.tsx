@@ -17,7 +17,7 @@ import { AnnotationMenu } from './AnnotationMenu';
 import { NoteEditor } from './NoteEditor';
 import { useAnnotations } from '@/reader/useAnnotations';
 import { toggleFullscreen, useImmersive } from '@/reader/useImmersive';
-import { isNativeApp, nativeApp } from '@/app/platform';
+import { isNativeApp, hasNativeSpeech, nativeApp } from '@/app/platform';
 import { addBookmark, listBookmarks, removeBookmark } from '@/db/bookmarks';
 import { QuietHint } from '@/components/QuietHint';
 import { TapHint } from '@/components/TapHint';
@@ -27,6 +27,16 @@ import { fontState } from '@/app/optionalFont';
 import { useBackClose } from '@/app/useBackClose';
 import { Icon } from '@/components/Icon';
 import { Modal } from '@/components/Modal';
+import { SpeechSetup } from '@/components/SpeechSetup';
+import { SpeechBar } from '@/components/SpeechBar';
+import { SpeechFollow } from '@/reader/speech/follow';
+import {
+  speechView,
+  connectSpeech,
+  startSpeech,
+  stopSpeech,
+  manualSpeechNavigation,
+} from '@/app/speech/coordinator';
 import type {
   Book,
   Bookmark,
@@ -40,8 +50,10 @@ export function ReaderView({
   book,
   onBack,
   onBookChanged,
+  initialHighlightId,
 }: {
   book: Book;
+  initialHighlightId?: string;
   onBack: () => void;
   onBookChanged: (book: Book) => void;
 }) {
@@ -82,23 +94,56 @@ export function ReaderView({
     locator: { chapterIndex: 0, paragraphIndex: 0, charOffset: 0 },
   });
   const [error, setError] = useState('');
+  const [speechOpen, setSpeechOpen] = useState(false);
+  const speech = speechView.value;
+  const speechActive =
+    speech.bookId === book.id &&
+    ['preparing', 'ready', 'speaking', 'paused'].includes(speech.status);
+  const flushManual = useRef<() => Promise<void>>(async () => {});
+  useEffect(() => {
+    if (hasNativeSpeech) void connectSpeech();
+  }, []);
+  const beginSpeech = async (engine: string, voice: string) => {
+    const start = engineRef.current?.currentLocator;
+    if (!start) return;
+    setSpeechOpen(false);
+    setMenu(false);
+    await flushManual.current();
+    await startSpeech(book, start, engine, voice);
+  };
+  const speechFollow = useRef(new SpeechFollow());
+  useEffect(() => {
+    const follow = speechFollow.current.update({
+      bookId: book.id,
+      snapshot: speech.snapshot,
+      detached: speech.detached,
+      visible: document.visibilityState === 'visible',
+      active: speechActive,
+    });
+    if (!follow) return;
+    if (follow.jump) engineRef.current?.jump(follow.jump, false);
+    engineRef.current?.setSpeechRanges(follow.ranges);
+  }, [speech.snapshot, speech.detached, speechActive]);
   const annotations = useAnnotations(book, engineRef, setError, () => {
     setMenu(false);
     setDrawer(false);
   });
   const overlayOpen =
+    speechOpen ||
     menu ||
     drawer ||
     encodingOpen ||
     !!linkAddress ||
     !!annotations.target ||
     !!annotations.editor;
-  const leave = useBackClose(overlayOpen, () => {
-    if (linkAddress) setLinkAddress('');
+  const leave = useBackClose(overlayOpen || speechActive, () => {
+    if (speechOpen) setSpeechOpen(false);
+    else if (linkAddress) setLinkAddress('');
     else if (encodingOpen) setEncodingOpen(false);
     else if (annotations.target || annotations.editor) annotations.close();
     else if (drawer) setDrawer(false);
-    else setMenu(false);
+    else if (menu) setMenu(false);
+    else if (speechActive) void stopSpeech();
   });
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [bookmarkBusy, setBookmarkBusy] = useState(false);
@@ -152,12 +197,14 @@ export function ReaderView({
     let cancelled = false;
     void nativeApp().then((native) => {
       if (!cancelled)
-        void native.setVolumeKeys(!!reading.volumeKeys && !overlayOpen);
+        void native.setVolumeKeys(
+          !!reading.volumeKeys && !overlayOpen && !speechActive,
+        );
     });
     return () => {
       cancelled = true;
     };
-  }, [reading.volumeKeys, overlayOpen]);
+  }, [reading.volumeKeys, overlayOpen, speechActive]);
   const followSystemTheme = settings.value.followSystemTheme;
   const changeReading = (patch: Partial<ReadingSettings>) => {
     setReading((current) => ({ ...current, ...themePatch(patch, current) }));
@@ -198,13 +245,17 @@ export function ReaderView({
     let latest: Progress | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let resizeFrame = 0;
-    const persist = () => {
+    const persist = async () => {
       clearTimeout(timer);
-      if (latest)
-        void saveProgress(latest, book.contentRevision ?? 0).catch(() => {
+      if (latest) {
+        const value = latest;
+        latest = undefined;
+        await saveProgress(value, book.contentRevision ?? 0).catch(() => {
           if (!disposed) setError('进度未能保存，请检查浏览器存储空间。');
         });
+      }
     };
+    flushManual.current = persist;
     const engine = new ReaderEngine(
       book,
       frame,
@@ -214,6 +265,17 @@ export function ReaderView({
         if (disposed) return;
         annotations.onLocation(value.locator);
         setInfo(value);
+        const listening = speechView.value;
+        if (
+          listening.bookId === book.id &&
+          !listening.detached &&
+          ['preparing', 'ready', 'speaking', 'paused'].includes(
+            listening.status,
+          )
+        ) {
+          clearTimeout(timer);
+          return;
+        }
         latest = {
           bookId: book.id,
           locator: value.locator,
@@ -229,10 +291,23 @@ export function ReaderView({
       (previous) => {
         if (!disposed) setReturnPoint(previous);
       },
+      () => manualSpeechNavigation(book.id),
     );
     engineRef.current = engine;
     void engine.start(
-      getProgress(book.id).then((progress) => progress?.locator),
+      (async () => {
+        if (initialHighlightId) {
+          const { db } = await import('@/db');
+          const note = await db.highlights.get(initialHighlightId);
+          if (
+            note?.bookId === book.id &&
+            !note.unanchored &&
+            !note.archivedSource
+          )
+            return { chapterIndex: note.chapterIndex, ...note.start };
+        }
+        return (await getProgress(book.id))?.locator;
+      })(),
     );
     const resize = () => {
       cancelAnimationFrame(resizeFrame);
@@ -430,7 +505,8 @@ export function ReaderView({
     };
     frame.addEventListener('keydown', linkKey);
     return () => {
-      persist();
+      void persist();
+      if (speechView.value.bookId === book.id) void stopSpeech();
       disposed = true;
       clearTimeout(timer);
       cancelAnimationFrame(resizeFrame);
@@ -467,7 +543,13 @@ export function ReaderView({
     fontPhase,
   ]);
   return (
-    <main class="reader">
+    <main class={`reader${speechActive ? ' reader-with-speech' : ''}`}>
+      {speechOpen && (
+        <SpeechSetup
+          onClose={() => setSpeechOpen(false)}
+          onStart={(engine, voice) => void beginSpeech(engine, voice)}
+        />
+      )}
       {linkAddress && (
         <Modal title="链接地址" onDismiss={() => setLinkAddress('')}>
           <h2>链接地址</h2>
@@ -554,6 +636,14 @@ export function ReaderView({
         )}
         {info.percent.toFixed(1)}%
       </footer>
+      {speechActive && !overlayOpen && (
+        <SpeechBar onFromPage={() => setSpeechOpen(true)} />
+      )}
+      {speech.bookId === book.id && speech.error && (
+        <p class="reader-error" role="alert">
+          {speech.error}
+        </p>
+      )}
       {error && (
         <p class="reader-error" role="alert">
           {error}
@@ -599,7 +689,13 @@ export function ReaderView({
             <button
               class="menu-back"
               aria-label="返回书架"
-              onClick={() => leave(onBack)}
+              onClick={() =>
+                leave(() => {
+                  void stopSpeech()
+                    .then(onBack)
+                    .catch(() => setError('听书位置未能保存，请重试。'));
+                })
+              }
             >
               <Icon name="back" />
               <span>书架</span>
@@ -640,6 +736,16 @@ export function ReaderView({
             )}
             {panel === 'more' && (
               <section class="more-panel" aria-label="更多">
+                {hasNativeSpeech && (
+                  <button
+                    onClick={() => {
+                      setMenu(false);
+                      setSpeechOpen(true);
+                    }}
+                  >
+                    听书
+                  </button>
+                )}
                 <label class="check-row">
                   安静提示
                   <input
@@ -655,7 +761,7 @@ export function ReaderView({
                     disabled={!engineRef.current?.currentLocator}
                     onClick={() => {
                       annotations.close();
-                      setEncodingOpen(true);
+                      void stopSpeech().then(() => setEncodingOpen(true));
                     }}
                   >
                     切换编码

@@ -1,4 +1,5 @@
 import { initialSettings } from '@/app/defaults';
+import { validRate, validTimer } from '@/reader/speech/protocol';
 import { comparePosition } from '@/reader/annotation';
 import { bookIdForHash } from '@/parsers/identity';
 import {
@@ -141,6 +142,12 @@ function readSettings(value: unknown): AppSettings {
     ...defaults,
     reading: { ...defaults.reading, ...validateReading(data.reading ?? {}) },
   };
+  if (data.speech !== undefined) {
+    const speech = record(data.speech, '听书设置');
+    if (!validRate(speech.rate) || !validTimer(speech.timer))
+      return error('听书设置');
+    result.speech = { rate: speech.rate, timer: speech.timer };
+  }
   if (data.shelfSort !== undefined)
     result.shelfSort = choice(
       data.shelfSort,
@@ -183,6 +190,16 @@ function readBook(value: unknown): BackupBook {
         ? number(data.importedAt, '导入时间')
         : number(data.lastReadAt, '阅读时间'),
   };
+  if (data.identityVersion !== undefined && data.identityVersion !== 1)
+    error('书籍身份版本');
+  if (data.identityVersion !== undefined) book.identityVersion = 1;
+  if (
+    data.sourceFingerprint !== undefined &&
+    data.sourceFingerprint !== book.id.slice(-64)
+  )
+    error('原文件指纹');
+  if (data.sourceFingerprint !== undefined)
+    book.sourceFingerprint = book.id.slice(-64);
   if (data.draftFormat !== undefined) {
     if (book.type !== 'paste') error('文稿格式');
     book.draftFormat = choice(data.draftFormat, ['markdown'], '文稿格式');
@@ -273,6 +290,7 @@ export function validateBackup(value: unknown): BackupFile {
     data.schemaVersion !== 1 &&
     data.schemaVersion !== 2 &&
     data.schemaVersion !== 3 &&
+    data.schemaVersion !== 4 &&
     data.schemaVersion !== BACKUP_VERSION
   )
     throw new Error('备份版本不受支持，请使用与备份匹配的静页版本。');
@@ -348,11 +366,43 @@ export function validateBackup(value: unknown): BackupFile {
         h.unanchored === undefined
           ? undefined
           : boolean(h.unanchored, '划线位置状态');
-      bookFor(bookId);
+      const archived =
+        h.archivedSource === undefined
+          ? undefined
+          : record(h.archivedSource, '摘录来源');
+      if (
+        archived &&
+        (number(data.schemaVersion, '备份版本') < 5 || !unanchored)
+      )
+        error('保留摘录状态');
+      if (!archived) bookFor(bookId);
       if (!unanchored) checkLocator(bookId, { chapterIndex, ...start });
+      const tags =
+        h.tags === undefined
+          ? undefined
+          : array(h.tags, '笔记标签', (tag) => string(tag, '标签'));
+      if (
+        tags &&
+        (tags.length > 12 ||
+          tags.some((tag) => tag.length > 30) ||
+          new Set(tags).size !== tags.length)
+      )
+        error('笔记标签');
       if (comparePosition(start, end) >= 0) error('划线范围');
       return {
         id: string(h.id, '划线ID'),
+        ...(tags ? { tags } : {}),
+        ...(h.reviewPending === undefined
+          ? {}
+          : { reviewPending: boolean(h.reviewPending, '回顾状态') }),
+        ...(archived
+          ? {
+              archivedSource: {
+                title: string(archived.title, '原书名'),
+                chapterTitle: string(archived.chapterTitle, '原章节', true),
+              },
+            }
+          : {}),
         bookId,
         chapterIndex,
         start,

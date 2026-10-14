@@ -253,3 +253,44 @@
   padding: 16px;
   overflow-wrap: anywhere;
 }
+
+.notes-filters {
+  display: grid;
+  gap: 12px;
+}
+.notes-filters label:not(.check-row) {
+  display: grid;
+  gap: 6px;
+}
+.notes-filters input:not([type='checkbox']),
+.notes-filters select {
+  min-height: 44px;
+  max-width: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  min-width: 0;
+}
+.notes-filters-panel summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.notes-list {
+  list-style: none;
+  padding: 0;
+}
+.notes-list > li {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+.notes-list blockquote,
+.note-thought {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.notes-list h2 {
+  font-size: 18px;
+}

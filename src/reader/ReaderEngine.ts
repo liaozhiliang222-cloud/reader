@@ -5,6 +5,8 @@ import { pageCount, pageGeometry } from './paginator';
 import { getLocator, pageOf } from './locator';
 import { currentSection } from './currentSection';
 import { HighlightLayer } from './highlight';
+import { rangeForSpan } from './selection';
+import type { SourceRange } from './speech/segment';
 import { PageMotion } from './PageMotion';
 import {
   chapterChunks,
@@ -83,6 +85,7 @@ export class ReaderEngine {
   private queue: Navigation[] = [];
   private highlights: Highlight[] = [];
   private highlightLayer = new HighlightLayer();
+  private speechRanges: SourceRange[] = [];
   private motion = new PageMotion();
   private visibilityChanged = () => {
     if (document.visibilityState === 'hidden') this.cancelMeasurement();
@@ -96,6 +99,7 @@ export class ReaderEngine {
     private onUpdate: (info: ReaderInfo) => void,
     private onError: (error: Error) => void,
     private onJump: (previous: Locator) => void,
+    private beforeNavigate?: () => Promise<void>,
   ) {
     this.sources = new ChapterWindow(async (index, signal) => {
       const end = beginMeasure('章节读取与分块索引');
@@ -120,8 +124,51 @@ export class ReaderEngine {
     this.paintHighlights();
   }
   private paintHighlights() {
-    if (!this.disposed)
+    if (!this.disposed) {
       this.highlightLayer.render(this.window.values(), this.highlights);
+      this.paintSpeech();
+    }
+  }
+  setSpeechRanges(ranges: SourceRange[]) {
+    this.speechRanges = ranges;
+    this.paintSpeech();
+  }
+  private paintSpeech() {
+    const ranges: Range[] = [];
+    if (this.active)
+      for (const span of this.speechRanges) {
+        if (span.start.chapterIndex !== this.active.chapter.index) continue;
+        const range = rangeForSpan(this.active.root, {
+          ...span,
+          chapterIndex: span.start.chapterIndex,
+        });
+        if (range) ranges.push(range);
+      }
+    this.frame.querySelector('[data-speech-overlay]')?.remove();
+    if (
+      typeof CSS !== 'undefined' &&
+      CSS.highlights &&
+      typeof globalThis.Highlight !== 'undefined'
+    ) {
+      if (ranges.length) {
+        const mark = new globalThis.Highlight(...ranges);
+        mark.priority = -1;
+        CSS.highlights.set('jingye-speech', mark);
+      } else CSS.highlights.delete('jingye-speech');
+    } else if (ranges.length) {
+      const overlay = document.createElement('div');
+      overlay.dataset.speechOverlay = '';
+      overlay.setAttribute('aria-hidden', 'true');
+      const frame = this.frame.getBoundingClientRect();
+      for (const range of ranges)
+        for (const rect of range.getClientRects()) {
+          if (rect.right <= frame.left || rect.left >= frame.right) continue;
+          const marker = document.createElement('i');
+          marker.style.cssText = `left:${rect.left - frame.left}px;top:${rect.top - frame.top}px;width:${rect.width}px;height:${rect.height}px`;
+          overlay.append(marker);
+        }
+      this.frame.append(overlay);
+    }
   }
   selectedText() {
     const active = this.active,
@@ -594,6 +641,7 @@ export class ReaderEngine {
         : percentOf(active.chapter, this.anchor, this.book.charCount),
       locator: { ...this.anchor },
     });
+    this.paintSpeech();
   }
   turn(direction: number) {
     this.queue.push({ kind: 'turn', direction: direction < 0 ? -1 : 1 });
@@ -615,6 +663,11 @@ export class ReaderEngine {
         this.motion.cancel();
         this.cancelMeasurement();
         const command = this.queue.shift()!;
+        if (
+          this.beforeNavigate &&
+          (command.kind !== 'jump' || command.remember)
+        )
+          await this.beforeNavigate();
         if (command.kind === 'turn') {
           if (!this.active) continue;
           const previous = this.active,
@@ -723,6 +776,8 @@ export class ReaderEngine {
       this.active.root.style.transform = `translateX(${-this.page * this.active.stride}px)`;
   }
   dispose() {
+    this.speechRanges = [];
+    this.paintSpeech();
     this.disposed = true;
     ++this.generation;
     this.cancelMeasurement();

@@ -4,11 +4,13 @@ import { trackNavPush } from './platform/nav';
 export type Route =
   | { page: 'shelf' }
   | { page: 'about' }
+  | { page: 'notes' }
   | { page: 'settings'; section?: 'backup' }
   | { page: 'paste'; bookId?: string; incomingId?: string }
   | { page: 'incoming'; id?: string }
-  | { page: 'reader'; bookId: string };
+  | { page: 'reader'; bookId: string; noteId?: string };
 export function parseRoute(hash: string): Route {
+  if (hash === '#/notes') return { page: 'notes' };
   if (hash === '#/about') return { page: 'about' };
   if (hash === '#/incoming') return { page: 'incoming' };
   if (hash.startsWith('#/incoming/'))
@@ -22,8 +24,13 @@ export function parseRoute(hash: string): Route {
   if (hash.startsWith('#/read/') || hash.startsWith('#/paste/')) {
     try {
       const paste = hash.startsWith('#/paste/');
-      const bookId = decodeURIComponent(hash.slice(paste ? 8 : 7));
-      if (bookId) return { page: paste ? 'paste' : 'reader', bookId };
+      const [encoded, query] = hash.slice(paste ? 8 : 7).split('?');
+      const bookId = decodeURIComponent(encoded ?? '');
+      const noteId = new URLSearchParams(query).get('note') ?? undefined;
+      if (bookId)
+        return paste
+          ? { page: 'paste', bookId }
+          : { page: 'reader', bookId, ...(noteId ? { noteId } : {}) };
     } catch {
       /* 无效路由返回书架 */
     }
@@ -38,6 +45,19 @@ export function navigate(hash: string, replace = false) {
     if (location.hash === hash) return;
     trackNavPush();
     location.hash = hash;
+  }
+}
+export function noteLinkRoute(value: string): string | undefined {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'jingye:' || url.hostname !== 'note') return;
+    const parts = url.pathname.slice(1).split('/');
+    if (parts.length !== 2 || !parts.every(Boolean)) return;
+    const book = decodeURIComponent(parts[0]!),
+      note = decodeURIComponent(parts[1]!);
+    return `#/read/${encodeURIComponent(book)}?note=${encodeURIComponent(note)}`;
+  } catch {
+    return;
   }
 }
 export function useRoute() {

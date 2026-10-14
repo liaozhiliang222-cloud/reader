@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { applyEncoding } from '@/db/recode';
+import { resetSpeechData } from '@/app/speech/coordinator';
+import { isNativeApp } from '@/app/platform';
 import {
   previewEncoding,
   TEXT_ENCODINGS,
@@ -81,6 +83,7 @@ export function EncodingPanel({
     setBusy('apply');
     setError('');
     try {
+      if (isNativeApp) await resetSpeechData();
       const updated = await applyEncoding(book, parsed, percent);
       if (live.current) onApplied(updated);
     } catch (cause) {

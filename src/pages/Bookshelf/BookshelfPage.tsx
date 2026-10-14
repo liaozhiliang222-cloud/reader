@@ -80,6 +80,7 @@ export function BookshelfPage({ notice }: { notice?: string }) {
     <main class="welcome">
       <header class="masthead">
         <span class="wordmark">静页</span>
+        <button onClick={() => navigate('#/notes')}>笔记</button>
         <button
           aria-label="设置与数据管理"
           onClick={() => navigate('#/settings')}

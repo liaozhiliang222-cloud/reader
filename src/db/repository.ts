@@ -1,3 +1,4 @@
+import { sourceFingerprint } from './identity';
 import { db } from './index';
 import { contentRevision } from './revision';
 import type { Book, ChapterSummary, Progress } from '@/types';
@@ -19,42 +20,54 @@ export async function saveBook(
   original: Blob,
   assets: { id: string; data: Blob }[] = [],
 ) {
-  return db.transaction('rw', db.books, db.chapters, db.blobs, async () => {
-    const existing = await db.books.get(book.id);
-    if (existing && !existing.missingFile) return false;
-    if (
-      existing?.type === 'md' &&
-      existing.markdownVersion !== book.markdownVersion
-    )
-      throw new Error('Markdown 段落结构版本不同，未修改现有笔记。');
-    if (
-      existing?.type === 'epub' &&
-      (existing.parserVersion ?? 1) !== (book.parserVersion ?? 1)
-    )
-      throw new Error(
-        '补导期间书籍的段落结构发生变化，请重新导入，未修改现有笔记。',
+  return db.transaction(
+    'rw',
+    db.books,
+    db.chapters,
+    db.blobs,
+    db.speech,
+    async () => {
+      const existing = await db.books.get(book.id);
+      if (existing && !existing.missingFile) return false;
+      await db.speech.delete(book.id);
+      if (
+        existing?.type === 'md' &&
+        existing.markdownVersion !== book.markdownVersion
+      )
+        throw new Error('Markdown 段落结构版本不同，未修改现有笔记。');
+      if (
+        existing?.type === 'epub' &&
+        (existing.parserVersion ?? 1) !== (book.parserVersion ?? 1)
+      )
+        throw new Error(
+          '补导期间书籍的段落结构发生变化，请重新导入，未修改现有笔记。',
+        );
+      await db.books.put({
+        ...book,
+        ...existing,
+        sourceFingerprint: sourceFingerprint(book),
+        identityVersion: 1,
+        chapterCount: book.chapterCount,
+        charCount: book.charCount,
+        size: book.size,
+        coverBlobId: book.coverBlobId,
+        toc: book.toc,
+        chapterSummaries: summarize(chapters),
+        encoding: book.encoding,
+        parserVersion: book.parserVersion,
+        markdownVersion: book.markdownVersion,
+        missingFile: false,
+        fileBlobId: book.fileBlobId ?? book.id,
+      });
+      await db.chapters.where('bookId').equals(book.id).delete();
+      await db.chapters.bulkAdd(
+        chapters.map((c) => ({ ...c, bookId: book.id })),
       );
-    await db.books.put({
-      ...book,
-      ...existing,
-      chapterCount: book.chapterCount,
-      charCount: book.charCount,
-      size: book.size,
-      coverBlobId: book.coverBlobId,
-      toc: book.toc,
-      chapterSummaries: summarize(chapters),
-      encoding: book.encoding,
-      parserVersion: book.parserVersion,
-      markdownVersion: book.markdownVersion,
-      missingFile: false,
-      fileBlobId: book.fileBlobId ?? book.id,
-    });
-    await db.chapters.where('bookId').equals(book.id).delete();
-    await db.chapters.bulkAdd(chapters.map((c) => ({ ...c, bookId: book.id })));
-    await db.blobs.put({ id: book.fileBlobId ?? book.id, data: original });
-    await db.blobs.bulkPut(assets);
-    return true;
-  });
+      await db.blobs.put({ id: book.fileBlobId ?? book.id, data: original });
+      await db.blobs.bulkPut(assets);
+      return true;
+    },
+  );
 }
 export const listBooks = () =>
   db.books.orderBy('lastReadAt').reverse().toArray();
@@ -64,21 +77,23 @@ export const getChapter = (id: string, index: number) =>
   db.chapters.get([id, index]);
 export const getProgress = (id: string) => db.progress.get(id);
 export async function saveProgress(progress: Progress, expectedRevision = 0) {
-  await db.transaction('rw', db.books, db.progress, async () => {
+  await db.transaction('rw', db.books, db.progress, db.speech, async () => {
     const book = await db.books.get(progress.bookId);
     // 旧阅读页的 debounce/pagehide/unmount 不得覆盖重解析后的锚点。
     if (!book || contentRevision(book) !== expectedRevision) return;
+    if ((await db.speech.get(progress.bookId))?.owner === 'speech') return;
     await db.progress.put(progress);
     await db.books.update(progress.bookId, { lastReadAt: progress.updatedAt });
   });
 }
 
-async function deleteBookRecords(book: Book) {
+async function deleteBookRecords(book: Book, keepNotes = false) {
   await db.books.delete(book.id);
   await db.chapters.where('bookId').equals(book.id).delete();
   await db.progress.delete(book.id);
+  await db.speech.delete(book.id);
   await db.bookmarks.where('bookId').equals(book.id).delete();
-  await db.highlights.where('bookId').equals(book.id).delete();
+  if (!keepNotes) await db.highlights.where('bookId').equals(book.id).delete();
   const ids = [
     book.fileBlobId ?? book.id,
     book.draftBlobId,
@@ -107,6 +122,7 @@ export async function saveDraft(
       db.bookmarks,
       db.highlights,
       db.settings,
+      db.speech,
     ],
     async () => {
       const previous = editingId ? await db.books.get(editingId) : undefined;
@@ -126,9 +142,12 @@ export async function saveDraft(
         return { book: { ...existing, title: book.title }, duplicate: false };
       }
       if (previous) await deleteBookRecords(previous);
+      await db.speech.delete(book.id);
       const draft: Book = {
         ...book,
         ...existing,
+        sourceFingerprint: sourceFingerprint(book),
+        identityVersion: 1,
         title:
           existing?.missingFile && !editingId ? existing.title : book.title,
         type: 'paste',
@@ -225,7 +244,7 @@ export async function renameBook(id: string, title: string) {
   if (!(await db.books.update(id, { title: value })))
     throw new Error('这本书已不存在。');
 }
-export async function deleteBook(id: string) {
+export async function deleteBook(id: string, keepNotes = false) {
   await db.transaction(
     'rw',
     [
@@ -236,11 +255,27 @@ export async function deleteBook(id: string) {
       db.bookmarks,
       db.highlights,
       db.settings,
+      db.speech,
     ],
     async () => {
       const book = await db.books.get(id);
       if (!book) return;
-      await deleteBookRecords(book);
+      if (keepNotes)
+        await db.highlights
+          .where('bookId')
+          .equals(id)
+          .modify((item) => {
+            item.archivedSource = {
+              title: book.title,
+              chapterTitle:
+                book.chapterSummaries?.find(
+                  (chapter) => chapter.index === item.chapterIndex,
+                )?.title ?? `第 ${item.chapterIndex + 1} 节`,
+            };
+            item.unanchored = true;
+            item.updatedAt = Date.now();
+          });
+      await deleteBookRecords(book, keepNotes);
       const global = await db.settings.get('global');
       if (global?.value.lastBookId === id)
         await db.settings.put({

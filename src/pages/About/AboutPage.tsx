@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { navigate } from '@/app/router';
 import { copyText } from '@/app/files';
-import { isNativeApp } from '@/app/platform';
+import { isNativeApp, isAndroidApp, isIosApp } from '@/app/platform';
 const version = import.meta.env.VITE_APP_VERSION;
 
 export function AboutPage() {
@@ -24,15 +24,22 @@ export function AboutPage() {
       </section>
       <section aria-labelledby="privacy-title">
         <h2 id="privacy-title">隐私与本地数据</h2>
+        {isAndroidApp && (
+          <p>
+            听书只选择已安装、标记为无需联网的系统语音。正文交给独立的语音引擎处理，引擎可能拥有联网权限。临时文本和短句音频只在本机，停止听书后删除。用户主动听书期间显示静默媒体控制通知。
+          </p>
+        )}
         <p>
           我们不收集任何阅读数据。书籍原文、阅读进度、书签、划线、笔记和设置只保存在
           {isNativeApp ? '应用私有存储' : '当前浏览器的本地存储'}
           中，不上传服务器。
         </p>
         <p>
-          {isNativeApp
-            ? '应用未申请联网权限，资源与可选字体均内置在安装包中；不参与系统云备份或自动换机传输。'
-            : '应用没有统计 SDK、广告、第三方 CDN 或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。'}
+          {isIosApp
+            ? '阅读资源与可选字体内置，书籍和笔记不上传。购买和恢复由 Apple StoreKit 按需联网，系统交易更新由系统处理；不提供应用云同步，设备的系统备份由你的设置决定。'
+            : isNativeApp
+              ? '应用未申请联网权限，资源与可选字体均内置在安装包中；不参与系统云备份或自动换机传输。'
+              : '应用没有统计 SDK、广告、第三方 CDN 或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。'}
         </p>
         <p>
           {isNativeApp
