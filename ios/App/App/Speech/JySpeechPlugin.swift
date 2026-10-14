@@ -5,7 +5,7 @@ import Foundation
 public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "JySpeechPlugin"
     public let jsName = "JySpeech"
-    public let pluginMethods = [CAPPluginMethod(name: "speech", returnType: CAPPluginReturnPromise)]
+    public let pluginMethods: [CAPPluginMethod] = [CAPPluginMethod(name: "speech", returnType: CAPPluginReturnPromise)]
     private let controller = SpeechController()
     private var identity: [String: Any] = [:]
     private var leaseId = ""

@@ -96,7 +96,7 @@ final class ProStore {
 public class JyProPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "JyProPlugin"
     public let jsName = "JyPro"
-    public let pluginMethods = [CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise)]
+    public let pluginMethods: [CAPPluginMethod] = [CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise)]
     public override func load() {
         Task { @MainActor in
             ProStore.shared.changed = { [weak self] in self?.notifyListeners("proChanged", data: [:]) }

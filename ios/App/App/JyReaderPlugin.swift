@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 public class JyReaderPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelegate {
     public let identifier = "JyReaderPlugin"
     public let jsName = "JyReader"
-    public let pluginMethods = ["pickFiles", "consumeLaunchFile", "readUriChunk", "releaseImport", "shareChunk", "shareCacheFile", "setImmersive", "keepAwake", "statusBar", "openUrl"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
+    public let pluginMethods: [CAPPluginMethod] = ["pickFiles", "consumeLaunchFile", "readUriChunk", "releaseImport", "shareChunk", "shareCacheFile", "setImmersive", "keepAwake", "statusBar", "openUrl"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
     private static let queue = DispatchQueue(label: "dev.jingye.reader.files")
     private static weak var current: JyReaderPlugin?
     private static var pending: [[String: String]] = []

@@ -140,13 +140,13 @@ final class SpeechQueueStore {
         guard size > 0, size <= Self.batchBytes + 1024 else { throw StoreError.malformed }
         let source = try Data(contentsOf: info.url)
         var bytes = [UInt8](repeating: 0, count: Self.batchBytes + 1)
-        let size = bytes.withUnsafeMutableBufferPointer { destination in
+        let decodedSize = bytes.withUnsafeMutableBufferPointer { destination in
             source.withUnsafeBytes { raw in
                 compression_decode_buffer(destination.baseAddress!, destination.count, raw.bindMemory(to: UInt8.self).baseAddress!, source.count, nil, COMPRESSION_LZFSE)
             }
         }
-        guard size > 0, size <= Self.batchBytes else { throw StoreError.malformed }
-        let data = Data(bytes.prefix(size))
+        guard decodedSize > 0, decodedSize <= Self.batchBytes else { throw StoreError.malformed }
+        let data = Data(bytes.prefix(decodedSize))
         let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
         guard digest == info.digest,
               let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
