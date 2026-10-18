@@ -17,9 +17,10 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
         if let url = snapshotURL, let data = try? Data(contentsOf: url) {
             pending = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
             if pending != nil {
+                let nextSequence = (pending?["sequence"] as? Int ?? 0) + 1
                 pending?["state"] = "stopped"
                 pending?["stopReason"] = "processTerminated"
-                pending?["sequence"] = (pending?["sequence"] as? Int ?? 0) + 1
+                pending?["sequence"] = nextSequence
             }
         }
         SpeechQueueStore.cleanupOrphans()
