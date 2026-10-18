@@ -824,3 +824,4 @@ GitHub 已上传：源码合并提交 `1ea55448ccb97fafb208c0b4f814f98818ab14b0`
 - `TTS_PLAN.md` 改写为 v2：安卓原生 `TextToSpeech` + 前台媒体服务为主线（锁屏/后台、通知与锁屏控制条、耳机键），网页 Web Speech 降为 T3 仅前台降级。架构为“原生负责读、网页负责排”：TS 分句定位并按批交给原生，原生按句暂存进度，前台/冷启动对账，以应对锁屏期间 WebView JS 可能冻结。
 - 不新增第三方依赖（框架 MediaSession / Notification.MediaStyle）；仍不申请 INTERNET，新增权限限于前台服务、mediaPlayback、WAKE_LOCK 与 TTS 引擎 `<queries>`。隐私边界如实写明：TTS 引擎为独立 App，只选 `isNetworkConnectionRequired()==false` 的语音并显示引擎名称。
 - 阶段：T0 真机探针 2 项、T1 安卓 MVP 8 项、T2 打磨与 1.1.0 发布 5 项、T3 网页降级 2 项、T4 神经语音可选 1 项。6 项待用户决策见第 9 节。未写产品代码；手机本轮未连接，引擎与语音清单留待 TTS-01。
+- R0–R2 Mac 验证补记（2026-10-18，codex/ios-r0-r2）：修 Swift 编译两处（pluginMethods 类型标注、size 重名）后 Xcode 构建+6 XCTest 全过（队列 4 + StoreKit 本地购买 2）。Debug 构建 JY_SK_TEST=1 环境变量 + bundle 内 storekit 配置可在模拟器解锁 Pro（Release 不携带）。模拟器回归：覆盖升级/导入/ZIP/划线摘录/批量导出/Pro 门控全过；修复致命冷启动崩溃（last-snapshot.json 存在时 exclusivity 冲突闪退）。遗留：测试权益 storekitd 残留、PNG 固定米色样式、多页摘录模拟器不可达、两导出共用文件名。真机待验：离线声音、锁屏媒体键、打断、沙盒购买。
