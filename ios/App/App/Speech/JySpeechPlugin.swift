@@ -73,7 +73,8 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
             controller.run({
                 if action == "voices" {
                     call.resolve(["engine": "ios", "engines": [["id": "ios", "label": "iOS 系统语音"]],
-                                  "voices": self.controller.voiceList(), "engineInternetPermission": false])
+                                  "voices": self.controller.voiceList(), "engineInternetPermission": false,
+                                  "savedVoice": UserDefaults.standard.string(forKey: "jingye.speech.voice") ?? NSNull()])
                 } else { call.resolve(["snapshot": (self.pending as Any?) ?? NSNull(), "active": self.active]) }
             }, reply: { error in if let error { call.reject(error.localizedDescription) } })
             return
@@ -102,6 +103,7 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
                 self.leaseId = lease
                 self.controller.setTitle(args["title"] as? String ?? "静页")
                 try self.controller.setVoice(voice)
+                UserDefaults.standard.set(voice, forKey: "jingye.speech.voice")
                 try self.controller.setRate(args["rate"] as? Double ?? 1)
                 try self.controller.setTimer(mode: args["timer"] as? String ?? "off")
                 try self.controller.command(commandId: UUID().uuidString, kind: "play", at: 0)

@@ -63,7 +63,7 @@ export function NotesPage() {
         new Blob([reviewMarkdown(items, template)], {
           type: 'text/markdown;charset=utf-8',
         }),
-        '静页_回顾笔记.md',
+        template === 'reading' ? '静页_回顾笔记.md' : '静页_摘录.md',
       ),
     );
   const premium = (work: () => void) => {

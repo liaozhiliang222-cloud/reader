@@ -34,9 +34,11 @@ import {
   speechView,
   connectSpeech,
   startSpeech,
+  speechVoices,
   stopSpeech,
   manualSpeechNavigation,
 } from '@/app/speech/coordinator';
+import { canUsePro } from '@/app/pro';
 import type {
   Book,
   Bookmark,
@@ -103,6 +105,24 @@ export function ReaderView({
   useEffect(() => {
     if (hasNativeSpeech) void connectSpeech();
   }, []);
+  const quickSpeech = async () => {
+    setMenu(false);
+    if (!canUsePro()) {
+      setSpeechOpen(true);
+      return;
+    }
+    try {
+      const list = await speechVoices();
+      const voice = list.voices.find((item) => item.id === list.savedVoice)?.id;
+      if (voice) {
+        await beginSpeech(list.engine, voice);
+        return;
+      }
+    } catch {
+      /* 读取语音失败时退回设置面板 */
+    }
+    setSpeechOpen(true);
+  };
   const beginSpeech = async (engine: string, voice: string) => {
     const start = engineRef.current?.currentLocator;
     if (!start) return;
@@ -737,14 +757,7 @@ export function ReaderView({
             {panel === 'more' && (
               <section class="more-panel" aria-label="更多">
                 {hasNativeSpeech && (
-                  <button
-                    onClick={() => {
-                      setMenu(false);
-                      setSpeechOpen(true);
-                    }}
-                  >
-                    听书
-                  </button>
+                  <button onClick={() => void quickSpeech()}>听书</button>
                 )}
                 <label class="check-row">
                   安静提示
