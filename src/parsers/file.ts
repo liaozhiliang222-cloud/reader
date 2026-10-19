@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { decodeText } from './txt/encoding';
 import { splitChapters } from './txt/chapters';
 import { parseEpub } from './epub/parse';
@@ -18,7 +19,7 @@ export async function parseText(buffer: ArrayBuffer, encoding?: string) {
           text: new TextDecoder(encoding, { fatal: true }).decode(buffer),
         };
   const chapters = splitChapters(decoded.text);
-  if (!chapters.length) throw new Error('文件没有可阅读的内容。');
+  if (!chapters.length) throw new Error(t('文件没有可阅读的内容。'));
   return {
     id,
     encoding: decoded.encoding,
@@ -40,7 +41,7 @@ export async function parseFile(
       '80,75,3,4'
     ) {
       if (markdownVersion !== 2)
-        throw new Error('Markdown 图文包需要第二版解析器。');
+        throw new Error(t('Markdown 图文包需要第二版解析器。'));
       return {
         ...(await parseMarkdownPackage(buffer, id, encoding)),
         id,

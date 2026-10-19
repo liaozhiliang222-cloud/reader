@@ -111,7 +111,7 @@ test('GUIDE-02：跳过后不重现，设置复看焦点受限、Escape 与浏�
     exact: true,
   });
   await keyboardActivate(page, opener);
-  const dialog = page.getByRole('dialog', { name: '静页使用引导' });
+  const dialog = page.getByRole('dialog', { name: '微光阅读使用引导' });
   await checkGuide(page, '你的书只在这台设备上');
   for (let i = 0; i < 6; i++) {
     await page.keyboard.press('Tab');
@@ -262,7 +262,10 @@ test('GUIDE-03：受控安装事件仅可信点击触发，取消与确认状态
     });
     window.dispatchEvent(event);
   });
-  const install = page.getByRole('button', { name: '安装静页', exact: true });
+  const install = page.getByRole('button', {
+    name: '安装微光阅读',
+    exact: true,
+  });
   await expect(install).toBeVisible();
   expect(
     await page.evaluate(() => Reflect.get(window, 'installTestCalls')),

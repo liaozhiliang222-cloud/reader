@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from './index';
 import type { AppSettings, ReadingSettings } from '@/types';
 import { initialSettings } from '@/app/settings';
@@ -37,7 +38,7 @@ export async function saveBookSettings(
 ) {
   await db.transaction('rw', db.books, db.settings, async () => {
     const book = await db.books.get(id);
-    if (!book) throw new Error('书籍不存在，无法保存排版。');
+    if (!book) throw new Error(t('书籍不存在，无法保存排版。'));
     const current =
       patch.theme === 'night'
         ? { ...(await loadSettings()).reading, ...book.settingsOverride }

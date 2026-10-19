@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from './index';
 import { assertContentRevision } from './revision';
 import {
@@ -29,10 +30,10 @@ export async function addHighlight(
       const book = await db.books.get(bookId);
       const chapter = await db.chapters.get([bookId, span.chapterIndex]);
       if (!book || book.missingFile || !chapter)
-        throw new Error('书籍内容不可用。');
+        throw new Error(t('书籍内容不可用。'));
       assertContentRevision(book, expectedRevision);
       const range = normalizeSpan(chapter.paragraphs, span);
-      if (!range) throw new Error('选区已失效，请重新选择文字。');
+      if (!range) throw new Error(t('选区已失效，请重新选择文字。'));
       const existing = (
         await db.highlights
           .where('[bookId+chapterIndex]')
@@ -70,7 +71,7 @@ export async function updateHighlight(
 ) {
   return db.transaction('rw', db.highlights, async () => {
     const item = await db.highlights.get(id);
-    if (!item || item.bookId !== bookId) throw new Error('划线不存在。');
+    if (!item || item.bookId !== bookId) throw new Error(t('划线不存在。'));
     const next = { ...item, ...patch, updatedAt: Date.now() };
     if ('note' in patch) next.note = patch.note?.trim() || undefined;
     await db.highlights.put(next);

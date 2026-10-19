@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from '@/db';
 import Dexie from 'dexie';
 import { RESTORE_PREFIX, type PreparedSource } from './staging';
@@ -40,7 +41,7 @@ function checkPosition(chapters: StoredChapter[], where: Locator) {
     (chapter) => chapter.index === where.chapterIndex,
   );
   if (!chapter || !sameLocator(clampLocator(chapter, where), where))
-    throw new Error('备份中的位置与原文不一致，未修改本地数据。');
+    throw new Error(t('备份中的位置与原文不一致，未修改本地数据。'));
   return chapter;
 }
 export async function restoreBackup(
@@ -64,9 +65,9 @@ export async function restoreBackup(
     preparedIds.size !== source.ids.length ||
     source.ids.some((id) => !bookIds.has(id))
   )
-    throw new Error('恢复内容与备份书架不一致。');
+    throw new Error(t('恢复内容与备份书架不一致。'));
   if (backup.files.some((file) => !preparedIds.has(file.bookId)))
-    throw new Error('原文件尚未验证，不能恢复。');
+    throw new Error(t('原文件尚未验证，不能恢复。'));
   const group = <T extends { bookId: string }>(rows: T[]) => {
     const groups = new Map<string, T[]>();
     for (const row of rows) {
@@ -90,6 +91,8 @@ export async function restoreBackup(
       );
       const global = await database.settings.get('global');
       const incomingBooks: Book[] = [];
+      // Device-local listening ownership never survives backup restoration.
+      await database.speech.clear();
       const keepBlobs = new Set<string>();
       if (mode === 'overwrite') {
         // Keep original chapters/blobs available for light backups until every book
@@ -103,21 +106,24 @@ export async function restoreBackup(
       for (const meta of backup.books) {
         const local = existing.get(meta.id);
         if (local && local.type !== meta.type)
-          throw new Error('相同指纹的书籍类型冲突，未修改本地数据。');
+          throw new Error(t('相同指纹的书籍类型冲突，未修改本地数据。'));
         if (
           local &&
           (local.markdownVersion !== meta.markdownVersion ||
             local.draftFormat !== meta.draftFormat) &&
           (mode === 'merge' || !preparedIds.has(meta.id))
         )
-          throw new Error('Markdown 段落结构版本不同，未修改本地数据。');
+          throw new Error(t('Markdown 段落结构版本不同，未修改本地数据。'));
         if (
           local?.type === 'epub' &&
           (local.parserVersion ?? 1) !== (meta.parserVersion ?? 1) &&
           (mode === 'merge' || !preparedIds.has(meta.id))
         )
           throw new Error(
-            `《${meta.title}》的段落结构版本不同，无法安全合并。请先备份本机数据，再使用完整备份覆盖恢复。`,
+            t(
+              '《{0}》的段落结构版本不同，无法安全合并。请先备份本机数据，再使用完整备份覆盖恢复。',
+              meta.title,
+            ),
           );
         const localData =
           local && (mode === 'merge' || !preparedIds.has(meta.id))
@@ -127,7 +133,7 @@ export async function restoreBackup(
           localData ??
           (preparedIds.has(meta.id) ? await source.get(meta.id) : undefined);
         if (!content && preparedIds.has(meta.id))
-          throw new Error('恢复暂存已丢失，请重新选择备份。');
+          throw new Error(t('恢复暂存已丢失，请重新选择备份。'));
         signal?.throwIfAborted();
         const originalFields = content
           ? {
@@ -182,7 +188,7 @@ export async function restoreBackup(
             normalized.end.charOffset !== highlight.end.charOffset ||
             spanText(chapter.paragraphs, normalized) !== highlight.text
           )
-            throw new Error('划线范围或摘录与原文不一致，未修改本地数据。');
+            throw new Error(t('划线范围或摘录与原文不一致，未修改本地数据。'));
         }
         await database.books.put(incomingBooks[incomingBooks.length - 1]!);
         if (content) {

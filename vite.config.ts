@@ -50,8 +50,8 @@ export default defineConfig(({ mode }) => ({
         },
         manifest: {
           id: './',
-          name: '静页 · 安静阅读',
-          short_name: '静页',
+          name: '微光阅读 · 安静阅读',
+          short_name: '微光阅读',
           description: '书籍、进度与笔记只在本机，随时离线阅读。',
           lang: 'zh-CN',
           start_url: './',

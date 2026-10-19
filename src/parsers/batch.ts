@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { Book } from '@/types';
 export interface ImportResult {
   book: Book;
@@ -33,7 +34,7 @@ export async function importBatch(
     } catch (cause) {
       item.status = 'error';
       item.error =
-        cause instanceof Error ? cause.message : '导入失败，请重试。';
+        cause instanceof Error ? cause.message : t('导入失败，请重试。');
     }
     notify();
   }

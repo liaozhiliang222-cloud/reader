@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { BoundedZip } from './zip';
 import { decodeText } from './txt/encoding';
 import { parseMarkdown } from './markdown';
@@ -21,7 +22,7 @@ export async function parseMarkdownPackage(
   );
   if (documents.length !== 1)
     throw new Error(
-      'Markdown 图文包需要且只能包含一个 .md 或 .markdown 文档。',
+      t('Markdown 图文包需要且只能包含一个 .md 或 .markdown 文档。'),
     );
   const path = documents[0]!;
   const original = await (await zip.read(path)).arrayBuffer();
@@ -39,7 +40,7 @@ export async function parseMarkdownPackage(
       ?.toLowerCase();
     if (!extension || path.startsWith('__MACOSX/')) continue;
     if (assets.length >= 256)
-      throw new Error('图片超过 256 张，请拆分图文包。');
+      throw new Error(t('图片超过 256 张，请拆分图文包。'));
     const bytes = new Uint8Array(await (await zip.read(path)).arrayBuffer());
     let type: string, data: ArrayBuffer | string;
     if (extension === 'svg') {
@@ -60,7 +61,7 @@ export async function parseMarkdownPackage(
               ? /^GIF8[79]a/.test(new TextDecoder().decode(bytes.slice(0, 6)))
               : new TextDecoder().decode(bytes.slice(0, 4)) === 'RIFF' &&
                 new TextDecoder().decode(bytes.slice(8, 12)) === 'WEBP';
-      if (!valid) throw new Error('图片格式与文件内容不符：' + path);
+      if (!valid) throw new Error(t('图片格式与文件内容不符：') + path);
       type = 'image/' + (/^jpe?g$/.test(extension) ? 'jpeg' : extension);
       data = Uint8Array.from(bytes).buffer;
     }

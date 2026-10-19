@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { getChapter } from '@/db/repository';
 import { ChapterWindow } from './ChapterWindow';
 import { renderNodes } from './content';
@@ -5,6 +6,8 @@ import { pageCount, pageGeometry } from './paginator';
 import { getLocator, pageOf } from './locator';
 import { currentSection } from './currentSection';
 import { HighlightLayer } from './highlight';
+import { rangeForSpan } from './selection';
+import type { SourceRange } from './speech/segment';
 import { PageMotion } from './PageMotion';
 import {
   chapterChunks,
@@ -83,6 +86,7 @@ export class ReaderEngine {
   private queue: Navigation[] = [];
   private highlights: Highlight[] = [];
   private highlightLayer = new HighlightLayer();
+  private speechRanges: SourceRange[] = [];
   private motion = new PageMotion();
   private visibilityChanged = () => {
     if (document.visibilityState === 'hidden') this.cancelMeasurement();
@@ -96,13 +100,14 @@ export class ReaderEngine {
     private onUpdate: (info: ReaderInfo) => void,
     private onError: (error: Error) => void,
     private onJump: (previous: Locator) => void,
+    private beforeNavigate?: () => Promise<void>,
   ) {
     this.sources = new ChapterWindow(async (index, signal) => {
-      const end = beginMeasure('章节读取与分块索引');
+      const end = beginMeasure(t('章节读取与分块索引'));
       try {
         const chapter = await getChapter(this.book.id, index);
-        if (signal.aborted) throw new Error('章节预排版已取消。');
-        if (!chapter) throw new Error('章节内容缺失。');
+        if (signal.aborted) throw new Error(t('章节预排版已取消。'));
+        if (!chapter) throw new Error(t('章节内容缺失。'));
         return { chapter, chunks: chapterChunks(chapter), release: () => {} };
       } finally {
         end(!signal.aborted);
@@ -120,8 +125,51 @@ export class ReaderEngine {
     this.paintHighlights();
   }
   private paintHighlights() {
-    if (!this.disposed)
+    if (!this.disposed) {
       this.highlightLayer.render(this.window.values(), this.highlights);
+      this.paintSpeech();
+    }
+  }
+  setSpeechRanges(ranges: SourceRange[]) {
+    this.speechRanges = ranges;
+    this.paintSpeech();
+  }
+  private paintSpeech() {
+    const ranges: Range[] = [];
+    if (this.active)
+      for (const span of this.speechRanges) {
+        if (span.start.chapterIndex !== this.active.chapter.index) continue;
+        const range = rangeForSpan(this.active.root, {
+          ...span,
+          chapterIndex: span.start.chapterIndex,
+        });
+        if (range) ranges.push(range);
+      }
+    this.frame.querySelector('[data-speech-overlay]')?.remove();
+    if (
+      typeof CSS !== 'undefined' &&
+      CSS.highlights &&
+      typeof globalThis.Highlight !== 'undefined'
+    ) {
+      if (ranges.length) {
+        const mark = new globalThis.Highlight(...ranges);
+        mark.priority = -1;
+        CSS.highlights.set('jingye-speech', mark);
+      } else CSS.highlights.delete('jingye-speech');
+    } else if (ranges.length) {
+      const overlay = document.createElement('div');
+      overlay.dataset.speechOverlay = '';
+      overlay.setAttribute('aria-hidden', 'true');
+      const frame = this.frame.getBoundingClientRect();
+      for (const range of ranges)
+        for (const rect of range.getClientRects()) {
+          if (rect.right <= frame.left || rect.left >= frame.right) continue;
+          const marker = document.createElement('i');
+          marker.style.cssText = `left:${rect.left - frame.left}px;top:${rect.top - frame.top}px;width:${rect.width}px;height:${rect.height}px`;
+          overlay.append(marker);
+        }
+      this.frame.append(overlay);
+    }
   }
   selectedText() {
     const active = this.active,
@@ -274,9 +322,9 @@ export class ReaderEngine {
     const source = await this.sources.get(index);
     const chapter = source.chapter,
       chunk = source.chunks[part];
-    if (signal.aborted) throw new Error('章节预排版已取消。');
-    if (!chunk) throw new Error('章节内容缺失。');
-    const end = beginMeasure('正文分块排版');
+    if (signal.aborted) throw new Error(t('章节预排版已取消。'));
+    if (!chunk) throw new Error(t('章节内容缺失。'));
+    const end = beginMeasure(t('正文分块排版'));
     const root = document.createElement('div');
     root.className = 'reader-content';
     if (this.book.type === 'md' || this.book.draftFormat === 'markdown')
@@ -315,7 +363,7 @@ export class ReaderEngine {
         releaseImages = rendered.release;
         if (signal.aborted) {
           rendered.release();
-          throw new Error('章节预排版已取消。');
+          throw new Error(t('章节预排版已取消。'));
         }
         root.append(rendered.fragment);
         const first = root.firstElementChild;
@@ -336,7 +384,7 @@ export class ReaderEngine {
           root.append(p);
         });
       }
-      if (signal.aborted) throw new Error('章节预排版已取消。');
+      if (signal.aborted) throw new Error(t('章节预排版已取消。'));
       const instance = {
         key,
         source,
@@ -357,7 +405,7 @@ export class ReaderEngine {
       );
       await document.fonts.ready;
       if (signal.aborted || this.disposed)
-        throw new Error('章节预排版已取消。');
+        throw new Error(t('章节预排版已取消。'));
       instance.finalized = true;
       this.layout(instance);
       return instance;
@@ -370,7 +418,7 @@ export class ReaderEngine {
     }
   }
   async start(position: Promise<Locator | undefined>) {
-    const end = beginMeasure('阅读正文就绪');
+    const end = beginMeasure(t('阅读正文就绪'));
     try {
       const target = await position;
       if (!this.disposed) await this.show(target ?? this.anchor);
@@ -394,7 +442,7 @@ export class ReaderEngine {
     this.motion.cancel();
     this.cancelMeasurement();
     const generation = ++this.generation;
-    if (this.book.chapterCount < 1) throw new Error('书籍没有章节。');
+    if (this.book.chapterCount < 1) throw new Error(t('书籍没有章节。'));
     const index = Math.max(
       0,
       Math.min(
@@ -404,7 +452,7 @@ export class ReaderEngine {
           : 0,
       ),
     );
-    if (index < 0) throw new Error('书籍没有章节。');
+    if (index < 0) throw new Error(t('书籍没有章节。'));
     this.sources.retain(
       this.active ? [this.active.chapter.index, index] : [index],
     );
@@ -594,6 +642,7 @@ export class ReaderEngine {
         : percentOf(active.chapter, this.anchor, this.book.charCount),
       locator: { ...this.anchor },
     });
+    this.paintSpeech();
   }
   turn(direction: number) {
     this.queue.push({ kind: 'turn', direction: direction < 0 ? -1 : 1 });
@@ -615,6 +664,11 @@ export class ReaderEngine {
         this.motion.cancel();
         this.cancelMeasurement();
         const command = this.queue.shift()!;
+        if (
+          this.beforeNavigate &&
+          (command.kind !== 'jump' || command.remember)
+        )
+          await this.beforeNavigate();
         if (command.kind === 'turn') {
           if (!this.active) continue;
           const previous = this.active,
@@ -671,7 +725,7 @@ export class ReaderEngine {
               this.book.charCount,
               command.value,
             );
-            if (!target) throw new Error('目录尚未就绪，请稍后重试。');
+            if (!target) throw new Error(t('目录尚未就绪，请稍后重试。'));
             await this.show(
               {
                 chapterIndex: target.chapter.index,
@@ -723,6 +777,8 @@ export class ReaderEngine {
       this.active.root.style.transform = `translateX(${-this.page * this.active.stride}px)`;
   }
   dispose() {
+    this.speechRanges = [];
+    this.paintSpeech();
     this.disposed = true;
     ++this.generation;
     this.cancelMeasurement();

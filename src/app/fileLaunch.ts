@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { incomingData } from './incomingData';
 import type { IncomingData } from './incomingData';
 
@@ -32,7 +33,7 @@ export function installFileConsumer(
           } catch {
             form.append(
               'error',
-              `${handle.name ?? '文件'}：未能读取，请重新选择。`,
+              t('{0}：未能读取，请重新选择。', handle.name ?? t('文件')),
             );
           }
         }

@@ -1,3 +1,6 @@
+import { t } from '@/i18n';
+import { ArchivePicker } from '@/components/ArchivePicker';
+import { isIosApp, nativeApp } from '@/app/platform';
 import { useRef, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { importText } from '@/parsers/importText';
@@ -26,6 +29,8 @@ export function ImportSheet({
   onClose: () => void;
   onComplete: (items: ImportItem[]) => void;
 }) {
+  const [archives, setArchives] = useState<File[]>([]);
+  const [pickerError, setPickerError] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<ImportItem[]>([]);
   const [busy, setBusy] = useState(false);
@@ -33,11 +38,55 @@ export function ImportSheet({
     if (!files.length || busy) return;
     setBusy(true);
     try {
-      const result = await importBatch(files, importText, setItems);
-      onComplete(result);
+      const remainingArchives = files.filter(
+        (file) =>
+          /\.zip$/i.test(file.name) &&
+          !/\.(md|markdown)\.zip$/i.test(file.name),
+      );
+      const plain = files.filter(
+        (file) =>
+          !/\.zip$/i.test(file.name) ||
+          /\.(md|markdown)\.zip$/i.test(file.name),
+      );
+      const result = await importBatch(plain, importText, setItems);
+      setArchives(remainingArchives);
+      if (!remainingArchives.length) onComplete(result);
     } finally {
       setBusy(false);
       if (input.current) input.current.value = '';
+    }
+  };
+  if (archives[0])
+    return (
+      <ArchivePicker
+        file={archives[0]}
+        onClose={() => {
+          setArchives(archives.slice(1));
+          if (archives.length === 1) onComplete(items);
+        }}
+        onComplete={(result) => {
+          const combined = [...items, ...result];
+          setItems(combined);
+          if (archives.length === 1) onComplete(combined);
+          setArchives(archives.slice(1));
+        }}
+      />
+    );
+  const pick = async () => {
+    if (!isIosApp) {
+      input.current?.click();
+      return;
+    }
+    try {
+      const data = await (await nativeApp()).pickIncoming();
+      if (data) {
+        setPickerError(data.errors.join('；'));
+        await select(data.files);
+      }
+    } catch (cause) {
+      setPickerError(
+        cause instanceof Error ? cause.message : t('未能选择文件。'),
+      );
     }
   };
   const finished = items.filter(
@@ -45,21 +94,28 @@ export function ImportSheet({
   ).length;
   return (
     <Modal
-      title="导入书籍"
+      title={t('导入书籍')}
       onDismiss={() => {
         if (!busy) onClose();
       }}
     >
       <header class="panel-heading">
-        <h2>导入书籍</h2>
-        <button disabled={busy} onClick={onClose} aria-label="关闭导入面板">
-          关闭
+        <h2>{t('导入书籍')}</h2>
+        <button
+          disabled={busy}
+          onClick={onClose}
+          aria-label={t('关闭导入面板')}
+        >
+          {t('关闭')}
         </button>
       </header>
-      <p class="muted">选择本机的 EPUB、TXT、Markdown，或把长文粘贴成文稿。</p>
       <p class="muted">
-        带图片的文章：把一个 Markdown 文件和图片文件夹一起压缩，命名为 .md.zip
-        后导入。
+        {t('选择本机的 EPUB、TXT、Markdown 或 ZIP，也可粘贴长文。')}
+      </p>
+      <p class="muted">
+        {t(
+          '带图片的文章：把一个 Markdown 文件和图片文件夹一起压缩，命名为 .md.zip 后导入。',
+        )}
       </p>
       <input
         ref={input}
@@ -67,15 +123,15 @@ export function ImportSheet({
         type="file"
         multiple
         accept=".epub,.txt,.md,.markdown,.zip,text/plain,text/markdown,text/x-markdown,application/epub+zip,application/zip"
-        aria-label="选择书籍文件"
+        aria-label={t('选择书籍文件')}
         disabled={busy}
         onChange={(event) =>
           void select(Array.from(event.currentTarget.files ?? []))
         }
       />
       <div class="panel-actions">
-        <button disabled={busy} onClick={() => input.current?.click()}>
-          选择文件
+        <button disabled={busy} onClick={() => void pick()}>
+          {t('选择文件')}
         </button>
         <button
           disabled={busy}
@@ -84,20 +140,30 @@ export function ImportSheet({
             navigate('#/paste');
           }}
         >
-          粘贴文本
+          {t('粘贴文本')}
         </button>
       </div>
+      {pickerError && <p role="alert">{pickerError}</p>}
       {!!items.length && (
         <>
           {busy ? (
             <BookLoading
-              title="正在导入书籍"
+              title={t('正在导入书籍')}
               fileName={items.find((item) => item.status === 'parsing')?.name}
-              detail={`正在解析 · 第 ${Math.min(finished + 1, items.length)} / ${items.length} 本`}
+              detail={t(
+                '正在解析 · 第 {0} / {1} 本',
+                Math.min(finished + 1, items.length),
+                items.length,
+              )}
             />
           ) : (
             <p role="status" aria-live="polite">
-              {`导入完成：${items.filter((i) => i.status === 'success').length} 本成功，${items.filter((i) => i.status === 'duplicate').length} 本已在书架，${items.filter((i) => i.status === 'error').length} 本失败`}
+              {t(
+                '导入完成：{0} 本成功，{1} 本已在书架，{2} 本失败',
+                items.filter((i) => i.status === 'success').length,
+                items.filter((i) => i.status === 'duplicate').length,
+                items.filter((i) => i.status === 'error').length,
+              )}
             </p>
           )}
           <ul class="import-results import-list">
@@ -108,7 +174,7 @@ export function ImportSheet({
                     {marks[item.status]}
                   </span>
                   <span class="import-name">{item.name}</span>
-                  <small>{labels[item.status]}</small>
+                  <small>{t(labels[item.status])}</small>
                 </>
               );
               return (
@@ -116,7 +182,7 @@ export function ImportSheet({
                   {item.book && !busy ? (
                     <button
                       class="import-row"
-                      aria-label={`阅读《${item.book.title}》`}
+                      aria-label={t('阅读《{0}》', item.book.title)}
                       onClick={() =>
                         navigate('#/read/' + encodeURIComponent(item.book!.id))
                       }

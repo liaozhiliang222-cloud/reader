@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import {
   elements,
   localName,
@@ -33,7 +34,7 @@ export function sanitizeModernChapter(
 ) {
   const doc = parseXml(source),
     body = elements(doc, 'body')[0] ?? doc.documentElement;
-  if (!body) throw new Error('章节正文不存在。');
+  if (!body) throw new Error(t('章节正文不存在。'));
   const ids = new Map<SafeElement, string[]>(),
     paragraphs: string[] = [];
   const anchors: Record<string, number> = Object.create(null) as Record<

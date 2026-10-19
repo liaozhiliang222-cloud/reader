@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import katex from 'katex';
 import DOMPurify from 'dompurify';
 import hljs from 'highlight.js/lib/core';
@@ -75,7 +76,7 @@ export async function enhanceMarkdown(
     visual.dataset.mdVisual = 'diagram';
     const image = document.createElement('img');
     image.src = url;
-    image.alt = 'Mermaid 图表';
+    image.alt = t('Mermaid 图表');
     visual.append(image);
     replaceWithVisual(el, visual, 'diagram');
     return url;

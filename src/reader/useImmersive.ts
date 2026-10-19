@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { ReaderWakeLock, type ScreenLock } from './WakeLock';
 import { isNativeApp, nativeApp, nativeImmersive } from '@/app/platform';
@@ -23,10 +24,10 @@ export function useImmersive(mode: ReadingSettings['wakeLock']) {
       setWakeStatus(
         {
           off: '',
-          active: '屏幕常亮中',
-          idle: '五分钟未操作，已恢复自动熄屏',
-          released: '常亮已由系统释放',
-          unavailable: '当前浏览器或系统未允许常亮',
+          active: t('屏幕常亮中'),
+          idle: t('五分钟未操作，已恢复自动熄屏'),
+          released: t('常亮已由系统释放'),
+          unavailable: t('当前浏览器或系统未允许常亮'),
         }[status],
       ),
     );
@@ -78,7 +79,7 @@ export async function toggleFullscreen() {
     !document.fullscreenEnabled ||
     !document.documentElement.requestFullscreen
   )
-    throw new Error('当前浏览器不支持全屏，可添加到主屏幕阅读。');
+    throw new Error(t('当前浏览器不支持全屏，可添加到主屏幕阅读。'));
   await document.documentElement.requestFullscreen();
 }
 export function tryReaderFullscreen() {

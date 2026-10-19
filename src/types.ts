@@ -8,8 +8,13 @@ export interface Locator {
   paragraphIndex: number;
   charOffset: number;
 }
+export type ReadingLocation =
+  | { kind: 'text'; locator: Locator }
+  | { kind: 'pdf'; pageIndex: number; x: number; y: number; scale: number };
 export interface Book {
   id: string;
+  sourceFingerprint?: string;
+  identityVersion?: 1;
   title: string;
   type: 'txt' | 'epub' | 'paste' | 'md';
   draftFormat?: 'markdown';
@@ -63,6 +68,9 @@ export interface Highlight {
   createdAt: number;
   updatedAt: number;
   unanchored?: boolean;
+  tags?: string[];
+  reviewPending?: boolean;
+  archivedSource?: { title: string; chapterTitle: string };
 }
 export interface ReadingSettings {
   fontSize: number;
@@ -84,6 +92,7 @@ export interface ReadingSettings {
   volumeKeys?: boolean;
 }
 export interface AppSettings {
+  speech?: { rate: number; timer: 'off' | '15m' | '30m' | '60m' | 'chapter' };
   shelfSort: 'recent' | 'imported' | 'title';
   reading: ReadingSettings;
   autoResume: boolean;

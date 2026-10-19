@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from './index';
 import { assertContentRevision } from './revision';
 import type { Bookmark, Locator } from '@/types';
@@ -24,7 +25,7 @@ export async function addBookmark(
 ) {
   return db.transaction('rw', db.books, db.bookmarks, async () => {
     const book = await db.books.get(data.bookId);
-    if (!book || book.missingFile) throw new Error('书籍内容不可用。');
+    if (!book || book.missingFile) throw new Error(t('书籍内容不可用。'));
     assertContentRevision(book, expectedRevision);
     const existing = (
       await db.bookmarks.where('bookId').equals(data.bookId).toArray()

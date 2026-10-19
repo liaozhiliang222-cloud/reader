@@ -51,7 +51,7 @@ async function start(
   await page.getByRole('button', { name: '设置与数据管理' }).click();
   await page.getByLabel('启动时继续上次阅读').uncheck();
   await page.getByLabel('进入阅读时显示安静提示').uncheck();
-  await page.getByRole('button', { name: '关于静页与隐私' }).click();
+  await page.getByRole('button', { name: '关于微光阅读与隐私' }).click();
   await expect(
     page.getByText(`版本 ${host.manifest.a.version}`, { exact: true }),
   ).toBeVisible();
@@ -183,7 +183,7 @@ test('新版本后台下载时阅读不刷新，回书架显式更新并完整�
   expect(after).toEqual(before);
   await page.getByRole('button', { name: '设置与数据管理' }).click();
   await expect(page.getByLabel('启动时继续上次阅读')).not.toBeChecked();
-  await page.getByRole('button', { name: '关于静页与隐私' }).click();
+  await page.getByRole('button', { name: '关于微光阅读与隐私' }).click();
   await expect(
     page.getByText(`版本 ${updateHost.manifest.b.version}`, { exact: true }),
   ).toBeVisible();

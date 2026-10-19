@@ -1,3 +1,4 @@
+import { t, uiLocale } from '@/i18n';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { listShelf } from '@/db/repository';
 import { navigate } from '@/app/router';
@@ -39,13 +40,13 @@ export function BookshelfPage({ notice }: { notice?: string }) {
   const sort = settings.value.shelfSort;
   useEffect(() => {
     let cancelled = false;
-    const end = beginMeasure('书架数据读取');
+    const end = beginMeasure(t('书架数据读取'));
     void listShelf()
       .then((value) => {
         if (!cancelled) setEntries(value);
       })
       .catch(() => {
-        if (!cancelled) setError('无法访问本地存储，请检查浏览器设置。');
+        if (!cancelled) setError(t('无法访问本地存储，请检查浏览器设置。'));
       })
       .finally(() => {
         end(!cancelled);
@@ -56,13 +57,16 @@ export function BookshelfPage({ notice }: { notice?: string }) {
       end(false);
     };
   }, [revision]);
-  const books = useMemo(() => sortShelf(entries, sort), [entries, sort]);
+  const books = useMemo(
+    () => sortShelf(entries, sort),
+    [entries, sort, uiLocale.value],
+  );
   const recent = entries
     .filter((entry) => entry.progress && !entry.book.missingFile)
     .sort((a, b) => b.book.lastReadAt - a.book.lastReadAt)[0];
   const read = (book: Book) => {
     if (book.missingFile) {
-      setError('请选择这本书的原文件，导入后会挂接已有进度与笔记。');
+      setError(t('请选择这本书的原文件，导入后会挂接已有进度与笔记。'));
       setImportOpen(true);
     } else {
       tryReaderFullscreen();
@@ -73,18 +77,19 @@ export function BookshelfPage({ notice }: { notice?: string }) {
     try {
       settings.value = await saveSettings({ shelfSort: value });
     } catch {
-      setError('排序保存失败，请重试。');
+      setError(t('排序保存失败，请重试。'));
     }
   };
   return (
     <main class="welcome">
       <header class="masthead">
-        <span class="wordmark">静页</span>
+        <span class="wordmark">{t('微光阅读')}</span>
+        <button onClick={() => navigate('#/notes')}>{t('笔记')}</button>
         <button
-          aria-label="设置与数据管理"
+          aria-label={t('设置与数据管理')}
           onClick={() => navigate('#/settings')}
         >
-          设置
+          {t('设置')}
         </button>
       </header>
       <UpdateNotice />
@@ -92,55 +97,55 @@ export function BookshelfPage({ notice }: { notice?: string }) {
       <BackupReminder revision={revision} />
       {!!pending.length && (
         <aside class="update-notice">
-          <p>有 {pending.length} 份分享尚未处理，原文仍在本机。</p>
+          <p>{t('有 {0} 份分享尚未处理，原文仍在本机。', pending.length)}</p>
           <button onClick={() => navigate('#/incoming/' + pending[0])}>
-            继续导入分享
+            {t('继续导入分享')}
           </button>
         </aside>
       )}
       {loading ? (
         <section class="welcome-body">
-          <p role="status">正在打开书架…</p>
+          <p role="status">{t('正在打开书架…')}</p>
         </section>
       ) : !books.length ? (
         <section class="welcome-body" aria-labelledby="welcome-title">
           <span class="book-symbol" aria-hidden="true">
-            页
+            {t('页')}
           </span>
-          <p class="eyebrow">留一点时间，给阅读。</p>
+          <p class="eyebrow">{t('留一点时间，给阅读。')}</p>
           <h1 id="welcome-title">
-            一页书，
+            {t('一页书，')}
             <br />
-            一会儿安静。
+            {t('一会儿安静。')}
           </h1>
           <p class="intro">
-            从信息流中暂时抽身。
+            {t('从信息流中暂时抽身。')}
             <br />
-            让文字回到纸上，让注意力回到此刻。
+            {t('让文字回到纸上，让注意力回到此刻。')}
           </p>
           <button class="import-button" onClick={() => setImportOpen(true)}>
-            导入第一本书
+            {t('导入第一本书')}
           </button>
         </section>
       ) : (
         <section class="bookshelf">
           <div class="shelf-heading">
-            <h1>我的书架</h1>
+            <h1>{t('我的书架')}</h1>
             <button class="primary-action" onClick={() => setImportOpen(true)}>
-              ＋ 导入书籍
+              {t('＋ 导入书籍')}
             </button>
           </div>
           {recent && (
             <button class="resume-card" onClick={() => read(recent.book)}>
               <small>
-                继续阅读 · {(recent.progress?.percent ?? 0).toFixed(1)}%
+                {t('继续阅读 ·')} {(recent.progress?.percent ?? 0).toFixed(1)}%
               </small>
               <strong>{recent.book.title}</strong>
               <span aria-hidden="true">→</span>
             </button>
           )}
           <label class="shelf-sort">
-            排序
+            {t('排序')}
             <select
               value={sort}
               onChange={(event) => {
@@ -153,9 +158,9 @@ export function BookshelfPage({ notice }: { notice?: string }) {
                   void updateSort(value);
               }}
             >
-              <option value="recent">最近阅读</option>
-              <option value="imported">导入时间</option>
-              <option value="title">书名</option>
+              <option value="recent">{t('最近阅读')}</option>
+              <option value="imported">{t('导入时间')}</option>
+              <option value="title">{t('书名')}</option>
             </select>
           </label>
           <VirtualShelf entries={books} onRead={read} onActions={setSelected} />
@@ -185,7 +190,7 @@ export function BookshelfPage({ notice }: { notice?: string }) {
           onChange={() => setRevision((n) => n + 1)}
         />
       )}
-      <footer>无注册 · 无推荐 · 无 AI</footer>
+      <footer>{t('无注册 · 无推荐 · 无 AI')}</footer>
     </main>
   );
 }

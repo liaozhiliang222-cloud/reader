@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { wrap, transfer, releaseProxy } from 'comlink';
 import { db } from '@/db';
 import { runWorkerTask } from '@/workers/runTask';
@@ -23,9 +24,9 @@ export async function previewEncoding(
   signal?: AbortSignal,
 ): Promise<ReparsedText> {
   if (book.type !== 'txt' || book.missingFile)
-    throw new Error('只有原文件完整的 TXT 可以切换编码。');
+    throw new Error(t('只有原文件完整的 TXT 可以切换编码。'));
   const original = await db.blobs.get(book.fileBlobId ?? book.id);
-  if (!original) throw new Error('原文件已不可用，请从书架重新导入。');
+  if (!original) throw new Error(t('原文件已不可用，请从书架重新导入。'));
   const buffer = await original.data.arrayBuffer();
   signal?.throwIfAborted();
   const worker = new Worker(
@@ -41,11 +42,13 @@ export async function previewEncoding(
       signal,
     );
     if (result.id !== book.id)
-      throw new Error('原文件指纹不一致，未修改书籍。');
+      throw new Error(t('原文件指纹不一致，未修改书籍。'));
     return result;
   } catch (cause) {
     if (cause instanceof Error && cause.name === 'TypeError')
-      throw new Error('该编码无法完整解码原文件，请选择其他编码。', { cause });
+      throw new Error(t('该编码无法完整解码原文件，请选择其他编码。'), {
+        cause,
+      });
     throw cause;
   } finally {
     try {

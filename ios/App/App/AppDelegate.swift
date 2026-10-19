@@ -1,12 +1,28 @@
 import UIKit
 import Capacitor
+#if DEBUG && canImport(StoreKitTest)
+import StoreKitTest
+#endif
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    /// 单元测试宿主专用：先于任何 StoreKit 调用建本地测试会话，
+    /// 否则店面在进程首个 StoreKit 调用处锁定，测试商品不可见。
+    private var storeKitTestSession: Any?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        #if DEBUG && canImport(StoreKitTest)
+        if (ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            || ProcessInfo.processInfo.environment["JY_SK_TEST"] == "1"),
+           #available(iOS 15.4, *) {
+            storeKitTestSession = try? SKTestSession(configurationFileNamed: "JingyePro")
+            (storeKitTestSession as? SKTestSession)?.disableDialogs = true
+            (storeKitTestSession as? SKTestSession)?.clearTransactions()
+        }
+        #endif
         // Override point for customization after application launch.
         return true
     }

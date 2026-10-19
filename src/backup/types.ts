@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type {
   AppSettings,
   Book,
@@ -6,7 +7,7 @@ import type {
   Progress,
   StoredChapter,
 } from '@/types';
-export const BACKUP_VERSION = 4;
+export const BACKUP_VERSION = 5;
 export type BackupBook = Omit<
   Book,
   'fileBlobId' | 'coverBlobId' | 'draftBlobId'
@@ -65,5 +66,5 @@ export function backupFilename(kind: 'light' | 'full', date = new Date()) {
     String(date.getMonth() + 1).padStart(2, '0'),
     String(date.getDate()).padStart(2, '0'),
   ].join('-');
-  return `静页备份_${day}.${kind === 'full' ? 'zip' : 'json'}`;
+  return t('微光阅读备份_{0}.{1}', day, kind === 'full' ? 'zip' : 'json');
 }

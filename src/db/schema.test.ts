@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { expect, it } from 'vitest';
 import { createDatabase } from './schema';
 
-it('M0 v1 升级到正式 v2 保留书籍、原文件、章节和进度', async () => {
+it('M0 v1 升级到正式 v4 保留书籍、原文件、章节和进度', async () => {
   const name = 'migration-' + crypto.randomUUID();
   const old = new Dexie(name);
   old.version(1).stores({
@@ -31,7 +31,7 @@ it('M0 v1 升级到正式 v2 保留书籍、原文件、章节和进度', async 
   const upgraded = createDatabase(name);
   try {
     await upgraded.open();
-    expect(upgraded.verno).toBe(2);
+    expect(upgraded.verno).toBe(4);
     expect((await upgraded.books.get('book'))?.fileBlobId).toBe('book');
     expect((await upgraded.progress.get('book'))?.locator).toEqual(locator);
     expect((await upgraded.chapters.get(['book', 2]))?.paragraphs).toEqual([

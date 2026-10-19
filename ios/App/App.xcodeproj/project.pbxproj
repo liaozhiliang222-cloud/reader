@@ -16,6 +16,18 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		9E5A10012C4E000000000001 /* ReaderBridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10012C4E000000000101 /* ReaderBridgeViewController.swift */; };
+		9E5A10022C4E000000000001 /* JySpeechPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10022C4E000000000101 /* JySpeechPlugin.swift */; };
+		9E5A10032C4E000000000001 /* SpeechController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10032C4E000000000101 /* SpeechController.swift */; };
+		9E5A10042C4E000000000001 /* SpeechQueueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10042C4E000000000101 /* SpeechQueueStore.swift */; };
+		9E5A10052C4E000000000001 /* SpeechAudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10052C4E000000000101 /* SpeechAudioSession.swift */; };
+		9E5A10062C4E000000000001 /* SpeechRemoteControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */; };
+		A00000000000000000000001 /* JyReaderPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* JyReaderPlugin.swift */; };
+		A00000000000000000000002 /* ProStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* ProStore.swift */; };
+B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
+C10000000000000000000001 = {isa = PBXBuildFile; fileRef = C10000000000000000000002; };
+C10000000000000000000003 = {isa = PBXBuildFile; fileRef = C10000000000000000000004; };
+D19000000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D19000000000000000000002 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +42,20 @@
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		9E5A10012C4E000000000101 /* ReaderBridgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderBridgeViewController.swift; sourceTree = "<group>"; };
+		9E5A10022C4E000000000101 /* JySpeechPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JySpeechPlugin.swift; sourceTree = "<group>"; };
+		9E5A10032C4E000000000101 /* SpeechController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechController.swift; sourceTree = "<group>"; };
+		9E5A10042C4E000000000101 /* SpeechQueueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechQueueStore.swift; sourceTree = "<group>"; };
+		9E5A10052C4E000000000101 /* SpeechAudioSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAudioSession.swift; sourceTree = "<group>"; };
+		9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRemoteControls.swift; sourceTree = "<group>"; };
+		A00000000000000000000101 /* JyReaderPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JyReaderPlugin.swift; sourceTree = "<group>"; };
+		A00000000000000000000102 /* ProStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStore.swift; sourceTree = "<group>"; };
+B10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechQueueStoreTests.swift; sourceTree = "<group>"; };
+C10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStoreTests.swift; sourceTree = "<group>"; };
+C10000000000000000000004 = {isa = PBXFileReference; lastKnownFileType = file.storekit; path = JingyePro.storekit; sourceTree = "<group>"; };
+B10000000000000000000003 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+D19000000000000000000003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+D19000000000000000000004 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +67,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+B10000000000000000000006 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -49,6 +76,7 @@
 			children = (
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
+B10000000000000000000004,
 				504EC3051FED79650016851F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -57,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+B10000000000000000000003,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,18 +94,24 @@
 			isa = PBXGroup;
 			children = (
 				9582B6822FE993A50072D4E8 /* SceneDelegate.swift */,
+				9E5A10012C4E000000000101 /* ReaderBridgeViewController.swift */,
+				9E5A10072C4E000000000002 /* Speech */,
+				A00000000000000000000102 /* ProStore.swift */,
+				A00000000000000000000101 /* JyReaderPlugin.swift */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
+D19000000000000000000002 /* InfoPlist.strings */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
+B10000000000000000000004 = {isa = PBXGroup; children = (B10000000000000000000002,C10000000000000000000002,); path = AppTests; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -87,6 +122,7 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				C10000000000000000000005 /* Copy StoreKit Config (Debug) */,
 			);
 			buildRules = (
 			);
@@ -100,8 +136,15 @@
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
 		};
+B1000000000000000000000a = {isa = PBXNativeTarget; buildConfigurationList = B1000000000000000000000b; buildPhases = (B10000000000000000000005,B10000000000000000000006,B10000000000000000000007,); buildRules = (); dependencies = (B10000000000000000000009,); name = AppTests; productName = AppTests; productReference = B10000000000000000000003; productType = "com.apple.product-type.bundle.unit-test"; };
 /* End PBXNativeTarget section */
 
+/* Begin PBXContainerItemProxy section */
+B10000000000000000000008 = {isa = PBXContainerItemProxy; containerPortal = 504EC2FC1FED79650016851F; proxyType = 1; remoteGlobalIDString = 504EC3031FED79650016851F; remoteInfo = App; };
+/* End PBXContainerItemProxy section */
+/* Begin PBXTargetDependency section */
+B10000000000000000000009 = {isa = PBXTargetDependency; target = 504EC3031FED79650016851F; targetProxy = B10000000000000000000008; };
+/* End PBXTargetDependency section */
 /* Begin PBXProject section */
 		504EC2FC1FED79650016851F /* Project object */ = {
 			isa = PBXProject;
@@ -122,6 +165,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
@@ -133,6 +177,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+B1000000000000000000000a,
 			);
 		};
 /* End PBXProject section */
@@ -143,6 +188,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
+D19000000000000000000001 /* InfoPlist.strings in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
@@ -151,8 +197,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (C10000000000000000000003,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
+		9E5A10072C4E000000000002 /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				9E5A10022C4E000000000101 /* JySpeechPlugin.swift */,
+				9E5A10032C4E000000000101 /* SpeechController.swift */,
+				9E5A10042C4E000000000101 /* SpeechQueueStore.swift */,
+				9E5A10052C4E000000000101 /* SpeechAudioSession.swift */,
+				9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */,
+			);
+			path = Speech;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+C10000000000000000000005 = {isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); name = "Copy StoreKit Config (Debug)"; outputPaths = (); runOnlyForDeploymentPostprocessing = 0; shellPath = /bin/sh; shellScript = "if [ \"$CONFIGURATION\" = \"Debug\" ]; then\n\tcp \"$SRCROOT/JingyePro.storekit\" \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/JingyePro.storekit\"\nfi\n"; };
 /* Begin PBXSourcesBuildPhase section */
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -160,9 +222,18 @@
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
+				9E5A10012C4E000000000001 /* ReaderBridgeViewController.swift in Sources */,
+				9E5A10022C4E000000000001 /* JySpeechPlugin.swift in Sources */,
+				A00000000000000000000002 /* ProStore.swift in Sources */,
+				A00000000000000000000001 /* JyReaderPlugin.swift in Sources */,
+				9E5A10032C4E000000000001 /* SpeechController.swift in Sources */,
+				9E5A10042C4E000000000001 /* SpeechQueueStore.swift in Sources */,
+				9E5A10052C4E000000000001 /* SpeechAudioSession.swift in Sources */,
+				9E5A10062C4E000000000001 /* SpeechRemoteControls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+B10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B10000000000000000000001,C10000000000000000000001,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
@@ -182,6 +253,7 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+D19000000000000000000002 /* InfoPlist.strings */ = {isa = PBXVariantGroup; children = (D19000000000000000000003 /* en */, D19000000000000000000004 /* zh-Hans */,); name = InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -300,14 +372,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.jingye.reader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -322,14 +394,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.jingye.reader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -338,6 +410,8 @@
 			};
 			name = Release;
 		};
+B1000000000000000000000c = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = dev.jingye.reader.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/App"; }; name = Debug; };
+B1000000000000000000000d = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = dev.jingye.reader.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/App"; }; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -359,6 +433,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+B1000000000000000000000b = {isa = XCConfigurationList; buildConfigurations = (B1000000000000000000000c,B1000000000000000000000d,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */

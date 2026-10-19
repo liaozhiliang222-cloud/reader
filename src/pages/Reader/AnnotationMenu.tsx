@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { selectionMenuPosition } from '@/reader/selection';
 import type { AnnotationTarget } from '@/reader/useAnnotations';
@@ -59,7 +60,7 @@ export function AnnotationMenu({
       ref={ref}
       class="annotation-menu"
       role="toolbar"
-      aria-label={existing ? '编辑划线' : '文字选区操作'}
+      aria-label={existing ? t('编辑划线') : t('文字选区操作')}
       style={{ left: `${position.left}px`, top: `${position.top}px` }}
       onPointerDown={(event) => event.preventDefault()}
     >
@@ -67,7 +68,11 @@ export function AnnotationMenu({
         <button
           class="highlight-color"
           data-color={color}
-          aria-label={`${existing ? '改为' : '添加'}${['朱砂红', '墨蓝', '琥珀黄'][index]}划线`}
+          aria-label={t(
+            '{0}{1}划线',
+            existing ? t('改为') : t('添加'),
+            [t('朱砂红'), t('墨蓝'), t('琥珀黄')][index],
+          )}
           aria-pressed={existing?.color === color}
           disabled={busy}
           onClick={() => onColor(color)}
@@ -76,22 +81,22 @@ export function AnnotationMenu({
         </button>
       ))}
       <button disabled={busy} onClick={onNote}>
-        {existing?.note ? '编辑笔记' : '笔记'}
+        {existing?.note ? t('编辑笔记') : t('笔记')}
       </button>
       <button disabled={busy} onClick={onCopy}>
-        复制
+        {t('复制')}
       </button>
       {existing && (
         <button
           disabled={busy}
-          aria-label={`删除划线${existing.note ? '与笔记' : ''}`}
+          aria-label={t('删除划线{0}', existing.note ? t('与笔记') : '')}
           onClick={onRemove}
         >
-          删除
+          {t('删除')}
         </button>
       )}
       <button disabled={busy} onClick={onClose}>
-        关闭
+        {t('关闭')}
       </button>
     </div>
   );

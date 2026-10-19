@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useRef } from 'preact/hooks';
 import { BookCover } from '@/components/BookCover';
 import { relativeRead, type ShelfEntry } from './model';
@@ -77,10 +78,10 @@ export function BookRow({
             {book.author && `${book.author} · `}
             {book.type === 'paste'
               ? book.draftFormat === 'markdown'
-                ? 'Markdown 文稿'
-                : '文稿'
+                ? t('Markdown 文稿')
+                : t('文稿')
               : book.type.toUpperCase()}{' '}
-            · {book.chapterCount} 章
+            · {book.chapterCount} {t('章')}
           </small>
           {!book.missingFile && !!progress && (
             <span
@@ -91,16 +92,16 @@ export function BookRow({
           )}
           <small>
             {book.missingFile
-              ? '待补充文件'
+              ? t('待补充文件')
               : !progress
-                ? '未读'
-                : `${progress.percent >= 100 ? '已读完' : `${progress.percent.toFixed(1)}%`} · ${relativeRead(progress.updatedAt)}`}
+                ? t('未读')
+                : `${progress.percent >= 100 ? t('已读完') : `${progress.percent.toFixed(1)}%`} · ${relativeRead(progress.updatedAt)}`}
           </small>
         </span>
       </button>
       <button
         class="shelf-more"
-        aria-label={`《${book.title}》的书籍操作`}
+        aria-label={t('《{0}》的书籍操作', book.title)}
         onClick={() => onActions(book)}
       >
         ⋮

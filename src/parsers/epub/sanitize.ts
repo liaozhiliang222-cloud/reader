@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import {
   elements,
   localName,
@@ -11,6 +12,8 @@ import { EPUB_PARSER_VERSION, type EpubParserVersion } from './version';
 export interface SafeElement {
   tag: string;
   children: SafeNode[];
+  /** Ephemeral speech preparation metadata; never changes canonical text. */
+  speechSkip?: boolean;
   paragraphIndex?: number;
   align?: 'left' | 'center' | 'right' | 'justify';
   imageId?: string;
@@ -99,7 +102,7 @@ export function sanitizeChapter(
     );
   const doc = parseXml(source);
   const body = elements(doc, 'body')[0] ?? doc.documentElement;
-  if (!body) throw new Error('章节正文不存在。');
+  if (!body) throw new Error(t('章节正文不存在。'));
   const paragraphs: string[] = [];
   const anchors: Record<string, number> = Object.create(null) as Record<
     string,

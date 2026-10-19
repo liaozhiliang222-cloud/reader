@@ -37,6 +37,7 @@ import { createSnapshot as exportSnapshot } from './snapshot';
 import { RESTORE_PREFIX } from './staging';
 const workers: WorkerStub[] = [];
 class WorkerStub extends EventTarget {
+  postMessage = vi.fn();
   terminate = vi.fn();
   constructor() {
     super();

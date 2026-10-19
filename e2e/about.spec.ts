@@ -14,8 +14,10 @@ test('关于隐私、版本与本地许可证', async ({ page, context }, info) 
   });
   await openShelf(page);
   await page.getByRole('button', { name: '设置与数据管理' }).click();
-  await page.getByRole('button', { name: '关于静页与隐私' }).click();
-  await expect(page.getByRole('heading', { name: '关于静页' })).toBeVisible();
+  await page.getByRole('button', { name: '关于微光阅读与隐私' }).click();
+  await expect(
+    page.getByRole('heading', { name: '关于微光阅读' }),
+  ).toBeVisible();
   await expect(
     page.getByText(`版本 ${version}`, { exact: true }),
   ).toBeVisible();
@@ -23,7 +25,7 @@ test('关于隐私、版本与本地许可证', async ({ page, context }, info) 
     page.getByRole('region', { name: '隐私与本地数据' }),
   ).toContainText('我们不收集任何阅读数据。');
   await expect(page.locator('.feedback-template')).toContainText(
-    `静页 ${version}`,
+    `微光阅读 ${version}`,
   );
   await expect(
     page.getByRole('link', { name: '查看项目源码' }),

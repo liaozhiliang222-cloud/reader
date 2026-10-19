@@ -79,7 +79,7 @@ test('SVG 包装与安全矢量图真实导入、显示及完整备份恢复，�
   );
   expect(backup).toEqual(
     expect.objectContaining({
-      schemaVersion: 4,
+      schemaVersion: 5,
       books: [expect.objectContaining({ parserVersion: 3 })],
     }),
   );

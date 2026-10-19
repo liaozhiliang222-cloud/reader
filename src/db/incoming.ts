@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { IncomingData } from '@/app/incomingData';
 import { incomingKeys, encodeIncoming, decodeIncoming } from './incomingRecord';
 
@@ -14,12 +15,12 @@ export function createIncomingStore(
       let expired = false;
       const timer = setTimeout(() => {
         expired = true;
-        reject(new Error('本地存储暂时被占用，请重新打开静页。'));
+        reject(new Error(t('本地存储暂时被占用，请重新打开微光阅读。')));
       }, 10_000);
       request.onupgradeneeded = () => request.transaction?.abort();
       request.onerror = () => {
         clearTimeout(timer);
-        reject(new Error('请先打开静页初始化本地存储，再重新分享。'));
+        reject(new Error(t('请先打开微光阅读初始化本地存储，再重新分享。')));
       };
       request.onsuccess = () => {
         clearTimeout(timer);
@@ -43,7 +44,7 @@ export function createIncomingStore(
         transaction.oncomplete = () => resolve(result);
         transaction.onabort = () =>
           reject(
-            transaction.error ?? new Error('分享暂存失败，请检查本地存储。'),
+            transaction.error ?? new Error(t('分享暂存失败，请检查本地存储。')),
           );
         const request = operation(transaction.objectStore('blobs'));
         request.onsuccess = () => {

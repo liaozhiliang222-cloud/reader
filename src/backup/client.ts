@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { proxy, releaseProxy, wrap } from 'comlink';
 import { runWorkerTask } from '@/workers/runTask';
 import type {
@@ -25,7 +26,7 @@ async function run<T>(
   const api = wrap<BackupApi>(worker);
   let abort: (() => void) | undefined;
   const cancelled = new Promise<T>((_, reject) => {
-    abort = () => reject(new DOMException('备份操作已取消。', 'AbortError'));
+    abort = () => reject(new DOMException(t('备份操作已取消。'), 'AbortError'));
   });
   signal?.addEventListener('abort', abort!, { once: true });
   try {
@@ -54,7 +55,7 @@ export const generateFullBackup = (
         snapshot.backup,
         proxy(async (bookId: string) => {
           const source = sources.get(bookId);
-          if (!source) throw new Error('备份原文件与快照不一致。');
+          if (!source) throw new Error(t('备份原文件与快照不一致。'));
           return readSnapshotOriginal(source, undefined, signal);
         }),
         proxy(onProgress),
@@ -94,19 +95,19 @@ export const restoreFromBackup = async (
           for (const [index, source] of preview.backup.files.entries()) {
             controller.signal.throwIfAborted();
             const meta = metadata.get(source.bookId);
-            if (!meta) throw new Error('恢复内容与备份书架不一致。');
+            if (!meta) throw new Error(t('恢复内容与备份书架不一致。'));
             const item = await api.prepareRestoreBook(source.bookId);
             controller.signal.throwIfAborted();
             await stage.put(item);
             onProgress({
               percent: ((index + 1) / preview.backup.files.length) * 100,
-              message: `正在验证并解析 ${meta.title}`,
+              message: t('正在验证并解析 {0}', meta.title),
             });
           }
           await api.finishRestore();
         }, controller.signal);
         controller.signal.throwIfAborted();
-        onProgress({ percent: 100, message: '正在保存恢复的数据…' });
+        onProgress({ percent: 100, message: t('正在保存恢复的数据…') });
         return await restoreBackup(
           preview,
           stage,

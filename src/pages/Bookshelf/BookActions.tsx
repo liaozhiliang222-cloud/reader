@@ -1,8 +1,10 @@
+import { t, uiLocale } from '@/i18n';
 import { useEffect, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { countAnnotations, deleteBook, renameBook } from '@/db/repository';
 import { navigate } from '@/app/router';
 import type { Book } from '@/types';
+import { resetSpeechData } from '@/app/speech/coordinator';
 
 export function BookActions({
   book,
@@ -21,6 +23,7 @@ export function BookActions({
     bookmarks: number;
     highlights: number;
   }>();
+  const [keepNotes, setKeepNotes] = useState(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   useEffect(() => {
@@ -30,7 +33,7 @@ export function BookActions({
         if (!cancelled) setCounts(value);
       })
       .catch(() => {
-        if (!cancelled) setError('无法读取书签与笔记数量。');
+        if (!cancelled) setError(t('无法读取书签与笔记数量。'));
       });
     return () => {
       cancelled = true;
@@ -45,14 +48,16 @@ export function BookActions({
       onChange();
       onClose();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '操作失败，请重试。');
+      setError(
+        cause instanceof Error ? cause.message : t('操作失败，请重试。'),
+      );
     } finally {
       setBusy(false);
     }
   };
   return (
     <Modal
-      title={page === 'delete' ? '确认删除书籍' : '书籍操作'}
+      title={page === 'delete' ? t('确认删除书籍') : t('书籍操作')}
       onDismiss={() => {
         if (!busy) onClose();
       }}
@@ -60,22 +65,22 @@ export function BookActions({
       <header class="panel-heading">
         <h2>
           {page === 'rename'
-            ? '重命名'
+            ? t('重命名')
             : page === 'info'
-              ? '书籍信息'
+              ? t('书籍信息')
               : page === 'delete'
-                ? '删除书籍'
+                ? t('删除书籍')
                 : book.title}
         </h2>
         <button disabled={busy} onClick={onClose}>
-          关闭
+          {t('关闭')}
         </button>
       </header>
       {page === 'menu' && (
         <div class="book-action-list">
-          <button onClick={() => setPage('rename')}>重命名</button>
-          <button onClick={() => setPage('info')}>查看信息</button>
-          <button onClick={() => setPage('delete')}>删除书籍</button>
+          <button onClick={() => setPage('rename')}>{t('重命名')}</button>
+          <button onClick={() => setPage('info')}>{t('查看信息')}</button>
+          <button onClick={() => setPage('delete')}>{t('删除书籍')}</button>
         </div>
       )}
       {page === 'rename' && (
@@ -86,7 +91,7 @@ export function BookActions({
           }}
         >
           <label class="rename-label">
-            书名
+            {t('书名')}
             <input
               value={title}
               maxLength={200}
@@ -100,10 +105,10 @@ export function BookActions({
               disabled={busy}
               onClick={() => setPage('menu')}
             >
-              取消
+              {t('取消')}
             </button>
             <button disabled={busy || !title.trim()} type="submit">
-              保存书名
+              {t('保存书名')}
             </button>
           </div>
         </form>
@@ -111,36 +116,41 @@ export function BookActions({
       {page === 'info' && (
         <>
           <dl class="book-info">
-            <dt>书名</dt>
+            <dt>{t('书名')}</dt>
             <dd>{book.title}</dd>
             {book.author && (
               <>
-                <dt>作者</dt>
+                <dt>{t('作者')}</dt>
                 <dd>{book.author}</dd>
               </>
             )}
-            <dt>格式</dt>
+            <dt>{t('格式')}</dt>
             <dd>
               {book.type === 'paste'
                 ? book.draftFormat === 'markdown'
-                  ? 'Markdown 文稿'
-                  : '文稿'
+                  ? t('Markdown 文稿')
+                  : t('文稿')
                 : book.type.toUpperCase()}
               {book.encoding && ` · ${book.encoding}`}
             </dd>
-            <dt>大小</dt>
+            <dt>{t('大小')}</dt>
             <dd>{(book.size / 1024).toFixed(1)} KB</dd>
-            <dt>字数</dt>
+            <dt>{t('字数')}</dt>
             <dd>
-              {book.charCount.toLocaleString()} 字 · {book.chapterCount} 章
+              {book.charCount.toLocaleString(uiLocale.value)} {t('字 ·')}{' '}
+              {book.chapterCount} {t('章')}
             </dd>
-            <dt>导入时间</dt>
-            <dd>{new Date(book.importedAt).toLocaleString('zh-CN')}</dd>
-            <dt>书签与笔记</dt>
+            <dt>{t('导入时间')}</dt>
+            <dd>{new Date(book.importedAt).toLocaleString(uiLocale.value)}</dd>
+            <dt>{t('书签与笔记')}</dt>
             <dd>
               {counts
-                ? `${counts.bookmarks} 个书签 · ${counts.highlights} 条划线笔记`
-                : '正在读取…'}
+                ? t(
+                    '{0} 个书签 · {1} 条划线笔记',
+                    counts.bookmarks,
+                    counts.highlights,
+                  )
+                : t('正在读取…')}
             </dd>
           </dl>
           {book.type === 'paste' && (
@@ -150,33 +160,50 @@ export function BookActions({
                 navigate('#/paste/' + encodeURIComponent(book.id));
               }}
             >
-              编辑正文
+              {t('编辑正文')}
             </button>
           )}
         </>
       )}
       {page === 'delete' && (
         <>
+          <label class="check-row">
+            <input
+              type="checkbox"
+              checked={keepNotes}
+              onChange={(e) => setKeepNotes(e.currentTarget.checked)}
+            />
+            {t('保留划线和想法副本（删除后不能回到原文）')}
+          </label>
           <p>
-            确认删除《{book.title}》？原文件、阅读进度
-            {counts &&
-              `、${counts.bookmarks} 个书签和 ${counts.highlights} 条划线笔记`}
-            将一起删除，此操作无法撤销。
+            {counts
+              ? t(
+                  '确认删除《{0}》？原文件、阅读进度、{1} 个书签{2}将一起删除，此操作无法撤销。',
+                  book.title,
+                  counts.bookmarks,
+                  keepNotes ? '' : t('和 {0} 条划线笔记', counts.highlights),
+                )
+              : t('正在读取…')}
           </p>
           <div class="panel-actions">
             <button disabled={busy} onClick={() => setPage('menu')}>
-              取消
+              {t('取消')}
             </button>
             <button
               disabled={busy || !counts}
-              onClick={() => void commit(() => deleteBook(book.id))}
+              onClick={() =>
+                void commit(async () => {
+                  await resetSpeechData();
+                  await deleteBook(book.id, keepNotes);
+                })
+              }
             >
-              确认删除
+              {t('确认删除')}
             </button>
           </div>
         </>
       )}
-      {busy && <p role="status">正在保存…</p>}
+      {busy && <p role="status">{t('正在保存…')}</p>}
       {error && <p role="alert">{error}</p>}
     </Modal>
   );

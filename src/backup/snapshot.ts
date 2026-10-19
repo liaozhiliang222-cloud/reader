@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from '@/db';
 import { initialSettings } from '@/app/settings';
 import {
@@ -123,8 +124,8 @@ export async function readSnapshotOriginal(
   const stored = await database.blobs.get(source.blobId);
   signal?.throwIfAborted();
   if (!stored || !(stored.data instanceof Blob))
-    throw new Error('备份生成期间原文已不可用，请重新生成备份。');
+    throw new Error(t('备份生成期间原文已不可用，请重新生成备份。'));
   if (stored.data.size !== source.size)
-    throw new Error('备份生成期间原文大小发生变化，请重新生成备份。');
+    throw new Error(t('备份生成期间原文大小发生变化，请重新生成备份。'));
   return stored.data;
 }

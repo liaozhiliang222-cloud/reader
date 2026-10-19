@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import type { NoteTarget } from '@/reader/useAnnotations';
@@ -20,13 +21,13 @@ export function NoteEditor({
     'highlight' in target ? target.highlight.text : target.selection.text;
   return (
     <Modal
-      title="编辑笔记"
+      title={t('编辑笔记')}
       onDismiss={() => {
         if (!busy) onClose();
       }}
       className="note-editor"
     >
-      <h2>笔记</h2>
+      <h2>{t('笔记')}</h2>
       <blockquote>{text}</blockquote>
       <form
         onSubmit={(event) => {
@@ -35,7 +36,7 @@ export function NoteEditor({
         }}
       >
         <label>
-          写下此刻的想法
+          {t('写下此刻的想法')}
           <textarea
             value={note}
             rows={6}
@@ -43,13 +44,13 @@ export function NoteEditor({
             onInput={(event) => setNote(event.currentTarget.value)}
           />
         </label>
-        <p class="muted">清空笔记并保存会保留划线。</p>
+        <p class="muted">{t('清空笔记并保存会保留划线。')}</p>
         <div class="note-editor-actions">
           <button type="button" disabled={busy} onClick={onClose}>
-            取消
+            {t('取消')}
           </button>
           <button type="submit" disabled={busy}>
-            {busy ? '保存中…' : '保存'}
+            {busy ? t('保存中…') : t('保存')}
           </button>
         </div>
       </form>

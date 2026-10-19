@@ -631,7 +631,7 @@ test('LONG-SINGLE：12万字单段跨块往返、UTF-16定位和字号窗口变�
     '😀' +
     Array.from(
       { length: 8000 },
-      (_, i) => `第${String(i).padStart(5, '0')}句，风穿过静页的窗户。`,
+      (_, i) => `第${String(i).padStart(5, '0')}句，风穿过微光阅读的窗户。`,
     ).join('')
   ).slice(0, 120001);
   const imported = await importText(page, text, '十二万字长段');

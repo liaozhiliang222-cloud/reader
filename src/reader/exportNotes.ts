@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { groupHighlights } from './annotation';
 import type { Book, ChapterSummary, Highlight } from '@/types';
 
@@ -15,7 +16,7 @@ export function notesMarkdown(
   const lines = [`# ${plainMarkdown(book.title.replace(/[\r\n]+/g, ' '))}`, ''];
   if (book.author)
     lines.push(
-      `作者：${plainMarkdown(book.author.replace(/[\r\n]+/g, ' '))}`,
+      t('作者：{0}', plainMarkdown(book.author.replace(/[\r\n]+/g, ' '))),
       '',
     );
   for (const group of groupHighlights(items)) {
@@ -23,7 +24,7 @@ export function notesMarkdown(
       (chapter) => chapter.index === group.chapterIndex,
     );
     lines.push(
-      `## ${plainMarkdown((group.chapterIndex < 0 ? '位置待确认（编码切换前的摘录）' : (chapter?.title ?? `第 ${group.chapterIndex + 1} 节`)).replace(/[\r\n]+/g, ' '))}`,
+      `## ${plainMarkdown((group.chapterIndex < 0 ? t('位置待确认（编码切换前的摘录）') : (chapter?.title ?? t('第 {0} 节', group.chapterIndex + 1))).replace(/[\r\n]+/g, ' '))}`,
       '',
     );
     for (const item of group.highlights) {
@@ -36,12 +37,12 @@ export function notesMarkdown(
       );
       if (item.note)
         lines.push(
-          '**笔记**',
+          t('**笔记**'),
           '',
           plainMarkdown(item.note.replace(/\r\n?/g, '\n')),
           '',
         );
-      lines.push(`时间：${new Date(item.createdAt).toISOString()}`, '');
+      lines.push(t('时间：{0}', new Date(item.createdAt).toISOString()), '');
     }
   }
   return lines.join('\n');
@@ -57,5 +58,5 @@ export function notesFilename(title: string) {
     .slice(0, 100)
     .join('')
     .replace(/[. ]+$/, '');
-  return `${safe || '静页'}_笔记.md`;
+  return t('{0}_笔记.md', safe || t('微光阅读'));
 }

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import {
   addHighlight,
@@ -52,7 +53,7 @@ export function useAnnotations(
         if (live.current) setItems(value);
       })
       .catch(() => {
-        if (live.current) callbacks.current.onError('无法读取划线与笔记。');
+        if (live.current) callbacks.current.onError(t('无法读取划线与笔记。'));
       });
     let frame = 0;
     const changed = () => {
@@ -96,7 +97,7 @@ export function useAnnotations(
     } catch (cause) {
       if (live.current)
         callbacks.current.onError(
-          cause instanceof Error ? cause.message : '标注未能保存，请重试。',
+          cause instanceof Error ? cause.message : t('标注未能保存，请重试。'),
         );
       return false;
     } finally {
@@ -175,7 +176,7 @@ export function useAnnotations(
           callbacks.current.onError(
             cause instanceof Error
               ? cause.message
-              : '复制失败，请使用系统选区菜单。',
+              : t('复制失败，请使用系统选区菜单。'),
           );
       }
     },

@@ -213,4 +213,16 @@ body:has(.reader) .debug-panel {
   .welcome {
     padding-inline: 24px;
   }
+  html:lang(en) .masthead {
+    flex-wrap: wrap;
+    gap: 8px;
+    letter-spacing: 0.02em;
+  }
+  html:lang(en) .wordmark {
+    flex-basis: 100%;
+    font-size: 24px;
+  }
+  html:lang(en) .welcome-body h1 {
+    letter-spacing: 0.02em;
+  }
 }

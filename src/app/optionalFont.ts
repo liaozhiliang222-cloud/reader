@@ -1,4 +1,7 @@
+import { t } from '@/i18n';
+import { Capacitor } from '@capacitor/core';
 import { signal } from '@preact/signals';
+import { db } from '@/db/index';
 import { file, size, sha256 } from './fontAsset.json';
 
 export const fontState = signal<{
@@ -12,22 +15,46 @@ let downloading: Promise<void> | undefined;
 const url = () => new URL(import.meta.env.BASE_URL + file, location.origin);
 const cacheName = () =>
   'jingye-font-' + new URL(import.meta.env.BASE_URL, location.origin).pathname;
+// iOS 的 Capacitor WebView 用 capacitor:// 自定义 scheme，Cache API 的 put
+// 只允许 http(s) 请求，字体缓存写不进去——改存 IndexedDB 的 blobs 表。
+const useIdb = () => Capacitor.getPlatform() === 'ios';
+const fontId = () => 'font:' + url().href;
+const storable = () =>
+  useIdb() ? typeof indexedDB !== 'undefined' : typeof caches !== 'undefined';
 const available = () =>
-  typeof caches !== 'undefined' &&
-  typeof FontFace !== 'undefined' &&
-  !!crypto.subtle;
+  storable() && typeof FontFace !== 'undefined' && !!crypto.subtle;
 
 async function verified(response: Response) {
   if (!response.ok || response.type === 'opaque')
-    throw new Error('字体下载失败，请联网后重试。');
+    throw new Error(t('字体下载失败，请联网后重试。'));
   const bytes = await response.arrayBuffer();
   if (bytes.byteLength !== size)
-    throw new Error('字体文件大小不正确，请重新下载。');
+    throw new Error(t('字体文件大小不正确，请重新下载。'));
   const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))]
     .map((n) => n.toString(16).padStart(2, '0'))
     .join('');
-  if (hash !== sha256) throw new Error('字体文件校验失败，请重新下载。');
+  if (hash !== sha256) throw new Error(t('字体文件校验失败，请重新下载。'));
   return bytes;
+}
+async function savedFont() {
+  if (useIdb()) {
+    const row = await db.blobs.get(fontId());
+    return row?.data ? new Response(row.data) : undefined;
+  }
+  const saved = await (await caches.open(cacheName())).match(url().href);
+  return saved ?? undefined;
+}
+async function storeFont(bytes: ArrayBuffer) {
+  if (useIdb()) {
+    await db.blobs.put({ id: fontId(), data: new Blob([bytes]) });
+    return;
+  }
+  await (
+    await caches.open(cacheName())
+  ).put(
+    url().href,
+    new Response(bytes, { headers: { 'Content-Type': 'font/woff2' } }),
+  );
 }
 async function load(bytes: ArrayBuffer) {
   const next = await new FontFace('JingyeWenkai', bytes, {
@@ -47,8 +74,7 @@ export function restoreOptionalFont() {
     }
     fontState.value = { phase: 'checking' };
     try {
-      const cache = await caches.open(cacheName());
-      const saved = await cache.match(url().href);
+      const saved = await savedFont();
       if (saved) {
         await load(await verified(saved));
         fontState.value = { phase: 'ready' };
@@ -56,7 +82,7 @@ export function restoreOptionalFont() {
     } catch {
       fontState.value = {
         phase: 'idle',
-        error: '本机字体缓存不可用，可以重新下载；当前使用系统字体。',
+        error: t('本机字体缓存不可用，可以重新下载；当前使用系统字体。'),
       };
     }
   })();
@@ -83,18 +109,18 @@ export function downloadOptionalFont() {
       // Load before caching so unsupported/corrupt fonts are never marked ready.
       await load(bytes);
       try {
-        await (await caches.open(cacheName())).put(url().href, response);
+        await storeFont(bytes);
         fontState.value = { phase: 'ready' };
       } catch {
         if (face) document.fonts.delete(face);
         face = undefined;
-        throw new Error('字体未能保存到本机，请检查存储空间后重试。');
+        throw new Error(t('字体未能保存到本机，请检查存储空间后重试。'));
       }
     } catch (cause) {
       fontState.value = {
         phase: 'idle',
         error:
-          cause instanceof Error ? cause.message : '字体下载失败，请重试。',
+          cause instanceof Error ? cause.message : t('字体下载失败，请重试。'),
       };
     }
   })().finally(() => {
@@ -107,6 +133,7 @@ export async function removeOptionalFont() {
   if (downloading) return;
   try {
     if (typeof caches !== 'undefined') await caches.delete(cacheName());
+    await db.blobs.delete(fontId());
     if (face) document.fonts.delete(face);
     face = undefined;
     restoring = undefined;
@@ -114,7 +141,7 @@ export async function removeOptionalFont() {
   } catch {
     fontState.value = {
       ...fontState.value,
-      error: '字体缓存未能删除，请重试。',
+      error: t('字体缓存未能删除，请重试。'),
     };
   }
 }

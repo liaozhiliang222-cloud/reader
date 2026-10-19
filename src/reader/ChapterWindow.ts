@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 export interface CachedChapter {
   release: () => void;
 }
@@ -13,7 +14,7 @@ export class ChapterWindow<T extends CachedChapter, Key = number> {
     private create: (index: Key, signal: AbortSignal) => Promise<T>,
   ) {}
   get(index: Key): Promise<T> {
-    if (this.disposed) return Promise.reject(new Error('阅读器已关闭。'));
+    if (this.disposed) return Promise.reject(new Error(t('阅读器已关闭。')));
     const old = this.entries.get(index);
     if (old) return old.promise;
     const controller = new AbortController();
@@ -28,7 +29,7 @@ export class ChapterWindow<T extends CachedChapter, Key = number> {
         .then((value) => {
           if (this.disposed || controller.signal.aborted) {
             value.release();
-            throw new Error('章节预排版已取消。');
+            throw new Error(t('章节预排版已取消。'));
           }
           entry.value = value;
           return value;

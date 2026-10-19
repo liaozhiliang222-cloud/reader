@@ -105,7 +105,7 @@ it('同指纹不同段落规则不能静默合并；完整覆盖按备份规则�
 });
 it('新备份版本阻止旧应用误读，当前应用接受v1，拒绝未知解析版本和错误版本组合', async () => {
   const { backup } = await payload(2);
-  expect(BACKUP_VERSION).toBe(4);
+  expect(BACKUP_VERSION).toBe(5);
   expect(() => validateBackup({ ...backup.backup, schemaVersion: 1 })).toThrow(
     '第2版',
   );
@@ -116,7 +116,7 @@ it('新备份版本阻止旧应用误读，当前应用接受v1，拒绝未知�
     }),
   ).toThrow('解析版本');
   expect(validateBackup((await payload(1)).backup.backup).schemaVersion).toBe(
-    4,
+    5,
   );
   expect(validateBackup(backup.backup).books[0]?.parserVersion).toBe(2);
   const v3 = (await payload(3)).backup.backup;

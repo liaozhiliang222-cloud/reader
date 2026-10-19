@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import JSZip from 'jszip';
 import { BACKUP_ENTRY_LIMIT, BACKUP_METADATA_LIMIT } from './limits';
 
@@ -17,12 +18,12 @@ export async function streamArchive(
   // JSZip emits classic ZIP fields, not ZIP64 output. Reject before reading
   // originals rather than silently wrapping directory offsets or entry counts.
   if (entries.length > BACKUP_ENTRY_LIMIT)
-    throw new Error('备份条目超过 20000 项，未生成文件。');
+    throw new Error(t('备份条目超过 20000 项，未生成文件。'));
   const paths = new Set<string>();
   let size = 22,
     directorySize = 0;
   for (const entry of entries) {
-    if (paths.has(entry.path)) throw new Error('备份包含重复路径。');
+    if (paths.has(entry.path)) throw new Error(t('备份包含重复路径。'));
     paths.add(entry.path);
     const nameSize = new TextEncoder().encode(entry.path).byteLength;
     const extraSize = nameSize === entry.path.length ? 0 : nameSize + 9;
@@ -32,22 +33,22 @@ export async function streamArchive(
       nameSize > 0xffff ||
       extraSize > 0xffff
     )
-      throw new Error('备份文件名超出 ZIP 格式范围。');
+      throw new Error(t('备份文件名超出 ZIP 格式范围。'));
     const bytes = 'data' in entry ? entry.data.size : entry.size;
     if (!Number.isSafeInteger(bytes) || bytes < 0)
-      throw new Error('备份原文件大小无效。');
+      throw new Error(t('备份原文件大小无效。'));
     size += bytes + 92 + 2 * nameSize + 2 * extraSize;
     directorySize += 46 + nameSize + extraSize;
   }
   if (directorySize > BACKUP_METADATA_LIMIT)
-    throw new Error('备份 ZIP 目录超过 32 MiB，未生成文件。');
+    throw new Error(t('备份 ZIP 目录超过 32 MiB，未生成文件。'));
   if (
     entries.length >= 0xffff ||
     !Number.isSafeInteger(size) ||
     size >= 0xffffffff
   )
     throw new Error(
-      '完整备份超过当前 ZIP 格式上限，未生成文件，本机数据未修改。',
+      t('完整备份超过当前 ZIP 格式上限，未生成文件，本机数据未修改。'),
     );
   const zip = new JSZip();
   const pending = new Map<string, () => void>();
@@ -65,7 +66,7 @@ export async function streamArchive(
             if (stopped) return;
             const expected = 'data' in entry ? entry.data.size : entry.size;
             if (bytes.byteLength !== expected)
-              throw new Error('备份原文大小与快照不一致。');
+              throw new Error(t('备份原文大小与快照不一致。'));
             resolve(bytes);
           } catch (cause) {
             reject(cause);

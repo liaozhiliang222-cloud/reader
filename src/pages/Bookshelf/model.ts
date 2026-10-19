@@ -1,16 +1,17 @@
+import { t, uiLocale } from '@/i18n';
 import type { AppSettings, Book, Progress } from '@/types';
 export interface ShelfEntry {
   book: Book;
   progress?: Progress;
 }
-const collator = new Intl.Collator('zh-CN', {
-  numeric: true,
-  sensitivity: 'base',
-});
 export function sortShelf(
   entries: ShelfEntry[],
   sort: AppSettings['shelfSort'],
 ): ShelfEntry[] {
+  const collator = new Intl.Collator(uiLocale.value, {
+    numeric: true,
+    sensitivity: 'base',
+  });
   return entries.slice().sort((a, b) => {
     const compare =
       sort === 'title'
@@ -22,7 +23,11 @@ export function sortShelf(
   });
 }
 export function relativeRead(updatedAt?: number, now = Date.now()) {
-  if (!updatedAt) return '尚未阅读';
+  if (!updatedAt) return t('尚未阅读');
   const days = Math.floor(Math.max(0, now - updatedAt) / 86400000);
-  return days === 0 ? '今天读过' : days === 1 ? '昨天读过' : `${days} 天前读过`;
+  return days === 0
+    ? t('今天读过')
+    : days === 1
+      ? t('昨天读过')
+      : t('{0} 天前读过', days);
 }

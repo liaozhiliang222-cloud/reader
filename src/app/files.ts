@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { isNativeApp, nativeApp } from './platform';
 
 export function downloadBlob(blob: Blob, name: string): Promise<void> {
@@ -28,7 +29,7 @@ export async function shareMarkdown(text: string, name: string, title: string) {
     const native = await nativeApp();
     return native.shareFile(new Blob([text], { type: 'text/markdown' }), name);
   }
-  if (!navigator.share) throw new Error('此浏览器不支持分享，请使用下载。');
+  if (!navigator.share) throw new Error(t('此浏览器不支持分享，请使用下载。'));
   const file = new File([text], name, { type: 'text/markdown' });
   if (navigator.canShare?.({ files: [file] }))
     await navigator.share({ files: [file], title });
@@ -39,10 +40,10 @@ export async function shareBlob(blob: Blob, name: string) {
     const native = await nativeApp();
     return native.shareFile(blob, name);
   }
-  if (!navigator.share) throw new Error('此浏览器不支持分享，请使用下载。');
+  if (!navigator.share) throw new Error(t('此浏览器不支持分享，请使用下载。'));
   const file = new File([blob], name, { type: blob.type });
   if (!navigator.canShare?.({ files: [file] }))
-    throw new Error('此浏览器无法分享这个文件，请使用下载。');
+    throw new Error(t('此浏览器无法分享这个文件，请使用下载。'));
   await navigator.share({ files: [file], title: name });
 }
 export async function copyText(text: string) {
@@ -72,7 +73,7 @@ export async function copyText(text: string) {
       typeof document.execCommand !== 'function' ||
       !document.execCommand('copy')
     )
-      throw new Error('复制未被允许，请使用系统选区菜单复制。');
+      throw new Error(t('复制未被允许，请使用系统选区菜单复制。'));
   } finally {
     input.remove();
     selection?.removeAllRanges();

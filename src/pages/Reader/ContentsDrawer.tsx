@@ -1,3 +1,4 @@
+import { t, uiLocale } from '@/i18n';
 import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { TOC_ROW_HEIGHT, visibleRange } from './virtual';
@@ -108,7 +109,7 @@ export function ContentsDrawer({
       setFocused(undefined);
       return;
     }
-    const end = beginMeasure('目录视口呈现');
+    const end = beginMeasure(t('目录视口呈现'));
     const root = list.current!;
     const resize = new ResizeObserver(() => setHeight(root.clientHeight));
     resize.observe(root);
@@ -130,17 +131,17 @@ export function ContentsDrawer({
   }, [active, tab]);
   return (
     <Modal
-      title="目录、书签与笔记"
+      title={t('目录、书签与笔记')}
       className={`reader-drawer${closing ? ' closing' : ''}`}
       closing={closing}
       onDismiss={onClose}
     >
       <div class="reader-drawer-body">
         <header class="panel-heading">
-          <h2>阅读导航</h2>
-          <button onClick={onClose}>关闭</button>
+          <h2>{t('阅读导航')}</h2>
+          <button onClick={onClose}>{t('关闭')}</button>
         </header>
-        <div role="tablist" aria-label="阅读导航" class="drawer-tabs">
+        <div role="tablist" aria-label={t('阅读导航')} class="drawer-tabs">
           <button
             role="tab"
             aria-selected={tab === 'contents'}
@@ -148,7 +149,7 @@ export function ContentsDrawer({
             aria-controls="contents-panel"
             onClick={() => setTab('contents')}
           >
-            目录
+            {t('目录')}
           </button>
           <button
             role="tab"
@@ -157,7 +158,7 @@ export function ContentsDrawer({
             aria-controls="bookmarks-panel"
             onClick={() => setTab('bookmarks')}
           >
-            书签
+            {t('书签')}
           </button>
           <button
             role="tab"
@@ -166,7 +167,7 @@ export function ContentsDrawer({
             aria-controls="notes-panel"
             onClick={() => setTab('notes')}
           >
-            笔记
+            {t('笔记')}
           </button>
         </div>
         {entries.length > 40 && (
@@ -183,22 +184,22 @@ export function ContentsDrawer({
               class="text-button"
               onClick={() => focusAt(Math.max(0, active))}
             >
-              回到当前
+              {t('回到当前')}
             </button>
             <label>
-              跳至
+              {t('跳至')}
               <input
                 type="number"
                 min={1}
                 max={chapters.length}
                 inputMode="numeric"
                 value={chapterInput}
-                aria-label="章节号"
+                aria-label={t('章节号')}
                 onInput={(event) => setChapterInput(event.currentTarget.value)}
               />
-              章
+              {t('章')}
             </label>
-            <button type="submit">前往</button>
+            <button type="submit">{t('前往')}</button>
           </form>
         )}
         <div
@@ -242,7 +243,7 @@ export function ContentsDrawer({
           }}
         >
           {!entries.length ? (
-            <p role="status">正在读取目录…</p>
+            <p role="status">{t('正在读取目录…')}</p>
           ) : (
             <ol
               class="toc-list"
@@ -267,7 +268,7 @@ export function ContentsDrawer({
                       }}
                       aria-current={index === active ? 'location' : undefined}
                       title={entry.title}
-                      aria-label={`跳转到${entry.title}`}
+                      aria-label={t('跳转到{0}', entry.title)}
                       onClick={() =>
                         onJump({
                           chapterIndex: entry.chapterIndex,
@@ -292,7 +293,9 @@ export function ContentsDrawer({
           class="bookmark-panel"
         >
           {!bookmarks.length ? (
-            <p class="muted">还没有书签。在阅读菜单中添加，即可随时回来。</p>
+            <p class="muted">
+              {t('还没有书签。在阅读菜单中添加，即可随时回来。')}
+            </p>
           ) : (
             <ol class="bookmark-list">
               {bookmarks.map((bookmark) => (
@@ -308,17 +311,19 @@ export function ContentsDrawer({
                     onClick={() => onJump(bookmark.locator)}
                   >
                     <strong>{bookmark.chapterTitle}</strong>
-                    <span>{bookmark.excerpt || '图片或章节开头'}</span>
+                    <span>{bookmark.excerpt || t('图片或章节开头')}</span>
                     <small>
-                      {bookmark.unanchored && '位置待确认 · '}
-                      {new Date(bookmark.createdAt).toLocaleDateString('zh-CN')}
+                      {bookmark.unanchored && t('位置待确认 · ')}
+                      {new Date(bookmark.createdAt).toLocaleDateString(
+                        uiLocale.value,
+                      )}
                     </small>
                   </button>
                   <button
-                    aria-label={`移除${bookmark.chapterTitle}的书签`}
+                    aria-label={t('移除{0}的书签', bookmark.chapterTitle)}
                     onClick={() => onRemoveBookmark(bookmark.id)}
                   >
-                    移除
+                    {t('移除')}
                   </button>
                 </li>
               ))}

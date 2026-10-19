@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useState } from 'preact/hooks';
 import { chapterAtPercent } from '@/reader/position';
 import type { ChapterSummary } from '@/types';
@@ -16,7 +17,8 @@ export function ProgressControl({
   const [draft, setDraft] = useState<number>();
   const value = draft ?? percent;
   const title =
-    chapterAtPercent(chapters, total, value)?.chapter.title ?? '正在读取章节';
+    chapterAtPercent(chapters, total, value)?.chapter.title ??
+    t('正在读取章节');
   const commit = (value: number) => {
     setDraft(undefined);
     onCommit(value);
@@ -24,7 +26,7 @@ export function ProgressControl({
   return (
     <div class="progress-control">
       <label for="reader-progress">
-        阅读进度 · {value.toFixed(1)}% · {title}
+        {t('阅读进度 ·')} {value.toFixed(1)}% · {title}
       </label>
       <input
         id="reader-progress"

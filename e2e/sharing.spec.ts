@@ -218,6 +218,18 @@ async function pending(page: Page) {
             ).join(''),
           });
         }
+        // 暂存的 multipart 用 ASCII 占位名，真实文件名在 value.names
+        const names =
+          record.value &&
+          typeof record.value === 'object' &&
+          'names' in record.value &&
+          Array.isArray(record.value.names)
+            ? (record.value.names as unknown[])
+            : undefined;
+        if (names)
+          files.forEach((file, index) => {
+            if (typeof names[index] === 'string') file.name = names[index];
+          });
         items.push({ id: record.id, value: record.value, files });
       }
       return items;
@@ -311,7 +323,12 @@ test('SHARE-TEXT：分享文字和URL只作文本，返回/重载保留预填，
   await expect(page.getByLabel('标题（选填）')).toHaveValue(title);
   const staged = await pending(page);
   expect(staged).toHaveLength(1);
-  expect(staged[0]!.value).toEqual({ title, text: transmitted, errors: [] });
+  expect(staged[0]!.value).toEqual({
+    title,
+    text: transmitted,
+    errors: [],
+    names: [],
+  });
   await page.getByRole('button', { name: '返回书架', exact: true }).click();
   await expect(
     page.getByText('有 1 份分享尚未处理，原文仍在本机。'),
@@ -404,7 +421,12 @@ test('SHARE-MIXED：混合分享保留失败文件并可重试，保存文字不
   const remaining = await pending(page);
   expect(remaining).toHaveLength(1);
   expect(remaining[0]!.files).toEqual(before[0]!.files);
-  expect(remaining[0]!.value).toEqual({ title: '', text: '', errors: [] });
+  expect(remaining[0]!.value).toEqual({
+    title: '',
+    text: '',
+    errors: [],
+    names: [badName],
+  });
   await expect(editor.getByLabel('标题（选填）')).toHaveValue('尚未保存的文稿');
   await expect(editor.getByLabel('正文', { exact: true })).toHaveValue(
     '这段尚未保存的原创内容不能被分享覆盖。',

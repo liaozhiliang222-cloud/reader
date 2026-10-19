@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 let sequence = 0;
 const skipMeasure: (report?: boolean) => void = () => {};
 /** 仅开发debug入口计时，结束即清理Performance条目，避免长时间阅读积累。 */
@@ -19,7 +20,9 @@ export function beginMeasure(
     performance.mark(end);
     const measure = performance.measure(key, start, end);
     if (report)
-      console.info(`性能 · ${label} · ${measure.duration.toFixed(1)} ms`);
+      console.info(
+        t('性能 · {0} · {1} ms', label, measure.duration.toFixed(1)),
+      );
     performance.clearMarks(start);
     performance.clearMarks(end);
     performance.clearMeasures(key);

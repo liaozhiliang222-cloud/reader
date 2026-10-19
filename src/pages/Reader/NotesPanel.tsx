@@ -1,3 +1,4 @@
+import { t, uiLocale } from '@/i18n';
 import { useState } from 'preact/hooks';
 import { groupHighlights } from '@/reader/annotation';
 import { notesFilename, notesMarkdown } from '@/reader/exportNotes';
@@ -28,13 +29,15 @@ export function NotesPanel({
       await shareMarkdown(markdown(), name, book.title);
     } catch (cause) {
       if (!(cause instanceof DOMException && cause.name === 'AbortError'))
-        setError('分享未能完成，请使用下载。');
+        setError(t('分享未能完成，请使用下载。'));
     } finally {
       setSharing(false);
     }
   };
   if (!items.length)
-    return <p class="muted">还没有划线或笔记。长按正文选中文字后即可添加。</p>;
+    return (
+      <p class="muted">{t('还没有划线或笔记。长按正文选中文字后即可添加。')}</p>
+    );
   return (
     <>
       <div class="notes-export">
@@ -49,15 +52,15 @@ export function NotesPanel({
               if (!(
                 cause instanceof DOMException && cause.name === 'AbortError'
               ))
-                setError('下载未能开始，请尝试分享。');
+                setError(t('下载未能开始，请尝试分享。'));
             });
           }}
         >
-          下载 Markdown
+          {t('下载 Markdown')}
         </button>
         {(typeof navigator.share === 'function' || isNativeApp) && (
           <button disabled={sharing} onClick={() => void share()}>
-            {sharing ? '分享中…' : '分享笔记'}
+            {sharing ? t('分享中…') : t('分享笔记')}
           </button>
         )}
       </div>
@@ -66,10 +69,10 @@ export function NotesPanel({
         <section key={group.chapterIndex} class="note-group">
           <h3>
             {group.chapterIndex < 0
-              ? '位置待确认'
+              ? t('位置待确认')
               : (chapters.find(
                   (chapter) => chapter.index === group.chapterIndex,
-                )?.title ?? `第 ${group.chapterIndex + 1} 节`)}
+                )?.title ?? t('第 {0} 节', group.chapterIndex + 1))}
           </h3>
           <ol class="notes-list">
             {group.highlights.map((item) => (
@@ -79,17 +82,20 @@ export function NotesPanel({
                   data-color={item.color}
                   disabled={item.unanchored}
                   onClick={() => onJump(item)}
-                  aria-label={`跳转到划线：${[...item.text].slice(0, 30).join('')}`}
+                  aria-label={t(
+                    '跳转到划线：{0}',
+                    [...item.text].slice(0, 30).join(''),
+                  )}
                 >
                   <span class="note-quote">{item.text}</span>
                   {item.note && <span class="note-content">{item.note}</span>}
                   <small>
-                    {item.unanchored && '编码切换前的摘录 · '}
-                    {new Date(item.createdAt).toLocaleString('zh-CN')}
+                    {item.unanchored && t('编码切换前的摘录 · ')}
+                    {new Date(item.createdAt).toLocaleString(uiLocale.value)}
                   </small>
                 </button>
                 <button onClick={() => onEdit(item)}>
-                  {item.note ? '编辑笔记' : '添加笔记'}
+                  {item.note ? t('编辑笔记') : t('添加笔记')}
                 </button>
               </li>
             ))}

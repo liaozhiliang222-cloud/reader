@@ -1,10 +1,11 @@
+import { t } from '@/i18n';
 export function formatDebugValue(value: unknown): string {
   if (value instanceof Error) return `${value.name}: ${value.message}`;
   if (typeof value === 'string') return value;
   try {
     return JSON.stringify(value) ?? String(value);
   } catch {
-    return '[无法序列化的对象]';
+    return t('[无法序列化的对象]');
   }
 }
 

@@ -163,7 +163,7 @@ test('MD完整备份清空恢复，划线笔记、书签、进度和原始字节
     files: { path: string }[];
     highlights: { text: string }[];
   };
-  expect(meta.schemaVersion).toBe(4);
+  expect(meta.schemaVersion).toBe(5);
   expect(meta.books[0]?.type).toBe('md');
   expect(meta.books[0]?.markdownVersion).toBe(2);
   expect(meta.highlights[0]?.text).toBe(selected);

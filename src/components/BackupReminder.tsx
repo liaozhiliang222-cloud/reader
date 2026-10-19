@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { backupReminder, type AnnotationActivity } from '@/app/backupReminder';
 import { annotationActivity } from '@/db/backupReminder';
@@ -49,22 +50,24 @@ export function BackupReminder({ revision }: { revision: number }) {
       const value = await saveSettings({ backupReminderDismissed: reminder });
       if (live.current) settings.value = value;
     } catch {
-      if (live.current) setError('提醒关闭状态未能保存，请重试。');
+      if (live.current) setError(t('提醒关闭状态未能保存，请重试。'));
     } finally {
       working.current = false;
       if (live.current) setBusy(false);
     }
   };
   return (
-    <aside class="update-notice" aria-label="本地备份提醒">
+    <aside class="update-notice" aria-label={t('本地备份提醒')}>
       <p>
         {settings.value.lastBackupAt === undefined
-          ? '划线或笔记已保存超过 30 天，尚未保存过备份，建议现在保存一份。'
-          : '有新划线或笔记尚未备份，距离上次备份已超过 30 天。'}
+          ? t('划线或笔记已保存超过 30 天，尚未保存过备份，建议现在保存一份。')
+          : t('有新划线或笔记尚未备份，距离上次备份已超过 30 天。')}
       </p>
-      <button onClick={() => navigate('#/settings/backup')}>去备份</button>{' '}
+      <button onClick={() => navigate('#/settings/backup')}>
+        {t('去备份')}
+      </button>{' '}
       <button disabled={busy} onClick={() => void dismiss()}>
-        本周期不再提醒
+        {t('本周期不再提醒')}
       </button>
       {error && <p role="status">{error}</p>}
     </aside>

@@ -96,7 +96,7 @@ if (root.devDependencies?.['@capacitor/android'])
 notices.sort((a, b) => a.key.localeCompare(b.key));
 await writeFile(
   'public/licenses.txt',
-  '静页第三方运行组件许可\n\nJSZip 按 MIT 分支使用；下方保留各组件的完整版权与许可文本。\n字体许可另见 fonts/OFL.txt。开发工具不进入浏览器交付包。\n\n' +
+  '微光阅读第三方运行组件许可\n\nJSZip 按 MIT 分支使用；下方保留各组件的完整版权与许可文本。\n字体许可另见 fonts/OFL.txt。开发工具不进入浏览器交付包。\n\n' +
     notices
       .map(
         (item) =>

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { releaseProxy, wrap } from 'comlink';
 import type { parseDraft } from '@/parsers/paste';
 import { runWorkerTask } from '@/workers/runTask';
@@ -16,7 +17,7 @@ export async function importDraft(
   if (format === 'markdown') {
     const bytes = new TextEncoder().encode(text);
     if (bytes.byteLength > 50 * 1024 * 1024)
-      throw new Error('文稿超过 50 MB，请拆分后导入。');
+      throw new Error(t('文稿超过 50 MB，请拆分后导入。'));
     previous = await getBook(
       bookIdForHash(
         { type: 'paste', draftFormat: 'markdown' },

@@ -28,13 +28,58 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * 静页原生桥：文件保存/分享、沉浸模式、常亮、content:// 读取、外部文件导入。
+ * 微光阅读原生桥：文件保存/分享、沉浸模式、常亮、content:// 读取、外部文件导入。
  * 仅本地能力，不涉及网络。
  */
 @CapacitorPlugin(name = "JyNative")
 public class JyNativePlugin extends Plugin {
 
     private File shareFile;
+    private boolean speechForeground;
+    private String speechLaunchBook;
+    private java.util.function.Consumer<org.json.JSONObject> speechListener;
+
+    @Override public void load() {
+        speechForeground = true;
+        speechLaunchBook = getActivity().getIntent().getStringExtra("speechBookId");
+        speechListener = value -> {
+            try { notifyListeners("speechChanged", new JSObject(value.toString())); }
+            catch (Exception ignored) { /* UI fetches the authoritative snapshot on resume. */ }
+        };
+        SpeechRuntime.get(getContext()).listener = speechListener;
+    }
+    @Override protected void handleOnResume() { speechForeground = true; }
+    @Override protected void handleOnPause() {
+        speechForeground = false;
+        SpeechRuntime.get(getContext()).background();
+    }
+    @Override protected void handleOnDestroy() {
+        SpeechRuntime runtime = SpeechRuntime.get(getContext());
+        if (runtime.listener == speechListener) runtime.listener = null;
+    }
+    @PluginMethod public void speech(PluginCall call) {
+        SpeechRuntime.get(getContext()).request(call.getString("action", ""), call.getObject("args", new JSObject()), getActivity(), speechForeground,
+            new SpeechRuntime.Reply() {
+                @Override public void success(org.json.JSONObject value) {
+                    try { call.resolve(new JSObject(value.toString())); }
+                    catch (Exception error) { call.reject("听书状态读取失败"); }
+                }
+                @Override public void failure(String reason) { call.reject(reason); }
+            });
+    }
+    @PluginMethod public void speechSettings(PluginCall call) {
+        getActivity().runOnUiThread(() -> {
+            try { getActivity().startActivity(new Intent("com.android.settings.TTS_SETTINGS")); call.resolve(); }
+            catch (Exception error) {
+                try { getActivity().startActivity(new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)); call.resolve(); }
+                catch (Exception failure) { call.reject("请手动打开系统设置中的文字转语音设置。"); }
+            }
+        });
+    }
+    @PluginMethod public void speechLaunch(PluginCall call) {
+        JSObject result = new JSObject(); result.put("bookId", speechLaunchBook == null ? org.json.JSONObject.NULL : speechLaunchBook);
+        speechLaunchBook = null; call.resolve(result);
+    }
 
     // ---- 保存：SAF「另存为」+ 分块写入 ----
 
@@ -154,7 +199,7 @@ public class JyNativePlugin extends Plugin {
     }
 
     public boolean wantsVolumeKeys() {
-        return volumeKeys;
+        return volumeKeys && SpeechRuntime.get(getContext()).service == null;
     }
 
     /** 返回 true 表示按键已消费；仅在 JS 开启时触发。 */
@@ -231,6 +276,8 @@ public class JyNativePlugin extends Plugin {
     }
 
     public void onNewIntent(Intent intent) {
+        String book = intent.getStringExtra("speechBookId");
+        if (book != null) { JSObject data = new JSObject(); data.put("bookId", book); notifyListeners("speechOpen", data, true); }
         JSObject payload = describeIntent(intent);
         if (payload != null) notifyListeners("incomingFile", payload, true);
     }
