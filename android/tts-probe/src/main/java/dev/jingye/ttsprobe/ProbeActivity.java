@@ -57,7 +57,7 @@ public class ProbeActivity extends Activity {
         scroll.addView(layout);
         setContentView(scroll);
         TextView intro = new TextView(this);
-        intro.setText("静页听书探针 · T0\n独立测试 App，仅朗读原创测试文本。系统语音引擎为独立 App；只选择标记为已安装、无需联网的语音。测试结果不等于正式阅读器已验收。");
+        intro.setText("微光阅读听书探针 · T0\n独立测试 App，仅朗读原创测试文本。系统语音引擎为独立 App；只选择标记为已安装、无需联网的语音。测试结果不等于正式阅读器已验收。");
         intro.setTextSize(17);
         layout.addView(intro);
         status = new TextView(this);

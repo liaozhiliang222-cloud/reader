@@ -9,7 +9,7 @@ final class SpeechRemoteControls {
         case play, pause, stop, previous, next
     }
 
-    var title = "静页听书"
+    var title = "微光阅读听书"
     private var tokens: [(MPRemoteCommand, Any)] = []
     private var registered = false
     var onCommand: ((Command) -> Void)?
@@ -41,7 +41,7 @@ final class SpeechRemoteControls {
         }))
     }
 
-    /// 发布媒体信息：标题用「静页听书」，详细书名只在 App 内显示。
+    /// 发布媒体信息：标题用「微光阅读听书」，详细书名只在 App 内显示。
     /// 不虚构全书秒数，也不把句序当时间。
     func publish(playing: Bool, chapterTitle: String?) {
         var info: [String: Any] = [

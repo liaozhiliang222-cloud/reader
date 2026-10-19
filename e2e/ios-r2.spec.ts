@@ -147,7 +147,7 @@ test('iOS 购买门控：商品显式加载、等待批准、恢复与撤销（�
   await openShelf(page);
   await page.getByRole('button', { name: '设置与数据管理' }).click();
   await page.getByRole('button', { name: '购买与恢复购买' }).click();
-  const panel = page.getByRole('dialog', { name: '静页 Pro' });
+  const panel = page.getByRole('dialog', { name: '微光阅读 Pro' });
   await expect(panel).toContainText('尚未解锁 Pro');
   const requests = await page.evaluate(() =>
     (
@@ -177,7 +177,7 @@ test('iOS 购买门控：商品显式加载、等待批准、恢复与撤销（�
   await page.evaluate(() =>
     (Reflect.get(window, '__iosProDouble') as { revoke(): void }).revoke(),
   );
-  await expect(page.getByRole('dialog', { name: '静页 Pro' })).toContainText(
+  await expect(page.getByRole('dialog', { name: '微光阅读 Pro' })).toContainText(
     '尚未解锁 Pro',
   );
 });

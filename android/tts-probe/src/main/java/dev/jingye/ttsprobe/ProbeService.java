@@ -418,7 +418,7 @@ public class ProbeService extends Service {
         summary = label + "\n句 " + state.index + "/" + state.count + " · 章 " + (state.index / 64 + 1)
             + " · 批 " + state.index / ProbeQueue.WINDOW + "\n" + voiceId + " · " + rate + "×";
         boolean playing = state.status == ProbeState.Status.SPEAKING;
-        media.setMetadata(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE, "静页原创听书测试")
+        media.setMetadata(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_TITLE, "微光阅读原创听书测试")
             .putString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE, "第 " + (state.index / 64 + 1) + " 章").build());
         media.setPlaybackState(new PlaybackState.Builder().setState(playing ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED,
             PlaybackState.PLAYBACK_POSITION_UNKNOWN, playing ? rate : 0)
@@ -436,7 +436,7 @@ public class ProbeService extends Service {
         Notification.Builder builder = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, "speech") : new Notification.Builder(this);
         Notification.Builder hidden = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, "speech") : new Notification.Builder(this);
         boolean playing = state != null && state.status == ProbeState.Status.SPEAKING;
-        return builder.setSmallIcon(android.R.drawable.ic_media_play).setContentTitle("静页原创听书测试")
+        return builder.setSmallIcon(android.R.drawable.ic_media_play).setContentTitle("微光阅读原创听书测试")
             .setContentText(label).setContentIntent(open).setOnlyAlertOnce(true).setShowWhen(false)
             .setCategory(Notification.CATEGORY_TRANSPORT).setVisibility(Notification.VISIBILITY_PRIVATE)
             .setPublicVersion(hidden.setSmallIcon(android.R.drawable.ic_media_play).setContentTitle("听书测试").build())

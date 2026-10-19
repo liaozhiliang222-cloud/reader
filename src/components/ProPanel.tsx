@@ -18,18 +18,18 @@ export function ProPanel({ onClose }: { onClose: () => void }) {
   }, []);
   return (
     <Modal
-      title="静页 Pro"
+      title="微光阅读 Pro"
       onDismiss={() => {
         if (!busy) onClose();
       }}
     >
-      <h2>静页 Pro</h2>
+      <h2>微光阅读 Pro</h2>
       <p>
         一次购买，解锁本版的本地听书、笔记整理与摘录图片。核心阅读、书签笔记、基础导出和备份继续免费。
       </p>
       <p>
         购买和恢复由 Apple
-        处理，需要联网；本机已验证的权益可离线使用。不收集阅读内容，不创建静页账号。
+        处理，需要联网；本机已验证的权益可离线使用。不收集阅读内容，不创建微光阅读账号。
       </p>
       <p>
         本版本仍需完成 iPhone 与 StoreKit 验收。测试配置中的价格仅用于本地测试。

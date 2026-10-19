@@ -14,12 +14,12 @@ export function createIncomingStore(
       let expired = false;
       const timer = setTimeout(() => {
         expired = true;
-        reject(new Error('本地存储暂时被占用，请重新打开静页。'));
+        reject(new Error('本地存储暂时被占用，请重新打开微光阅读。'));
       }, 10_000);
       request.onupgradeneeded = () => request.transaction?.abort();
       request.onerror = () => {
         clearTimeout(timer);
-        reject(new Error('请先打开静页初始化本地存储，再重新分享。'));
+        reject(new Error('请先打开微光阅读初始化本地存储，再重新分享。'));
       };
       request.onsuccess = () => {
         clearTimeout(timer);

@@ -63,7 +63,7 @@ export function NotesPage() {
         new Blob([reviewMarkdown(items, template)], {
           type: 'text/markdown;charset=utf-8',
         }),
-        template === 'reading' ? '静页_回顾笔记.md' : '静页_摘录.md',
+        template === 'reading' ? '微光阅读_回顾笔记.md' : '微光阅读_摘录.md',
       ),
     );
   const premium = (work: () => void) => {
@@ -221,7 +221,7 @@ export function NotesPage() {
                       void action(async () => {
                         const images = await quoteCards(row);
                         for (const [index, image] of images.entries())
-                          await shareBlob(image, `静页_摘录_${index + 1}.png`);
+                          await shareBlob(image, `微光阅读_摘录_${index + 1}.png`);
                       }),
                   )
                 }

@@ -63,7 +63,7 @@ export function reviewMarkdown(
   rows: ReviewNote[],
   template: 'quotes' | 'reading' = 'quotes',
 ) {
-  const lines = ['# 静页笔记', ''];
+  const lines = ['# 微光阅读笔记', ''];
   for (const row of rows) {
     const { item } = row;
     lines.push(
@@ -82,7 +82,7 @@ export function reviewMarkdown(
     );
     if (row.available)
       lines.push(
-        `[在本机静页打开原文](jingye://note/${encodeURIComponent(item.bookId)}/${encodeURIComponent(item.id)})`,
+        `[在本机微光阅读打开原文](jingye://note/${encodeURIComponent(item.bookId)}/${encodeURIComponent(item.id)})`,
         '',
       );
     else lines.push('位置：原书缺失或位置待确认，摘录副本仍可保留。', '');

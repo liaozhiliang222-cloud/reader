@@ -6,7 +6,7 @@
     <queries>
         <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
     </queries>
-    <application android:label="静页听书探针" android:allowBackup="false"
+    <application android:label="微光阅读听书探针" android:allowBackup="false"
         android:fullBackupContent="false" android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity android:name=".ProbeActivity" android:exported="true">
             <intent-filter>

@@ -125,7 +125,7 @@ it('启动桥或暂存失败退出加载并显示可操作的错误，未处理�
   await vi.waitFor(() =>
     expect(root.textContent).toContain('未能接收系统打开的文件'),
   );
-  expect(root.textContent).not.toContain('正在打开静页');
+  expect(root.textContent).not.toContain('正在打开微光阅读');
 });
 
 it('热分享读取期间保留当前页面，完成后移除加载层', async () => {

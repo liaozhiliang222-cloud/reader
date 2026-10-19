@@ -79,7 +79,7 @@ export function SettingsPage({
       <EnvironmentNotice />
       {isIosApp && (
         <section>
-          <h2>静页 Pro</h2>
+          <h2>微光阅读 Pro</h2>
           <button onClick={() => setPro(true)}>购买与恢复购买</button>
         </section>
       )}
@@ -129,7 +129,7 @@ export function SettingsPage({
       )}
       {guide && (
         <Modal
-          title="静页使用引导"
+          title="微光阅读使用引导"
           className="guide-modal"
           onDismiss={() => setGuide(false)}
         >
@@ -276,7 +276,7 @@ export function SettingsPage({
                 自动检查应用更新
               </label>
               <p>
-                发现新版本后只在书架提示，点击更新才重新打开。关闭后静页不主动定时检查，浏览器仍可能检查应用资源。
+                发现新版本后只在书架提示，点击更新才重新打开。关闭后微光阅读不主动定时检查，浏览器仍可能检查应用资源。
               </p>
               <button
                 disabled={
@@ -311,7 +311,7 @@ export function SettingsPage({
         </section>
         <section>
           <h3>关于</h3>
-          <button onClick={() => navigate('#/about')}>关于静页与隐私</button>
+          <button onClick={() => navigate('#/about')}>关于微光阅读与隐私</button>
         </section>
       </div>
       {clearDialog && (

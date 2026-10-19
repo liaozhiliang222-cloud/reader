@@ -50,7 +50,7 @@ export function createPwaClient(
       publish({
         error: container.controller
           ? '新版本资源尚未下载完整，稍后会再检查。'
-          : '离线资源下载未完成，请联网重新打开静页。',
+          : '离线资源下载未完成，请联网重新打开微光阅读。',
       });
     }
   };
@@ -117,7 +117,7 @@ export function createPwaClient(
         })
         .catch(() => {
           starting = undefined;
-          publish({ error: '离线资源尚未就绪，请联网重新打开静页。' });
+          publish({ error: '离线资源尚未就绪，请联网重新打开微光阅读。' });
         });
       await starting;
     },

@@ -65,5 +65,5 @@ export function backupFilename(kind: 'light' | 'full', date = new Date()) {
     String(date.getMonth() + 1).padStart(2, '0'),
     String(date.getDate()).padStart(2, '0'),
   ].join('-');
-  return `静页备份_${day}.${kind === 'full' ? 'zip' : 'json'}`;
+  return `微光阅读备份_${day}.${kind === 'full' ? 'zip' : 'json'}`;
 }

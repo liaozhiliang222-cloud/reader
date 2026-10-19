@@ -8,7 +8,7 @@
 	<string>en</string>
 	<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLSchemes</key><array><string>jingye</string></array></dict></array>
 	<key>CFBundleDisplayName</key>
-        <string>静页</string>
+        <string>微光阅读</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

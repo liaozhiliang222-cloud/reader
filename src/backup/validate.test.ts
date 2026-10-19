@@ -102,7 +102,7 @@ it('拒绝错误app/版本、非法位置/主题、重复ID、孤立标注和危
   const { backup } = await fixturePayload();
   expect(() => parseBackupJson('{')).toThrow('JSON');
   expect(() => validateBackup({ ...backup, app: 'another' })).toThrow(
-    '不是静页',
+    '不是微光阅读',
   );
   expect(() => validateBackup({ ...backup, schemaVersion: 999 })).toThrow(
     '版本',

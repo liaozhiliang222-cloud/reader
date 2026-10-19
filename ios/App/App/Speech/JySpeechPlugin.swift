@@ -101,7 +101,7 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
                       lease.range(of: "^[a-zA-Z0-9_-]{1,96}$", options: .regularExpression) != nil,
                       let voice = args["voice"] as? String else { throw SpeechQueueStore.StoreError.malformed }
                 self.leaseId = lease
-                self.controller.setTitle(args["title"] as? String ?? "静页")
+                self.controller.setTitle(args["title"] as? String ?? "微光阅读")
                 try self.controller.setVoice(voice)
                 UserDefaults.standard.set(voice, forKey: "jingye.speech.voice")
                 try self.controller.setRate(args["rate"] as? Double ?? 1)

@@ -57,5 +57,5 @@ export function notesFilename(title: string) {
     .slice(0, 100)
     .join('')
     .replace(/[. ]+$/, '');
-  return `${safe || '静页'}_笔记.md`;
+  return `${safe || '微光阅读'}_笔记.md`;
 }

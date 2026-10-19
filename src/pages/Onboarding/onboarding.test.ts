@@ -169,7 +169,7 @@ it('内置浏览器有可关闭提示；无安装事件只提供菜单说明，�
   expect(root.textContent).toContain('浏览器菜单');
   expect(
     [...root.querySelectorAll('button')].some(
-      (node) => node.textContent === '安装静页',
+      (node) => node.textContent === '安装微光阅读',
     ),
   ).toBe(false);
 });

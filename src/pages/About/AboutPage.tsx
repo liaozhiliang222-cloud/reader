@@ -6,19 +6,19 @@ const version = import.meta.env.VITE_APP_VERSION;
 
 export function AboutPage() {
   const [message, setMessage] = useState('');
-  const feedback = `静页 ${version}\n问题描述：\n\n复现步骤：\n1. \n2. \n\n期望结果：\n实际结果：\n`;
+  const feedback = `微光阅读 ${version}\n问题描述：\n\n复现步骤：\n1. \n2. \n\n期望结果：\n实际结果：\n`;
   const repository = 'https://github.com/liaozhiliang222-cloud/reader';
   return (
     <main class="settings-page">
       <header>
         <button onClick={() => navigate('#/settings')}>返回设置</button>
-        <h1>关于静页</h1>
+        <h1>关于微光阅读</h1>
       </header>
       <section>
         <h2>留一点时间，给阅读。</h2>
         <p>版本 {version}</p>
         <p>
-          静页是一款本地阅读器：无注册、无推荐、无
+          微光阅读是一款本地阅读器：无注册、无推荐、无
           AI、无追踪。导入自己的书籍，安静读完一页。
         </p>
       </section>
@@ -72,7 +72,7 @@ export function AboutPage() {
           </a>
         </p>
         <p>
-          可选的静页文楷网页子集源自霞鹜文楷 1.522 与 Klee One，使用 OFL 1.1
+          可选的微光阅读文楷网页子集源自霞鹜文楷 1.522 与 Klee One，使用 OFL 1.1
           许可。未覆盖的字符由系统字体显示。
         </p>
         <p>
@@ -116,7 +116,7 @@ export function AboutPage() {
         <p>
           <a
             class="resource-link"
-            href={`${repository}/issues/new?title=${encodeURIComponent(`静页 ${version} 问题反馈`)}&body=${encodeURIComponent(feedback)}`}
+            href={`${repository}/issues/new?title=${encodeURIComponent(`微光阅读 ${version} 问题反馈`)}&body=${encodeURIComponent(feedback)}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -126,7 +126,7 @@ export function AboutPage() {
         <p>
           <a
             class="resource-link"
-            href={`mailto:liaozhiliang222@gmail.com?subject=${encodeURIComponent(`静页 ${version} 问题反馈`)}&body=${encodeURIComponent(feedback)}`}
+            href={`mailto:liaozhiliang222@gmail.com?subject=${encodeURIComponent(`微光阅读 ${version} 问题反馈`)}&body=${encodeURIComponent(feedback)}`}
           >
             邮件反馈：liaozhiliang222@gmail.com
           </a>

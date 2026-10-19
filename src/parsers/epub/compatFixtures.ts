@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 export const compatibilityCases = [
-  { name: '普通段落', body: '<h1>开篇</h1><p id="target">静页原创样本。</p>' },
+  { name: '普通段落', body: '<h1>开篇</h1><p id="target">微光阅读原创样本。</p>' },
   {
     name: '竖排转统一横排',
     body: '<div style="writing-mode:vertical-rl"><p id="target">春风拂过书页。</p></div>',
@@ -69,12 +69,12 @@ export const compatibilityCases = [
   },
   {
     name: '超长单段',
-    body: '<p id="target">' + '静页原创测试。'.repeat(9000) + '</p>',
+    body: '<p id="target">' + '微光阅读原创测试。'.repeat(9000) + '</p>',
   },
 ];
 export async function compatibilityEpub(
   body: string,
-  title = '静页自编兼容样本',
+  title = '微光阅读自编兼容样本',
 ) {
   const zip = new JSZip();
   zip.file('mimetype', 'application/epub+zip');
@@ -86,7 +86,7 @@ export async function compatibilityEpub(
     'OPS/book.opf',
     '<package><metadata><title>' +
       title +
-      '</title><creator>静页自编测试</creator></metadata><manifest><item id="body" href="chapter.xhtml" media-type="application/xhtml+xml"/><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/></manifest><spine><itemref idref="body"/></spine></package>',
+      '</title><creator>微光阅读自编测试</creator></metadata><manifest><item id="body" href="chapter.xhtml" media-type="application/xhtml+xml"/><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/></manifest><spine><itemref idref="body"/></spine></package>',
   );
   zip.file('OPS/chapter.xhtml', '<html><body>' + body + '</body></html>');
   zip.file(

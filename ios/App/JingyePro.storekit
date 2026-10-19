@@ -6,7 +6,7 @@
       "displayPrice": "1.00",
       "familyShareable": false,
       "internalID": "100001",
-      "localizations": [{ "description": "仅用于本地测试的静页 Pro 商品", "displayName": "静页 Pro（测试）", "locale": "zh_CN" }],
+      "localizations": [{ "description": "仅用于本地测试的微光阅读 Pro 商品", "displayName": "微光阅读 Pro（测试）", "locale": "zh_CN" }],
       "productID": "dev.jingye.reader.pro",
       "referenceName": "Jingye Pro Local Test",
       "type": "NonConsumable"

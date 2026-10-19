@@ -177,7 +177,7 @@ export function App() {
       <main class="welcome">
         <section class="welcome-body">
           {receiveLoading || (
-            <BookLoading title="正在打开静页" detail="留一点时间，给阅读。" />
+            <BookLoading title="正在打开微光阅读" detail="留一点时间，给阅读。" />
           )}
         </section>
       </main>

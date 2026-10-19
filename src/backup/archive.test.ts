@@ -47,7 +47,7 @@ it('10本原文件和文稿可解压，ZIP再读/解析后指纹、正文和类�
     );
   }
   expect(progress.at(-1)).toBe(100);
-  const file = new File([blob], '静页备份.zip');
+  const file = new File([blob], '微光阅读备份.zip');
   const read = await readBackup(file);
   expect(read.books).toHaveLength(11);
   expect(read).not.toHaveProperty('originals');

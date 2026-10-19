@@ -13,7 +13,7 @@ it('旧跨块跨段划线在新的注音边界只画当前交集，mark保留注
     '<p data-p="0" data-char-start="11999"><ruby><em>静</em>页<rt>jìngyè</rt></ruby>尾段。</p><p data-p="1">跨段后续😀文本。</p>';
   document.body.append(root);
   const paragraphs = [
-    '前'.repeat(11999) + '静页jìngyè尾段。',
+    '前'.repeat(11999) + '微光阅读jìngyè尾段。',
     '跨段后续😀文本。',
   ];
   const annotation: Highlight = {
@@ -22,14 +22,14 @@ it('旧跨块跨段划线在新的注音边界只画当前交集，mark保留注
     chapterIndex: 0,
     start: { paragraphIndex: 0, charOffset: 11995 },
     end: { paragraphIndex: 1, charOffset: 6 },
-    text: '前前前前静页jìngyè尾段。\n跨段后续😀',
+    text: '前前前前微光阅读jìngyè尾段。\n跨段后续😀',
     color: 'blue',
     createdAt: 1,
     updatedAt: 1,
   };
   const unchanged = structuredClone(annotation),
     before = root.innerHTML;
-  const expected = '静页jìngyè尾段。跨段后续😀';
+  const expected = '微光阅读jìngyè尾段。跨段后续😀';
   expect(rangeForSpan(root, annotation)?.toString()).toBe(expected);
   const layer = new HighlightLayer(false);
   layer.render([{ root, chapter: { index: 0 } }], [annotation]);
@@ -42,7 +42,7 @@ it('旧跨块跨段划线在新的注音边界只画当前交集，mark保留注
   expect(spanFromRange(root, 0, paragraphs, range)).toMatchObject({
     start: { paragraphIndex: 0, charOffset: 11999 },
     end: { paragraphIndex: 1, charOffset: 6 },
-    text: '静页jìngyè尾段。\n跨段后续😀',
+    text: '微光阅读jìngyè尾段。\n跨段后续😀',
   });
   expect(annotation).toEqual(unchanged);
   layer.dispose();

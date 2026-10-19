@@ -285,7 +285,7 @@ function locator(value: unknown): Locator {
 }
 export function validateBackup(value: unknown): BackupFile {
   const data = record(value, '文件');
-  if (data.app !== 'jingye') throw new Error('这不是静页备份文件。');
+  if (data.app !== 'jingye') throw new Error('这不是微光阅读备份文件。');
   if (
     data.schemaVersion !== 1 &&
     data.schemaVersion !== 2 &&
@@ -293,7 +293,7 @@ export function validateBackup(value: unknown): BackupFile {
     data.schemaVersion !== 4 &&
     data.schemaVersion !== BACKUP_VERSION
   )
-    throw new Error('备份版本不受支持，请使用与备份匹配的静页版本。');
+    throw new Error('备份版本不受支持，请使用与备份匹配的微光阅读版本。');
   const books = array(data.books, '书架', readBook),
     ids = new Set<string>();
   for (const book of books) {

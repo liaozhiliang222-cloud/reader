@@ -110,14 +110,14 @@ describe('speech segmentation and original UTF-16 anchors', () => {
 describe('safe-node speech extraction', () => {
   it('filters Markdown code/math/diagrams/images/tables, retaining visible link and wiki text', () => {
     const parsed = parseMarkdown(
-      '# 听书\n\n早上 **好**。\n\n```js\nsecret_code()\n```\n\n公式 $x^2$ 后继续。\n\n$$y=1$$\n\n```mermaid\ngraph TD; A-->B;\n```\n\n![图片](https://example.com/x.png)\n\n|列|值|\n|---|---|\n|甲|乙|\n\n[静页](https://example.com)与[[听书|显示名]]。',
+      '# 听书\n\n早上 **好**。\n\n```js\nsecret_code()\n```\n\n公式 $x^2$ 后继续。\n\n$$y=1$$\n\n```mermaid\ngraph TD; A-->B;\n```\n\n![图片](https://example.com/x.png)\n\n|列|值|\n|---|---|\n|甲|乙|\n\n[微光阅读](https://example.com)与[[听书|显示名]]。',
     );
     const input = { ...parsed.chapters[0]!, bookId: 'md' };
     const sentences = [...segmentChapter(input, 0)];
     const speech = sentences.map((s) => s.text).join('');
     expect(speech).toContain('早上 好。');
     expect(speech).toContain('公式  后继续。');
-    expect(speech).toContain('静页与显示名。');
+    expect(speech).toContain('微光阅读与显示名。');
     for (const forbidden of [
       'secret',
       'x^2',

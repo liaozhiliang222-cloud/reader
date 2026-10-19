@@ -32,7 +32,7 @@ export async function quoteCards(row: ReviewNote): Promise<Blob[]> {
     context.font = '24px sans-serif';
     const source = `${row.title} · ${row.chapterTitle}`;
     context.fillText(source, 90, canvas.height - 115, 820);
-    context.fillText(`静页 · ${page + 1} / ${pages}`, 90, canvas.height - 65);
+    context.fillText(`微光阅读 · ${page + 1} / ${pages}`, 90, canvas.height - 65);
     result.push(
       await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(

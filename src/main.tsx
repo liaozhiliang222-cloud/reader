@@ -37,7 +37,7 @@ async function bootstrap() {
       </>,
       document.getElementById('app')!,
     );
-    console.info('静页开发环境已就绪');
+    console.info('微光阅读开发环境已就绪');
     return;
   }
   render(<App />, document.getElementById('app')!);

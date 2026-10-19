@@ -17,7 +17,7 @@ export function IncomingPage({ id }: { id?: string }) {
     id === 'error-size'
       ? '这次分享超过大小限制，请分批分享；单本书最多 50 MB。'
       : id === 'error-storage'
-        ? '无法暂存分享，请先打开静页并检查本地存储，再重新分享。'
+        ? '无法暂存分享，请先打开微光阅读并检查本地存储，再重新分享。'
         : id?.startsWith('error')
           ? '没有收到可用文件或文字，请重新分享，或从书架选择文件导入。'
           : '',

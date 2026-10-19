@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * 静页原生桥：文件保存/分享、沉浸模式、常亮、content:// 读取、外部文件导入。
+ * 微光阅读原生桥：文件保存/分享、沉浸模式、常亮、content:// 读取、外部文件导入。
  * 仅本地能力，不涉及网络。
  */
 @CapacitorPlugin(name = "JyNative")

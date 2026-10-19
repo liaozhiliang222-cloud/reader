@@ -17,7 +17,7 @@ final class ProbeQueue {
     static final int WINDOW = 128;
     static final int MAX_BATCH_BYTES = 128 * 1024;
     static final long MAX_BYTES = 64L * 1024 * 1024;
-    static final String ZH = "清晨，窗外的树叶轻轻摇动。我们沿着河边慢慢向前走，看看天空，也听听风的声音。这段文字专为静页听书测试编写，只用于检查离线播放、暂停恢复和跨章续读。";
+    static final String ZH = "清晨，窗外的树叶轻轻摇动。我们沿着河边慢慢向前走，看看天空，也听听风的声音。这段文字专为微光阅读听书测试编写，只用于检查离线播放、暂停恢复和跨章续读。";
     static final String EN = "The morning light falls across the quiet room. This original passage tests offline reading and pauses.";
     final File directory;
     final int count;

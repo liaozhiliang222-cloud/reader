@@ -179,7 +179,7 @@ it('可复现模型基准：千章按需打开/百次翻页，以及百本书架
     lastShelfRows: shelfRoot.querySelectorAll('li').length,
     retainedShelfChapterSummaries: 0,
   };
-  console.info('静页性能模型基准', JSON.stringify(report));
+  console.info('微光阅读性能模型基准', JSON.stringify(report));
   if (process.env.JINGYE_PERF_REPORT === '1') {
     await mkdir('artifacts', { recursive: true });
     await writeFile(

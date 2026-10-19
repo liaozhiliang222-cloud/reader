@@ -98,7 +98,7 @@ it('不创建不兼容的主库版本，损坏记录与恶意标识拒绝，已�
     indexedDB,
     'incoming-uninitialized',
   );
-  await expect(unopened.put(id, sample())).rejects.toThrow('先打开静页');
+  await expect(unopened.put(id, sample())).rejects.toThrow('先打开微光阅读');
   expect(
     (await indexedDB.databases()).some(
       (value) => value.name === 'incoming-uninitialized',

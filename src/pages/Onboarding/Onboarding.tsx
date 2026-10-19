@@ -43,7 +43,7 @@ export function Onboarding({
   return (
     <section class="onboarding" aria-labelledby="guide-heading">
       <div class="guide-top">
-        <span>静页 · 使用引导</span>
+        <span>微光阅读 · 使用引导</span>
         <button disabled={busy} onClick={() => void finish()}>
           {first ? '跳过引导' : '关闭引导'}
         </button>
@@ -84,7 +84,7 @@ export function Onboarding({
         <>
           <p>App 与网页版的书籍互不相通，各存各的。</p>
           <p>
-            如果你在用网页版静页：在网页版“设置 → 备份与恢复”中导出完整备份，
+            如果你在用网页版微光阅读：在网页版“设置 → 备份与恢复”中导出完整备份，
             再回到这里“设置 → 备份与恢复”选择该文件恢复。
           </p>
         </>
@@ -120,7 +120,7 @@ export function Onboarding({
                         src={`${import.meta.env.BASE_URL}icons/icon-192.png`}
                         alt=""
                       />
-                      <span>添加 → 打开静页</span>
+                      <span>添加 → 打开微光阅读</span>
                     </li>
                   </ol>
                   <p>
@@ -135,7 +135,7 @@ export function Onboarding({
                       disabled={install.pending}
                       onClick={() => void requestInstall()}
                     >
-                      安装静页
+                      安装微光阅读
                     </button>
                   )}
                   <p>
@@ -161,7 +161,7 @@ export function Onboarding({
         <>
           <p>阅读前，在系统控制中心或快捷设置中开启“专注 / 勿扰”。</p>
           <p>
-            静页无法代你开启系统勿扰。阅读菜单中的“安静提示”可关闭进入阅读时的短暂提示。
+            微光阅读无法代你开启系统勿扰。阅读菜单中的“安静提示”可关闭进入阅读时的短暂提示。
           </p>
         </>
       )}

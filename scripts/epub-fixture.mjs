@@ -46,7 +46,7 @@ zip.file(
 );
 zip.file(
   'OPS/book.opf',
-  '<package xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata><dc:title>纸间漫步 · EPUB 回归</dc:title><dc:creator>静页测试</dc:creator></metadata><manifest><item id="a" href="a.xhtml" media-type="application/xhtml+xml"/><item id="b" href="b.xhtml" media-type="application/xhtml+xml"/><item id="cover" href="cover.png" media-type="image/png" properties="cover-image"/><item id="nav" href="nav.xhtml" properties="nav"/></manifest><spine><itemref idref="a"/><itemref idref="b"/></spine></package>',
+  '<package xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata><dc:title>纸间漫步 · EPUB 回归</dc:title><dc:creator>微光阅读测试</dc:creator></metadata><manifest><item id="a" href="a.xhtml" media-type="application/xhtml+xml"/><item id="b" href="b.xhtml" media-type="application/xhtml+xml"/><item id="cover" href="cover.png" media-type="image/png" properties="cover-image"/><item id="nav" href="nav.xhtml" properties="nav"/></manifest><spine><itemref idref="a"/><itemref idref="b"/></spine></package>',
 );
 zip.file('OPS/cover.png', png);
 zip.file(

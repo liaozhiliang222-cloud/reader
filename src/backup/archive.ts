@@ -169,7 +169,7 @@ export async function readBackup(
     return backup;
   }
   if (!/\.zip$/i.test(file.name))
-    throw new Error('请选择静页 JSON 或 ZIP 备份。');
+    throw new Error('请选择微光阅读 JSON 或 ZIP 备份。');
   const archive = await BackupArchive.open(file);
   await archive.verify(onProgress);
   return archive.backup;
