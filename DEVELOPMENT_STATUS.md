@@ -856,3 +856,11 @@ GitHub 已上传：源码合并提交 `1ea55448ccb97fafb208c0b4f814f98818ab14b0`
 - Release 验证（Release-iphonesimulator 构建）：包内无 JingyePro.storekit，二进制零 SKTestSession/JY_SK_TEST 字符串 —— 模拟购买与测试解锁在归档构建中不生效；SKTestSession 代码整体在 `#if DEBUG` 内，storekit 配置仅 Debug 脚本拷贝。
 - 待用户：App Store Connect 建 App 记录（dev.jingye.reader）+ 内购商品（dev.jingye.reader.pro，非消耗型，送审元数据）+ Xcode 登录开发者账号授权签名；然后 Release 归档上传。
 - 真机验收清单：TestFlight 安装、沙盒购买/恢复、离线语音、锁屏媒体键、来电/拔耳机打断、段尾续播平滑。
+
+## TestFlight 上传记录（2026-10-19，SHA 0b96bea）
+
+- 分支 codex/ios-r0-r2-acceptance-fixes，商品 ID 已全量替换为 dev.weiguang.reader.pro
+- Release 归档 artifacts/LumiRead-1.2.0.xcarchive：dev.weiguang.reader 1.2.0(4)，含 PrivacyInfo.xcprivacy，无 JingyePro.storekit，无测试解锁路径
+- 导出产物 artifacts/LumiRead-1.2.0-4-appstore.ipa：Apple Distribution: Zhiliang Liao (7R5Z28YJZ9) 签名，App Store provisioning profile，get-task-allow=false
+- xcodebuild -exportArchive（app-store-connect / automatic signing / API Key N23VM7F87M）EXPORT SUCCEEDED + Uploaded App，Apple 端处理中（Processing）
+- 待办：ASC 下需为 dev.weiguang.reader 新建非消耗型商品 dev.weiguang.reader.pro；TestFlight 内部测试员配置；Processing 完成后可安装
