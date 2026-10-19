@@ -3,7 +3,7 @@ import { signal } from '@preact/signals';
 import { registerPlugin } from '@capacitor/core';
 import { isIosApp } from './platform';
 
-export const PRO_PRODUCT_ID = 'dev.jingye.reader.pro';
+export const PRO_PRODUCT_ID = 'dev.weiguang.reader.pro';
 export type ProStatus =
   'unknown' | 'free' | 'owned' | 'purchasing' | 'pending' | 'unverified';
 export interface ProState {

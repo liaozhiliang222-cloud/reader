@@ -30,7 +30,7 @@ if (!scheme.includes('AppTests.xctest'))
 const product = JSON.parse(readFileSync('ios/App/JingyePro.storekit', 'utf8'))
   .products[0];
 if (
-  product.productID !== 'dev.jingye.reader.pro' ||
+  product.productID !== 'dev.weiguang.reader.pro' ||
   product.type !== 'NonConsumable'
 )
   throw new Error('StoreKit test product mismatch');

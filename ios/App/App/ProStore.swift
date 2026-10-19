@@ -5,7 +5,7 @@ import Foundation
 /// No boolean in JS/UserDefaults is an entitlement. StoreKit verifies local signed transactions.
 final class ProStore {
     static let shared = ProStore()
-    static let productID = "dev.jingye.reader.pro"
+    static let productID = "dev.weiguang.reader.pro"
     private let lock = NSLock()
     private var verified = false
     var hasVerifiedEntitlement: Bool { lock.lock(); defer { lock.unlock() }; return verified }

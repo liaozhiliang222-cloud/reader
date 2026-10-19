@@ -19,7 +19,7 @@ open ios/App/App.xcodeproj
 
 使用满足 package.json 要求的 Node（建议 24）和 pnpm 11.21.0。先在 Xcode Settings 安装 iOS Simulator runtime，并确认 `xcode-select -p` 指向完整 Xcode。`pnpm test:ios` 自动选择可用 iPhone 模拟器，执行 App Scheme 的 XCTest，结果写入忽略目录 `artifacts/*.xcresult`。依赖下载只发生在开发准备时。
 
-保留应用身份 `dev.jingye.reader`。源码候选版本 1.2.0，构建号 4；如果 App Store Connect 或设备已有该构建号或更高构建号，在两套 Build Settings 中递增。不要以卸载重装代替数据升级测试。
+保留应用身份 `dev.weiguang.reader`（原 `dev.jingye.reader`，已按用户注册的 App ID 变更）。源码候选版本 1.2.0，构建号 4；如果 App Store Connect 或设备已有该构建号或更高构建号，在两套 Build Settings 中递增。不要以卸载重装代替数据升级测试。
 
 ## 2. 本地 StoreKit 测试
 
@@ -67,7 +67,7 @@ App Store Connect 尚未创建商品。用户确认暂用 `dev.jingye.reader.pro
 >
 > Download the voices you need in iOS Settings and test them offline before listening. Purchases and restoration use Apple's services and require an internet connection. Save backups outside the app before uninstalling.
 
-App ID 和商品 ID 沿用 `dev.jingye.reader` / `dev.jingye.reader.pro`，两种语言共用同一商品。不要把测试价格或浏览器测试截图当作正式定价和商店截图。App 内 About 页面已提供英文隐私说明；公开隐私政策 URL 和支持 URL 需配置可访问的对应页面。
+App ID 和商品 ID 为 `dev.weiguang.reader` / `dev.jingye.reader.pro`（Bundle ID 已变更，商品 ID 不变），两种语言共用同一商品。不要把测试价格或浏览器测试截图当作正式定价和商店截图。App 内 About 页面已提供英文隐私说明；公开隐私政策 URL 和支持 URL 需配置可访问的对应页面。
 
 ## 3. 必须补的原生验证
 
