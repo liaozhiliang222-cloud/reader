@@ -34,7 +34,7 @@ public class JyReaderPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelega
         UserDefaults.standard.set(language, forKey: ReaderLanguage.key)
         call.resolve()
     }
-    private static let queue = DispatchQueue(label: "dev.jingye.reader.files")
+    private static let queue = DispatchQueue(label: "dev.weiguang.reader.files")
     private static weak var current: JyReaderPlugin?
     private static var pending: [[String: String]] = []
     private static var rootPrepared = false

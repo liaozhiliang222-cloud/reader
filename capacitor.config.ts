@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   // 临时应用 ID，首个公开发布前可在本文件确认后修改（见 ANDROID_PLAN.md 第 9 节）
-  appId: 'dev.jingye.reader',
+  appId: 'dev.weiguang.reader',
   appName: '微光阅读',
   webDir: 'dist',
   android: {
