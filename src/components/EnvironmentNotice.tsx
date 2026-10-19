@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useState } from 'preact/hooks';
 import { environment } from '@/app/environment';
 import { settings } from '@/app/settings';
@@ -13,11 +14,15 @@ export function EnvironmentNotice() {
   if (!kind || dismissed || settings.value.environmentNoticeDismissed === kind)
     return null;
   return (
-    <aside class="environment-notice" aria-label="浏览器使用提示">
+    <aside class="environment-notice" aria-label={t('浏览器使用提示')}>
       <p>
         {inApp
-          ? `当前为${inApp}内置浏览器，请点右上角菜单用${ios ? ' Safari ' : '系统浏览器'}打开。切换浏览器不会带走书籍，已有数据请先备份。`
-          : '当前 iOS 低于 16.4，部分安装和离线能力受限，建议升级系统。'}
+          ? t(
+              '当前为{0}内置浏览器，请点右上角菜单用{1}打开。切换浏览器不会带走书籍，已有数据请先备份。',
+              inApp,
+              ios ? ' Safari ' : t('系统浏览器'),
+            )
+          : t('当前 iOS 低于 16.4，部分安装和离线能力受限，建议升级系统。')}
       </p>
       <button
         class="text-button"
@@ -29,9 +34,9 @@ export function EnvironmentNotice() {
             })
             .catch(() => {});
         }}
-        aria-label="关闭浏览器提示，不再显示"
+        aria-label={t('关闭浏览器提示，不再显示')}
       >
-        知道了
+        {t('知道了')}
       </button>
     </aside>
   );

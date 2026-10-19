@@ -32,6 +32,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
+      - name: Localization catalog
+        run: pnpm check:i18n
       - name: Unit tests
         run: pnpm test
       - name: Build

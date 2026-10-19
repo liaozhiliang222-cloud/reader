@@ -177,7 +177,7 @@ test('iOS 购买门控：商品显式加载、等待批准、恢复与撤销（�
   await page.evaluate(() =>
     (Reflect.get(window, '__iosProDouble') as { revoke(): void }).revoke(),
   );
-  await expect(page.getByRole('dialog', { name: '微光阅读 Pro' })).toContainText(
-    '尚未解锁 Pro',
-  );
+  await expect(
+    page.getByRole('dialog', { name: '微光阅读 Pro' }),
+  ).toContainText('尚未解锁 Pro');
 });

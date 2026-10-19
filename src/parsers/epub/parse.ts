@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { BoundedZip } from '@/parsers/zip';
 import { obfuscatedFonts, validateObfuscatedFonts } from './encryption';
 import {
@@ -49,7 +50,7 @@ export async function parseEpub(
     ? obfuscatedFonts(decodeXml(await read('META-INF/encryption.xml')))
     : [];
   const opfHref = elements(container, 'rootfile')[0]?.getAttribute('full-path');
-  if (!opfHref) throw new Error('文件无法解析：缺少 OPF 路径。');
+  if (!opfHref) throw new Error(t('文件无法解析：缺少 OPF 路径。'));
   const opfPath = resolvePath('', opfHref).path;
   const opf = await xml(opfPath);
   const title = elements(opf, 'title')[0]?.textContent?.trim() || '未命名书籍';
@@ -59,10 +60,10 @@ export async function parseEpub(
   );
   const paths = elements(opf, 'itemref').map((ref) => {
     const item = manifest.get(ref.getAttribute('idref') ?? '');
-    if (!item) throw new Error('文件无法解析：章节清单不完整。');
+    if (!item) throw new Error(t('文件无法解析：章节清单不完整。'));
     return resolvePath(opfPath, item.getAttribute('href') ?? '').path;
   });
-  if (!paths.length) throw new Error('文件无法解析：书籍没有章节。');
+  if (!paths.length) throw new Error(t('文件无法解析：书籍没有章节。'));
   validateObfuscatedFonts(fonts, manifest.values(), opfPath, paths, (path) =>
     zip.has(path),
   );

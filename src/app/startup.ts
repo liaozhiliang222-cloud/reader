@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { parseRoute } from './router';
 import { loadSettings } from '@/db/settings';
 import { getBook } from '@/db/repository';
@@ -26,8 +27,8 @@ export async function loadStartup(hash: string, native = false) {
   const notice =
     route.page === 'reader' && (!book || book.missingFile)
       ? book
-        ? '这本书待补充原文件，请重新导入。'
-        : '这本书已不存在。'
+        ? t('这本书待补充原文件，请重新导入。')
+        : t('这本书已不存在。')
       : '';
   return {
     settings,

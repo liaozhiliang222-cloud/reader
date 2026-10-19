@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 export const incomingLimit = 100 * 1024 * 1024;
 export const validIncomingId = (id: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -12,17 +13,17 @@ export interface IncomingData {
 const field = (form: FormData, name: string) => {
   const value = form.get(name);
   if (value !== null && typeof value !== 'string')
-    throw new TypeError('分享文字格式无效。');
+    throw new TypeError(t('分享文字格式无效。'));
   return value ?? '';
 };
 export function incomingData(form: FormData): IncomingData {
   const files = form.getAll('files').map((value) => {
-    if (typeof value === 'string') throw new TypeError('分享文件格式无效。');
+    if (typeof value === 'string') throw new TypeError(t('分享文件格式无效。'));
     let name =
       value.name
         .split(/[\\/]/)
         .at(-1)
-        ?.replace(/[\p{Cc}]/gu, '_') || '分享文件';
+        ?.replace(/[\p{Cc}]/gu, '_') || t('分享文件');
     if (!name.includes('.')) {
       const mime = value.type.split(';')[0]?.trim();
       if (mime === 'application/epub+zip') name += '.epub';
@@ -42,7 +43,7 @@ export function incomingData(form: FormData): IncomingData {
     ? body + (url && !body.includes(url) ? '\n\n' + url : '')
     : url || (!files.length ? title : '');
   const errors = form.getAll('error').map((value) => {
-    if (typeof value !== 'string') throw new TypeError('分享错误信息无效。');
+    if (typeof value !== 'string') throw new TypeError(t('分享错误信息无效。'));
     return value.slice(0, 300);
   });
   if (
@@ -51,10 +52,10 @@ export function incomingData(form: FormData): IncomingData {
       incomingLimit
   )
     throw new RangeError(
-      '这次分享内容超过 100 MB，或文字超过 50 MB，请分批导入。',
+      t('这次分享内容超过 100 MB，或文字超过 50 MB，请分批导入。'),
     );
   if (!files.length && !text.trim() && !errors.length)
-    throw new TypeError('没有收到文件或文字，请重新分享。');
+    throw new TypeError(t('没有收到文件或文字，请重新分享。'));
   return { files, text, title: text ? title : '', errors };
 }
 export function incomingForm(data: IncomingData) {

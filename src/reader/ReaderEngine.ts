@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { getChapter } from '@/db/repository';
 import { ChapterWindow } from './ChapterWindow';
 import { renderNodes } from './content';
@@ -102,11 +103,11 @@ export class ReaderEngine {
     private beforeNavigate?: () => Promise<void>,
   ) {
     this.sources = new ChapterWindow(async (index, signal) => {
-      const end = beginMeasure('章节读取与分块索引');
+      const end = beginMeasure(t('章节读取与分块索引'));
       try {
         const chapter = await getChapter(this.book.id, index);
-        if (signal.aborted) throw new Error('章节预排版已取消。');
-        if (!chapter) throw new Error('章节内容缺失。');
+        if (signal.aborted) throw new Error(t('章节预排版已取消。'));
+        if (!chapter) throw new Error(t('章节内容缺失。'));
         return { chapter, chunks: chapterChunks(chapter), release: () => {} };
       } finally {
         end(!signal.aborted);
@@ -321,9 +322,9 @@ export class ReaderEngine {
     const source = await this.sources.get(index);
     const chapter = source.chapter,
       chunk = source.chunks[part];
-    if (signal.aborted) throw new Error('章节预排版已取消。');
-    if (!chunk) throw new Error('章节内容缺失。');
-    const end = beginMeasure('正文分块排版');
+    if (signal.aborted) throw new Error(t('章节预排版已取消。'));
+    if (!chunk) throw new Error(t('章节内容缺失。'));
+    const end = beginMeasure(t('正文分块排版'));
     const root = document.createElement('div');
     root.className = 'reader-content';
     if (this.book.type === 'md' || this.book.draftFormat === 'markdown')
@@ -362,7 +363,7 @@ export class ReaderEngine {
         releaseImages = rendered.release;
         if (signal.aborted) {
           rendered.release();
-          throw new Error('章节预排版已取消。');
+          throw new Error(t('章节预排版已取消。'));
         }
         root.append(rendered.fragment);
         const first = root.firstElementChild;
@@ -383,7 +384,7 @@ export class ReaderEngine {
           root.append(p);
         });
       }
-      if (signal.aborted) throw new Error('章节预排版已取消。');
+      if (signal.aborted) throw new Error(t('章节预排版已取消。'));
       const instance = {
         key,
         source,
@@ -404,7 +405,7 @@ export class ReaderEngine {
       );
       await document.fonts.ready;
       if (signal.aborted || this.disposed)
-        throw new Error('章节预排版已取消。');
+        throw new Error(t('章节预排版已取消。'));
       instance.finalized = true;
       this.layout(instance);
       return instance;
@@ -417,7 +418,7 @@ export class ReaderEngine {
     }
   }
   async start(position: Promise<Locator | undefined>) {
-    const end = beginMeasure('阅读正文就绪');
+    const end = beginMeasure(t('阅读正文就绪'));
     try {
       const target = await position;
       if (!this.disposed) await this.show(target ?? this.anchor);
@@ -441,7 +442,7 @@ export class ReaderEngine {
     this.motion.cancel();
     this.cancelMeasurement();
     const generation = ++this.generation;
-    if (this.book.chapterCount < 1) throw new Error('书籍没有章节。');
+    if (this.book.chapterCount < 1) throw new Error(t('书籍没有章节。'));
     const index = Math.max(
       0,
       Math.min(
@@ -451,7 +452,7 @@ export class ReaderEngine {
           : 0,
       ),
     );
-    if (index < 0) throw new Error('书籍没有章节。');
+    if (index < 0) throw new Error(t('书籍没有章节。'));
     this.sources.retain(
       this.active ? [this.active.chapter.index, index] : [index],
     );
@@ -724,7 +725,7 @@ export class ReaderEngine {
               this.book.charCount,
               command.value,
             );
-            if (!target) throw new Error('目录尚未就绪，请稍后重试。');
+            if (!target) throw new Error(t('目录尚未就绪，请稍后重试。'));
             await this.show(
               {
                 chapterIndex: target.chapter.index,

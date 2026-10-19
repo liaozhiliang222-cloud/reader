@@ -499,7 +499,7 @@ test('M2-08：30天边界、周期关闭重载、真实下载与旧快照不吞�
   expect(backup).toEqual(
     expect.objectContaining({
       exportedAt: start + 61 * day,
-      schemaVersion: 4,
+      schemaVersion: 5,
       highlights: [expect.objectContaining({ note: '初次笔记' })],
     }),
   );

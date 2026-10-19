@@ -43,7 +43,7 @@ final class ProStore {
         }
         if failedVerification && !owned {
             status = hasVerifiedEntitlement ? "owned" : "unverified"
-            message = "购买凭据暂时无法验证，请稍后重试。"
+            message = ReaderLanguage.text("购买凭据暂时无法验证，请稍后重试。", "The purchase could not be verified right now. Try again later.")
             return
         }
         setVerified(owned); status = owned ? "owned" : "free"; message = ""
@@ -52,7 +52,7 @@ final class ProStore {
         product = try await Product.products(for: [Self.productID]).first
         guard product?.type == .nonConsumable else {
             product = nil
-            throw NSError(domain: "JyPro", code: 1, userInfo: [NSLocalizedDescriptionKey: "Pro 商品尚未配置或暂不可用。免费阅读与已有笔记仍可使用。"])
+            throw NSError(domain: "JyPro", code: 1, userInfo: [NSLocalizedDescriptionKey: ReaderLanguage.text("Pro 商品尚未配置或暂不可用。免费阅读与已有笔记仍可使用。", "The Pro product is not configured or is temporarily unavailable. Free reading and existing notes remain available.")])
         }
     }
     @MainActor func purchase() async throws {
@@ -66,13 +66,13 @@ final class ProStore {
                       transaction.productID == Self.productID, transaction.productType == .nonConsumable,
                       transaction.revocationDate == nil else {
                     status = hasVerifiedEntitlement ? "owned" : "unverified"
-                    message = "购买凭据未通过验证。"; return
+                    message = ReaderLanguage.text("购买凭据未通过验证。", "The purchase did not pass verification."); return
                 }
                 setVerified(true); status = "owned"; message = ""
                 await transaction.finish()
-            case .pending: status = "pending"; message = "购买正在等待批准，批准后将自动更新。"
-            case .userCancelled: status = hasVerifiedEntitlement ? "owned" : "free"; message = "已取消购买。"
-            @unknown default: status = "unknown"; message = "购买状态暂时无法确认。"
+            case .pending: status = "pending"; message = ReaderLanguage.text("购买正在等待批准，批准后将自动更新。", "Purchase approval is pending. Access will update automatically when approved.")
+            case .userCancelled: status = hasVerifiedEntitlement ? "owned" : "free"; message = ReaderLanguage.text("已取消购买。", "Purchase canceled.")
+            @unknown default: status = "unknown"; message = ReaderLanguage.text("购买状态暂时无法确认。", "Purchase status could not be confirmed.")
             }
         } catch {
             status = hasVerifiedEntitlement ? "owned" : "free"; throw error
@@ -111,7 +111,7 @@ public class JyProPlugin: CAPPlugin, CAPBridgedPlugin {
                 case "product": try await ProStore.shared.loadProduct()
                 case "purchase": try await ProStore.shared.purchase()
                 case "restore": try await ProStore.shared.restore()
-                default: call.reject("购买请求无效"); return
+                default: call.reject(ReaderLanguage.text("购买请求无效", "Invalid purchase request")); return
                 }
                 call.resolve(ProStore.shared.snapshot())
             } catch { call.reject(error.localizedDescription) }

@@ -1,3 +1,4 @@
+import { t, uiLocale } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { Modal } from '@/components/Modal';
 import { applyEncoding } from '@/db/recode';
@@ -70,7 +71,7 @@ export function EncodingPanel({
     } catch (cause) {
       if (live.current && !abort.signal.aborted)
         setError(
-          cause instanceof Error ? cause.message : '预览失败，原书未修改。',
+          cause instanceof Error ? cause.message : t('预览失败，原书未修改。'),
         );
     } finally {
       busyRef.current = undefined;
@@ -89,7 +90,7 @@ export function EncodingPanel({
     } catch (cause) {
       if (live.current)
         setError(
-          cause instanceof Error ? cause.message : '保存失败，原书未修改。',
+          cause instanceof Error ? cause.message : t('保存失败，原书未修改。'),
         );
     } finally {
       busyRef.current = undefined;
@@ -97,13 +98,19 @@ export function EncodingPanel({
     }
   };
   return (
-    <Modal title="切换 TXT 编码" onDismiss={close} className="encoding-panel">
-      <h2>切换编码</h2>
+    <Modal
+      title={t('切换 TXT 编码')}
+      onDismiss={close}
+      className="encoding-panel"
+    >
+      <h2>{t('切换编码')}</h2>
       <p class="muted">
-        当前编码：{book.encoding ?? '自动识别'}。先检查预览，再确认替换正文。
+        {t('当前编码：')}
+        {book.encoding ?? t('自动识别')}
+        {t('。先检查预览，再确认替换正文。')}
       </p>
       <label>
-        原文件编码
+        {t('原文件编码')}
         <select
           value={encoding}
           disabled={!!busy}
@@ -124,28 +131,31 @@ export function EncodingPanel({
         </select>
       </label>
       <button disabled={!!busy} onClick={() => void preview()}>
-        {busy === 'preview' ? '正在重新解析…' : '预览正文'}
+        {busy === 'preview' ? t('正在重新解析…') : t('预览正文')}
       </button>
       {parsed && (
-        <section aria-label="解码预览" class="encoding-preview">
+        <section aria-label={t('解码预览')} class="encoding-preview">
           <p>
-            {parsed.chapters.length} 章 · {parsed.charCount.toLocaleString()} 字
+            {parsed.chapters.length} {t('章 ·')}{' '}
+            {parsed.charCount.toLocaleString(uiLocale.value)} {t('字')}
           </p>
           <h3>{parsed.chapters[0]?.title}</h3>
           <p>{excerpt(parsed)}</p>
         </section>
       )}
       <p class="muted">
-        将保留约 {percent.toFixed(1)}%
-        的阅读进度与原文件。正文改变的章节中，书签、划线和笔记会保留为“位置待确认”，可查看、编辑和导出，不再跳转或标在正文上。
+        {t('将保留约')} {percent.toFixed(1)}
+        {t(
+          '% 的阅读进度与原文件。正文改变的章节中，书签、划线和笔记会保留为“位置待确认”，可查看、编辑和导出，不再跳转或标在正文上。',
+        )}
       </p>
       {error && <p role="alert">{error}</p>}
       <div class="panel-actions">
         <button disabled={busy === 'apply'} onClick={close}>
-          取消
+          {t('取消')}
         </button>
         <button disabled={!parsed || !!busy} onClick={() => void apply()}>
-          {busy === 'apply' ? '正在保存…' : '确认切换'}
+          {busy === 'apply' ? t('正在保存…') : t('确认切换')}
         </button>
       </div>
     </Modal>

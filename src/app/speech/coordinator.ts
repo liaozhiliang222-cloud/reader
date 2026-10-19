@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { signal } from '@preact/signals';
 import { db } from '@/db';
 import { getBook, getChapter, getBlob } from '@/db/repository';
@@ -65,26 +66,27 @@ let installed = false;
 let seen = '';
 const showError = (error: unknown) => {
   const detail =
-    error instanceof Error ? error.message : '听书未能完成，请重试。';
+    error instanceof Error ? error.message : t('听书未能完成，请重试。');
   speechView.value = {
     ...speechView.value,
     error:
       detail === 'queue_too_large'
-        ? '本次听书内容超出设备缓存上限，可选择“读完本章”后重试。'
-        : /^[\x20-\x7e_]+$/.test(detail)
-          ? '听书暂不可用，请检查离线语音后重试。'
+        ? t('本次听书内容超出设备缓存上限，可选择“读完本章”后重试。')
+        : /^[a-z][a-z0-9_:-]*$/i.test(detail)
+          ? t('听书暂不可用，请检查离线语音后重试。')
           : detail,
   };
 };
 function readSnapshot(value: unknown): NativeSpeechSnapshot | undefined {
   if (!value || typeof value !== 'object')
-    throw new Error('无法读取听书状态。');
+    throw new Error(t('无法读取听书状态。'));
   const snapshot: unknown = Reflect.get(value, 'snapshot');
   if (snapshot === null) return;
-  if (!validSnapshot(snapshot)) throw new Error('听书状态无效，请停止后重试。');
+  if (!validSnapshot(snapshot))
+    throw new Error(t('听书状态无效，请停止后重试。'));
   const leaseId: unknown = Reflect.get(snapshot, 'leaseId');
   if (typeof leaseId !== 'string' || !/^[a-zA-Z0-9_-]{1,96}$/.test(leaseId))
-    throw new Error('听书进度状态无效。');
+    throw new Error(t('听书进度状态无效。'));
   return { ...snapshot, leaseId };
 }
 async function syncNow() {
@@ -124,7 +126,7 @@ async function syncNow() {
     detached,
     error:
       snapshot.state === 'error'
-        ? '听书已停止，请检查离线语音或重新准备。'
+        ? t('听书已停止，请检查离线语音或重新准备。')
         : speechView.value.error,
   };
   if (['ended', 'stopped', 'error'].includes(snapshot.state))
@@ -162,7 +164,7 @@ export async function connectSpeech() {
 export async function speechVoices(engine = ''): Promise<SpeechVoiceList> {
   const value = await (await backend()).request('voices', { engine });
   if (!value || typeof value !== 'object')
-    throw new Error('无法读取系统语音。');
+    throw new Error(t('无法读取系统语音。'));
   const field = (key: string): unknown => Reflect.get(value, key);
   const engines = field('engines'),
     voices = field('voices');
@@ -171,15 +173,15 @@ export async function speechVoices(engine = ''): Promise<SpeechVoiceList> {
     !Array.isArray(engines) ||
     !Array.isArray(voices)
   )
-    throw new Error('系统语音信息不完整。');
+    throw new Error(t('系统语音信息不完整。'));
   const read = (rows: unknown[], key: 'label' | 'language') =>
     rows.map((row) => {
       if (!row || typeof row !== 'object')
-        throw new Error('系统语音信息无效。');
+        throw new Error(t('系统语音信息无效。'));
       const id: unknown = Reflect.get(row, 'id'),
         label: unknown = Reflect.get(row, key);
       if (typeof id !== 'string' || typeof label !== 'string')
-        throw new Error('系统语音信息无效。');
+        throw new Error(t('系统语音信息无效。'));
       return { id, label };
     });
   return {
@@ -210,7 +212,7 @@ export async function startSpeech(
   if (isIosApp) {
     await connectPro();
     if (!canUsePro()) {
-      showError(new Error('请先解锁 Pro 本地听书。'));
+      showError(new Error(t('请先解锁 Pro 本地听书。')));
       return;
     }
   }
@@ -243,14 +245,14 @@ export async function startSpeech(
       controller.signal.throwIfAborted();
       const current = await getBook(book.id);
       if (!current || current.missingFile)
-        throw new Error('书籍已不存在或原文缺失。');
+        throw new Error(t('书籍已不存在或原文缺失。'));
       assertContentRevision(current, identity.contentRevision);
     };
     const last = await getChapter(
       book.id,
       timer === 'chapter' ? start.chapterIndex : book.chapterCount - 1,
     );
-    if (!last) throw new Error('书籍章节缺失。');
+    if (!last) throw new Error(t('书籍章节缺失。'));
     const endLocator = {
       chapterIndex: last.index,
       paragraphIndex: Math.max(0, last.paragraphs.length - 1),
@@ -262,7 +264,7 @@ export async function startSpeech(
       Awaited<ReturnType<typeof openEpubSpeechSource>> | undefined;
     if (book.type === 'epub') {
       const original = await getBlob(book.fileBlobId ?? book.id);
-      if (!original) throw new Error('本机缺少书籍原件，无法准备听书。');
+      if (!original) throw new Error(t('本机缺少书籍原件，无法准备听书。'));
       epubSource = await openEpubSpeechSource(
         original.data,
         book.parserVersion ?? 1,
@@ -279,7 +281,7 @@ export async function startSpeech(
       assertRevision,
       getChapter: async (index) => {
         const chapter = await getChapter(book.id, index);
-        if (!chapter) throw new Error('书籍章节缺失。');
+        if (!chapter) throw new Error(t('书籍章节缺失。'));
         return epubSource ? epubSource(chapter) : chapter;
       },
       onProgress: (finished, total) => {
@@ -311,7 +313,7 @@ export async function startSpeech(
       if (speechView.value.snapshot?.sessionId === identity.sessionId) break;
     }
     if (speechView.value.snapshot?.sessionId !== identity.sessionId)
-      throw new Error('听书服务未能启动，请重新准备。');
+      throw new Error(t('听书服务未能启动，请重新准备。'));
   } catch (error) {
     await (await backend()).request('cancel', identity).catch(() => {});
     if (leaseId) await releaseSpeech(book.id, leaseId);
@@ -339,11 +341,13 @@ export async function speechControl(
       value !== 'chapter' &&
       (await db.speech.get(snapshot.bookId))?.wholeBook === false
     )
-      throw new Error('此会话只准备了本章，请关闭后从本页重新开始不限时听书。');
+      throw new Error(
+        t('此会话只准备了本章，请关闭后从本页重新开始不限时听书。'),
+      );
     let leaseId = snapshot.leaseId;
     if (action === 'resume' && speechView.value.detached) {
       const old = await db.speech.get(snapshot.bookId);
-      if (!old) throw new Error('请从本页重新开始听书。');
+      if (!old) throw new Error(t('请从本页重新开始听书。'));
       leaseId = (await claimSpeech(snapshot, old.endLocator, old.wholeBook))
         .leaseId;
     }

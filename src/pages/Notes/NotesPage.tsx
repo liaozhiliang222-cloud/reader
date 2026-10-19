@@ -1,3 +1,4 @@
+import { t, uiLocale } from '@/i18n';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { db } from '@/db';
 import type { Book, Highlight } from '@/types';
@@ -9,6 +10,7 @@ import {
 } from '@/reader/notesReview';
 import { quoteCards } from '@/reader/quoteCards';
 import { downloadBlob, shareBlob } from '@/app/files';
+import { isNativeApp } from '@/app/platform';
 import { canUsePro } from '@/app/pro';
 import { ProPanel } from '@/components/ProPanel';
 import { Modal } from '@/components/Modal';
@@ -38,11 +40,11 @@ export function NotesPage() {
     setNotes(h);
   };
   useEffect(() => {
-    void load().catch(() => setMessage('无法读取本机笔记。'));
+    void load().catch(() => setMessage(t('无法读取本机笔记。')));
   }, []);
   const rows = useMemo(
     () => reviewNotes(books, notes, { book, tag, query, pending, order }),
-    [books, notes, book, tag, query, pending, order],
+    [books, notes, book, tag, query, pending, order, uiLocale.value],
   );
   const allRows = reviewNotes(books, notes);
   const allTags = [...new Set(notes.flatMap((item) => item.tags ?? []))].sort();
@@ -52,7 +54,7 @@ export function NotesPage() {
     try {
       await work();
     } catch (cause) {
-      setMessage(cause instanceof Error ? cause.message : '操作未完成。');
+      setMessage(cause instanceof Error ? cause.message : t('操作未完成。'));
     } finally {
       setBusy(false);
     }
@@ -63,7 +65,9 @@ export function NotesPage() {
         new Blob([reviewMarkdown(items, template)], {
           type: 'text/markdown;charset=utf-8',
         }),
-        template === 'reading' ? '微光阅读_回顾笔记.md' : '微光阅读_摘录.md',
+        template === 'reading'
+          ? t('微光阅读_回顾笔记.md')
+          : t('微光阅读_摘录.md'),
       ),
     );
   const premium = (work: () => void) => {
@@ -73,21 +77,23 @@ export function NotesPage() {
   const edit = (row: ReviewNote) => {
     setEditing(row);
     setNote(row.item.note ?? '');
-    setTags(row.item.tags?.join('、') ?? '');
+    setTags(
+      row.item.tags?.join(uiLocale.value === 'en-US' ? ', ' : '、') ?? '',
+    );
     setReview(row.item.reviewPending ?? false);
   };
   return (
     <main class="settings-page notes-page">
       <header>
-        <button onClick={() => navigate('#/')}>返回书架</button>
-        <h1>笔记回顾</h1>
+        <button onClick={() => navigate('#/')}>{t('返回书架')}</button>
+        <h1>{t('笔记回顾')}</h1>
       </header>
-      <p>书籍、摘录和想法只在本机。已有内容始终可查看与导出。</p>
+      <p>{t('书籍、摘录和想法只在本机。已有内容始终可查看与导出。')}</p>
       <details class="notes-filters-panel">
-        <summary>筛选与排序</summary>
+        <summary>{t('筛选与排序')}</summary>
         <div class="notes-filters">
           <label>
-            书籍
+            {t('书籍')}
             <select
               value={book}
               onChange={(e) => {
@@ -95,7 +101,7 @@ export function NotesPage() {
                 setPage(0);
               }}
             >
-              <option value="">全部书籍</option>
+              <option value="">{t('全部书籍')}</option>
               {[
                 ...new Map(
                   allRows.map((row) => [row.item.bookId, row.title]),
@@ -108,7 +114,7 @@ export function NotesPage() {
             </select>
           </label>
           <label>
-            标签
+            {t('标签')}
             <select
               value={tag}
               onChange={(e) => {
@@ -116,14 +122,14 @@ export function NotesPage() {
                 setPage(0);
               }}
             >
-              <option value="">全部标签</option>
+              <option value="">{t('全部标签')}</option>
               {allTags.map((value) => (
                 <option key={value}>{value}</option>
               ))}
             </select>
           </label>
           <label>
-            检索摘录与想法
+            {t('检索摘录与想法')}
             <input
               value={query}
               onInput={(e) => {
@@ -133,7 +139,7 @@ export function NotesPage() {
             />
           </label>
           <label>
-            时间
+            {t('时间')}
             <select
               value={order}
               onChange={(e) => {
@@ -141,8 +147,8 @@ export function NotesPage() {
                 setPage(0);
               }}
             >
-              <option value="recent">最新在前</option>
-              <option value="oldest">最早在前</option>
+              <option value="recent">{t('最新在前')}</option>
+              <option value="oldest">{t('最早在前')}</option>
             </select>
           </label>
           <label class="check-row">
@@ -154,7 +160,7 @@ export function NotesPage() {
                 setPage(0);
               }}
             />
-            只看待回顾
+            {t('只看待回顾')}
           </label>
         </div>
       </details>
@@ -163,13 +169,13 @@ export function NotesPage() {
           disabled={busy || !rows.length}
           onClick={() => premium(() => void exportRows(rows, 'quotes'))}
         >
-          批量导出 Markdown
+          {t('批量导出 Markdown')}
         </button>
         <button
           disabled={busy || !rows.length}
           onClick={() => premium(() => void exportRows(rows, 'reading'))}
         >
-          导出读后整理模板
+          {t('导出读后整理模板')}
         </button>
         <button
           disabled={!rows.length}
@@ -177,11 +183,12 @@ export function NotesPage() {
             premium(() => edit(rows[Math.floor(Math.random() * rows.length)]!))
           }
         >
-          随机回顾一条
+          {t('随机回顾一条')}
         </button>
       </div>
       <p role="status">
-        共 {rows.length} 条笔记{message ? ` · ${message}` : ''}
+        {t('共 {0} 条笔记', rows.length)}
+        {message ? ` · ${message}` : ''}
       </p>
       <ol class="notes-list">
         {rows.slice(page * 40, (page + 1) * 40).map((row) => (
@@ -189,12 +196,14 @@ export function NotesPage() {
             <h2>{row.title}</h2>
             <small>
               {row.chapterTitle} ·{' '}
-              {new Date(row.item.createdAt).toLocaleDateString('zh-CN')}
+              {new Date(row.item.createdAt).toLocaleDateString(uiLocale.value)}
             </small>
             <blockquote>{row.item.text}</blockquote>
             {row.item.note && <p class="note-thought">{row.item.note}</p>}
             {!!row.item.tags?.length && <p>{row.item.tags.join(' · ')}</p>}
-            {!row.available && <p>原书缺失或位置待确认；摘录副本仍可导出。</p>}
+            {!row.available && (
+              <p>{t('原书缺失或位置待确认；摘录副本仍可导出。')}</p>
+            )}
             <div class="panel-actions">
               <button
                 disabled={!row.available}
@@ -204,14 +213,14 @@ export function NotesPage() {
                   )
                 }
               >
-                回到原文
+                {t('回到原文')}
               </button>
-              <button onClick={() => edit(row)}>编辑想法</button>
+              <button onClick={() => edit(row)}>{t('编辑想法')}</button>
               <button
                 disabled={busy}
                 onClick={() => void exportRows([row], 'quotes')}
               >
-                导出此条
+                {t('导出此条')}
               </button>
               <button
                 disabled={busy}
@@ -220,13 +229,24 @@ export function NotesPage() {
                     () =>
                       void action(async () => {
                         const images = await quoteCards(row);
-                        for (const [index, image] of images.entries())
-                          await shareBlob(image, `微光阅读_摘录_${index + 1}.png`);
+                        for (const [index, image] of images.entries()) {
+                          const name = t('微光阅读_摘录_{0}.png', index + 1);
+                          const file = new File([image], name, {
+                            type: image.type,
+                          });
+                          if (
+                            !isNativeApp &&
+                            (!navigator.share ||
+                              !navigator.canShare?.({ files: [file] }))
+                          )
+                            await downloadBlob(image, name);
+                          else await shareBlob(image, name);
+                        }
                       }),
                   )
                 }
               >
-                摘录图片
+                {t('摘录图片')}
               </button>
             </div>
           </li>
@@ -235,7 +255,7 @@ export function NotesPage() {
       {rows.length > 40 && (
         <div class="panel-actions">
           <button disabled={!page} onClick={() => setPage(page - 1)}>
-            上一组
+            {t('上一组')}
           </button>
           <span>
             {page + 1} / {Math.ceil(rows.length / 40)}
@@ -244,13 +264,13 @@ export function NotesPage() {
             disabled={(page + 1) * 40 >= rows.length}
             onClick={() => setPage(page + 1)}
           >
-            下一组
+            {t('下一组')}
           </button>
         </div>
       )}
       {editing && (
         <Modal
-          title="编辑想法"
+          title={t('编辑想法')}
           onDismiss={() => {
             if (!busy) setEditing(undefined);
           }}
@@ -258,14 +278,14 @@ export function NotesPage() {
           <h2>{editing.title}</h2>
           <blockquote>{editing.item.text}</blockquote>
           <label class="rename-label">
-            想法
+            {t('想法')}
             <textarea
               value={note}
               onInput={(e) => setNote(e.currentTarget.value)}
             />
           </label>
           <label class="rename-label">
-            标签（顿号分隔）
+            {t('标签（顿号分隔）')}
             <input
               value={tags}
               maxLength={300}
@@ -280,7 +300,7 @@ export function NotesPage() {
               disabled={!canUsePro()}
               onChange={(e) => setReview(e.currentTarget.checked)}
             />
-            待回顾
+            {t('待回顾')}
           </label>
           <div class="panel-actions">
             <button
@@ -288,7 +308,7 @@ export function NotesPage() {
               onClick={() =>
                 void action(async () => {
                   const item = await db.highlights.get(editing.item.id);
-                  if (!item) throw new Error('此笔记已不存在。');
+                  if (!item) throw new Error(t('此笔记已不存在。'));
                   const values = [
                     ...new Set(
                       tags
@@ -298,7 +318,7 @@ export function NotesPage() {
                     ),
                   ];
                   if (values.length > 12 || values.some((s) => s.length > 30))
-                    throw new Error('最多 12 个标签，每个不超过 30 字。');
+                    throw new Error(t('最多 12 个标签，每个不超过 30 字。'));
                   await db.highlights.update(item.id, {
                     note: note.trim() || undefined,
                     ...(canUsePro()
@@ -311,10 +331,10 @@ export function NotesPage() {
                 })
               }
             >
-              保存想法
+              {t('保存想法')}
             </button>
             <button disabled={busy} onClick={() => setEditing(undefined)}>
-              关闭
+              {t('关闭')}
             </button>
           </div>
         </Modal>

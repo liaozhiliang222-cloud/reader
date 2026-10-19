@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { Locator, StoredChapter } from '@/types';
 import { extractSpeech, type SpeechParagraph } from './extract';
 
@@ -48,7 +49,7 @@ function safeCut(text: string, end: number) {
 /** Bounded UTF-16 ranges; keep punctuation/closing quotes on their sentence. */
 export function sentenceSlices(text: string, limit = 120) {
   if (!Number.isInteger(limit) || limit < 2 || limit > 4000)
-    throw new Error('单句长度限制无效。');
+    throw new Error(t('单句长度限制无效。'));
   const spans: { start: number; end: number }[] = [];
   const append = (start: number, end: number) => {
     while (start < end) {
@@ -113,7 +114,7 @@ export function* segmentChapter(
   from?: Locator,
 ): Generator<SpeechSentence> {
   if (!Number.isSafeInteger(revision) || revision < 0)
-    throw new Error('书籍内容版本无效。');
+    throw new Error(t('书籍内容版本无效。'));
   for (const paragraph of extractSpeech(chapter).paragraphs) {
     for (const slice of sentenceSlices(paragraph.text, limit)) {
       let sourceRanges = mapRanges(

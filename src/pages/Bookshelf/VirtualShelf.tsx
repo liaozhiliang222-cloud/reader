@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { visibleRange } from '@/components/virtualRange';
 import { beginMeasure } from '@/app/performance';
@@ -23,7 +24,7 @@ export function VirtualShelf({
   });
   const [focused, setFocused] = useState<number>();
   useLayoutEffect(() => {
-    const end = beginMeasure('书架视口呈现');
+    const end = beginMeasure(t('书架视口呈现'));
     let frame = 0;
     const measure = () => {
       const top = root.current!.getBoundingClientRect().top;
@@ -106,7 +107,7 @@ export function VirtualShelf({
     <ul
       ref={root}
       class="virtual-shelf"
-      aria-label="本地书架"
+      aria-label={t('本地书架')}
       style={{ height: `${entries.length * SHELF_ROW_HEIGHT}px` }}
       onFocusCapture={(event) => {
         const row = (event.target as Element).closest<HTMLElement>(

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { localName, parseXml, resolvePath, type XmlElement } from './xml';
 import type { SafeElement } from './sanitize';
 
@@ -148,7 +149,7 @@ function declarations(source: string) {
  */
 export function sanitizeSvg(source: string | XmlElement): string | undefined {
   if (typeof source === 'string' && source.length > 1024 * 1024)
-    throw new Error('SVG 图片超过安全处理范围。');
+    throw new Error(t('SVG 图片超过安全处理范围。'));
   const root =
     typeof source === 'string' ? parseXml(source).documentElement : source;
   if (
@@ -158,7 +159,8 @@ export function sanitizeSvg(source: string | XmlElement): string | undefined {
   )
     return;
   const nodes = [root, ...Array.from(root.getElementsByTagName('*'))];
-  if (nodes.length > 20000) throw new Error('SVG 图片节点超过安全处理范围。');
+  if (nodes.length > 20000)
+    throw new Error(t('SVG 图片节点超过安全处理范围。'));
   const ids = new Map(
     nodes
       .filter((node) => node.getAttribute('id'))
@@ -183,7 +185,7 @@ export function sanitizeSvg(source: string | XmlElement): string | undefined {
       for (const selector of match[1]!.split(',').map((s) => s.trim())) {
         if (!/^[.#]?[A-Za-z_][\w-]*$/.test(selector)) continue;
         if (rules.length >= 1024)
-          throw new Error('SVG 图片样式超过安全处理范围。');
+          throw new Error(t('SVG 图片样式超过安全处理范围。'));
         rules.push({
           selector,
           values,
@@ -202,7 +204,7 @@ export function sanitizeSvg(source: string | XmlElement): string | undefined {
     visiting: ReadonlySet<XmlElement>,
   ): string => {
     if (++count > 20000 || depth > 64)
-      throw new Error('SVG 图片结构超过安全处理范围。');
+      throw new Error(t('SVG 图片结构超过安全处理范围。'));
     if ((el.namespaceURI && el.namespaceURI !== namespace) || visiting.has(el))
       return '';
     const name = localName(el),
@@ -270,7 +272,7 @@ export function sanitizeSvg(source: string | XmlElement): string | undefined {
   };
   const output = clean(root, 0, new Set());
   if (output.length > 1024 * 1024)
-    throw new Error('SVG 图片超过安全处理范围。');
+    throw new Error(t('SVG 图片超过安全处理范围。'));
   return drawn ? output : undefined;
 }
 
@@ -284,7 +286,7 @@ export function svgLocalImages(
   let count = 0;
   const visit = (el: XmlElement, depth: number) => {
     if (++count > 20000 || depth > 64)
-      throw new Error('SVG 图片结构超过安全处理范围。');
+      throw new Error(t('SVG 图片结构超过安全处理范围。'));
     if (el.namespaceURI && el.namespaceURI !== namespace) return;
     const tag = localName(el);
     if (tag === 'image') {

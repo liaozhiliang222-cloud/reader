@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { Locator, StoredChapter } from '@/types';
 import { segmentChapter, type SpeechSentence } from './segment';
 import {
@@ -34,7 +35,7 @@ export async function* prepareSpeech(
     chapterCount < 0 ||
     start.chapterIndex >= chapterCount
   )
-    throw new Error('听书准备参数无效。');
+    throw new Error(t('听书准备参数无效。'));
   const lastChapter = options.chapterOnly
     ? start.chapterIndex + 1
     : chapterCount;
@@ -57,11 +58,11 @@ export async function* prepareSpeech(
   const account = (batch: SpeechBatch) => {
     const size = utf8Size(batch);
     if (size > SPEECH_LIMITS.batchBytes)
-      throw new Error('单批听书数据过大，无法准备。');
+      throw new Error(t('单批听书数据过大，无法准备。'));
     // The native store bounds actual compressed disk usage. Wire messages
     // repeat IDs/titles/ranges and are not a measure of that private cache.
     if (batchIndex >= SPEECH_LIMITS.queueBatches)
-      throw new Error('本次待朗读句数过多，可改为“读完本章”后重试。');
+      throw new Error(t('本次待朗读句数过多，可改为“读完本章”后重试。'));
     return batch;
   };
   for (let index = start.chapterIndex; index < lastChapter; index++) {
@@ -70,7 +71,7 @@ export async function* prepareSpeech(
     const chapter = await getChapter(index);
     check();
     if (chapter.bookId !== identity.bookId || chapter.index !== index)
-      throw new Error('听书章节与书籍不一致，请重新打开书籍。');
+      throw new Error(t('听书章节与书籍不一致，请重新打开书籍。'));
     for (const sentence of segmentChapter(
       chapter,
       identity.contentRevision,
@@ -84,7 +85,8 @@ export async function* prepareSpeech(
         envelopeBytes + sentenceBytes + addedBytes + sentences.length >
           SPEECH_LIMITS.batchBytes
       ) {
-        if (!sentences.length) throw new Error('单句听书数据过大，无法准备。');
+        if (!sentences.length)
+          throw new Error(t('单句听书数据过大，无法准备。'));
         yield account(message(false));
         check();
         firstSentenceIndex += sentences.length;
@@ -94,7 +96,7 @@ export async function* prepareSpeech(
         envelopeBytes = utf8Size(message(false));
       }
       if (envelopeBytes + addedBytes > SPEECH_LIMITS.batchBytes)
-        throw new Error('单句听书数据过大，无法准备。');
+        throw new Error(t('单句听书数据过大，无法准备。'));
       sentences.push(sentence);
       sentenceBytes += addedBytes;
     }
@@ -105,6 +107,6 @@ export async function* prepareSpeech(
   check();
   await assertRevision();
   check();
-  if (!sentences.length) throw new Error('此位置之后没有可朗读内容。');
+  if (!sentences.length) throw new Error(t('此位置之后没有可朗读内容。'));
   yield account(message(true));
 }

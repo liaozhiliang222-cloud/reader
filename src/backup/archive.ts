@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { streamArchive, type ArchiveEntry } from './streamArchive';
 import { BoundedZip } from '@/parsers/zip';
 import { parseFile } from '@/parsers/file';
@@ -31,7 +32,7 @@ export async function buildArchive(
     payload.backup,
     async (bookId) => {
       const source = originals.get(bookId);
-      if (!source) throw new Error('原文件不可用，备份未生成。');
+      if (!source) throw new Error(t('原文件不可用，备份未生成。'));
       return source;
     },
     onProgress,
@@ -45,7 +46,7 @@ export async function buildSnapshotArchive(
   let lastReport = 0;
   const json = new TextEncoder().encode(JSON.stringify(backup, null, 2));
   if (json.byteLength > BACKUP_METADATA_LIMIT)
-    throw new Error('备份元数据超过 32 MiB，请减少单次备份的笔记数量。');
+    throw new Error(t('备份元数据超过 32 MiB，请减少单次备份的笔记数量。'));
   const entries: ArchiveEntry[] = [
     { path: 'backup.json', data: new Blob([json]) },
   ];
@@ -59,14 +60,14 @@ export async function buildSnapshotArchive(
       read: async () => {
         const source = await readOriginal(file.bookId);
         if (source.size !== book.size)
-          throw new Error('备份原文大小与快照不一致。');
+          throw new Error(t('备份原文大小与快照不一致。'));
         const bytes = await source.arrayBuffer();
         const digest = await crypto.subtle.digest('SHA-256', bytes);
         const hash = Array.from(new Uint8Array(digest), (byte) =>
           byte.toString(16).padStart(2, '0'),
         ).join('');
         if (bookIdForHash(book, hash) !== book.id)
-          throw new Error('备份生成期间原文指纹发生变化，请重新生成备份。');
+          throw new Error(t('备份生成期间原文指纹发生变化，请重新生成备份。'));
         return bytes;
       },
     });
@@ -77,7 +78,7 @@ export async function buildSnapshotArchive(
     lastReport = now;
     onProgress({
       percent,
-      message: `正在生成完整备份 ${Math.floor(percent)}%`,
+      message: t('正在生成完整备份 {0}%', Math.floor(percent)),
     });
   });
 }
@@ -94,9 +95,9 @@ export class BackupArchive {
     for (const file of backup.files) {
       const book = this.books.get(file.bookId)!;
       if (!zip.has(file.path))
-        throw new Error(`原文件缺失或路径错误：${book.title}。`);
+        throw new Error(t('原文件缺失或路径错误：{0}。', book.title));
       if (zip.size(file.path) !== book.size)
-        throw new Error('原文件大小与备份信息不符，内容不完整。');
+        throw new Error(t('原文件大小与备份信息不符，内容不完整。'));
     }
   }
   static async open(file: File) {
@@ -106,7 +107,7 @@ export class BackupArchive {
       entry: BACKUP_BOOK_LIMIT,
       total: Number.MAX_SAFE_INTEGER,
     });
-    if (!zip.has('backup.json')) throw new Error('ZIP 中缺少 backup.json。');
+    if (!zip.has('backup.json')) throw new Error(t('ZIP 中缺少 backup.json。'));
     const json = await zip.read('backup.json', BACKUP_METADATA_LIMIT);
     const backup = parseBackupJson(
       new TextDecoder('utf-8', { fatal: true }).decode(
@@ -133,7 +134,11 @@ export class BackupArchive {
       );
       onProgress({
         percent: ((index + 1) / this.backup.files.length) * 100,
-        message: `正在校验原文件 ${index + 1}/${this.backup.files.length}`,
+        message: t(
+          '正在校验原文件 {0}/{1}',
+          index + 1,
+          this.backup.files.length,
+        ),
       });
     }
     await this.verifyRemaining();
@@ -141,9 +146,9 @@ export class BackupArchive {
   async prepare(bookId: string): Promise<PreparedBook> {
     const meta = this.books.get(bookId),
       path = this.paths.get(bookId);
-    if (!meta || !path) throw new Error('恢复内容与备份书架不一致。');
+    if (!meta || !path) throw new Error(t('恢复内容与备份书架不一致。'));
     if (this.prepared.has(bookId))
-      throw new Error('不能重复读取同一份原文件。');
+      throw new Error(t('不能重复读取同一份原文件。'));
     this.prepared.add(bookId);
     const data = await this.zip.read(path, meta.size);
     return prepareBook(meta, { bookId, data });
@@ -158,18 +163,18 @@ export async function readBackup(
 ): Promise<BackupFile> {
   if (/\.json$/i.test(file.name)) {
     if (file.size > BACKUP_METADATA_LIMIT)
-      throw new Error('备份元数据超过 32 MiB，无法读取。');
+      throw new Error(t('备份元数据超过 32 MiB，无法读取。'));
     const backup = parseBackupJson(
       new TextDecoder('utf-8', { fatal: true }).decode(
         await file.arrayBuffer(),
       ),
     );
     if (backup.files.length)
-      throw new Error('完整备份请导入 ZIP，JSON 中不包含原文件。');
+      throw new Error(t('完整备份请导入 ZIP，JSON 中不包含原文件。'));
     return backup;
   }
   if (!/\.zip$/i.test(file.name))
-    throw new Error('请选择微光阅读 JSON 或 ZIP 备份。');
+    throw new Error(t('请选择微光阅读 JSON 或 ZIP 备份。'));
   const archive = await BackupArchive.open(file);
   await archive.verify(onProgress);
   return archive.backup;
@@ -183,16 +188,16 @@ export function createArchiveRestoreApi() {
       const backup = validateBackup(preview.backup);
       if (!preview.archive) {
         if (backup.files.length)
-          throw new Error('备份原文件不可用，请重新选择。');
+          throw new Error(t('备份原文件不可用，请重新选择。'));
         return;
       }
       const opened = await BackupArchive.open(preview.archive);
       if (JSON.stringify(opened.backup) !== JSON.stringify(backup))
-        throw new Error('备份内容与预览不一致，请重新选择备份。');
+        throw new Error(t('备份内容与预览不一致，请重新选择备份。'));
       archive = opened;
     },
     async prepareRestoreBook(bookId: string) {
-      if (!archive) throw new Error('备份原文件不可用，请重新选择。');
+      if (!archive) throw new Error(t('备份原文件不可用，请重新选择。'));
       return archive.prepare(bookId);
     },
     async finishRestore() {
@@ -206,7 +211,7 @@ export async function prepareBook(
   source: SourceFile,
 ): Promise<PreparedBook> {
   if (source.bookId !== meta.id || source.data.size !== meta.size)
-    throw new Error('原文件大小与备份信息不一致。');
+    throw new Error(t('原文件大小与备份信息不一致。'));
   const result =
     meta.type === 'paste'
       ? {
@@ -230,7 +235,7 @@ export async function prepareBook(
           meta.markdownVersion ?? 1,
         );
   if (result.id !== meta.id)
-    throw new Error(`原文件指纹不匹配：${meta.title}。`);
+    throw new Error(t('原文件指纹不匹配：{0}。', meta.title));
   const book = {
     ...meta,
     missingFile: false,
@@ -272,11 +277,11 @@ export async function prepareBooks(
   const prepared: PreparedBook[] = [];
   for (const [index, source] of payload.originals.entries()) {
     const meta = payload.backup.books.find((book) => book.id === source.bookId);
-    if (!meta) throw new Error('原文件大小与备份信息不一致。');
+    if (!meta) throw new Error(t('原文件大小与备份信息不一致。'));
     prepared.push(await prepareBook(meta, source));
     onProgress({
       percent: ((index + 1) / payload.originals.length) * 100,
-      message: '正在验证并解析 ' + meta.title,
+      message: t('正在验证并解析 ') + meta.title,
     });
   }
   return prepared;

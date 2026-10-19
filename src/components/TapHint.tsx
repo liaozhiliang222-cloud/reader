@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useState } from 'preact/hooks';
 import type { ReadingSettings } from '@/types';
 
@@ -27,16 +28,18 @@ export function TapHint({
   }, []);
   if (!visible) return null;
   const sides =
-    mode === 'oneHand' ? ['下一页', '下一页'] : ['上一页', '下一页'];
+    mode === 'oneHand'
+      ? [t('下一页'), t('下一页')]
+      : [t('上一页'), t('下一页')];
   return (
     <div class="quiet-hint tap-hint" role="status">
       <span>{sides[0]}</span>
       <span>
-        菜单
-        <small>点按中间</small>
+        {t('菜单')}
+        <small>{t('点按中间')}</small>
       </span>
       <span>{sides[1]}</span>
-      {mode === 'oneHand' && <em>左上角：上一页</em>}
+      {mode === 'oneHand' && <em>{t('左上角：上一页')}</em>}
     </div>
   );
 }

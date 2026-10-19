@@ -27,6 +27,7 @@ vi.mock('comlink', () => ({
   transfer: (value: ArrayBuffer) => value,
 }));
 class TestWorker extends EventTarget {
+  postMessage = vi.fn();
   static instances: TestWorker[] = [];
   terminate = vi.fn();
   constructor() {

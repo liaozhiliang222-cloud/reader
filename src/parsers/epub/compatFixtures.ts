@@ -1,6 +1,9 @@
 import JSZip from 'jszip';
 export const compatibilityCases = [
-  { name: '普通段落', body: '<h1>开篇</h1><p id="target">微光阅读原创样本。</p>' },
+  {
+    name: '普通段落',
+    body: '<h1>开篇</h1><p id="target">微光阅读原创样本。</p>',
+  },
   {
     name: '竖排转统一横排',
     body: '<div style="writing-mode:vertical-rl"><p id="target">春风拂过书页。</p></div>',

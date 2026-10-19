@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import {
   incomingData,
   incomingForm,
@@ -11,7 +12,7 @@ export function incomingKeys(scope: string) {
   return {
     prefix,
     key(id: string) {
-      if (!validIncomingId(id)) throw new Error('分享标识无效。');
+      if (!validIncomingId(id)) throw new Error(t('分享标识无效。'));
       return prefix + id;
     },
     list(keys: IDBValidKey[]) {
@@ -53,7 +54,7 @@ export async function decodeIncoming(record: unknown): Promise<IncomingData> {
     typeof record.type !== 'string' ||
     !record.type.startsWith('multipart/form-data;')
   )
-    throw new Error('这份分享已处理或不在本机，请重新分享。');
+    throw new Error(t('这份分享已处理或不在本机，请重新分享。'));
   const form = await new Response(record.data, {
     headers: { 'Content-Type': record.type },
   }).formData();
@@ -70,7 +71,7 @@ export async function decodeIncoming(record: unknown): Promise<IncomingData> {
       !Array.isArray(value.errors) ||
       !value.errors.every((item: unknown) => typeof item === 'string')
     )
-      throw new Error('分享暂存已损坏，请重新分享。');
+      throw new Error(t('分享暂存已损坏，请重新分享。'));
     form.set('text', value.text);
     form.set('title', value.title);
     for (const error of value.errors) form.append('error', error);
@@ -93,7 +94,7 @@ export async function decodeIncoming(record: unknown): Promise<IncomingData> {
           typeof name === 'string' && name.length > 0 && name.length <= 255,
       ))
   )
-    throw new Error('分享文件名暂存已损坏，请重新分享。');
+    throw new Error(t('分享文件名暂存已损坏，请重新分享。'));
   if (Array.isArray(names))
     parsed.files = parsed.files.map((file, index) =>
       typeof names[index] === 'string' && names[index]

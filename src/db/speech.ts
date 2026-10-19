@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from './index';
 import { contentRevision } from './revision';
 import { clampLocator, percentOf } from '@/reader/position';
@@ -35,7 +36,7 @@ export async function claimSpeech(
         book.missingFile ||
         contentRevision(book) !== identity.contentRevision
       )
-        throw new Error('书籍内容已变化，请重新打开后听书。');
+        throw new Error(t('书籍内容已变化，请重新打开后听书。'));
       const lease: StoredSpeechLease = {
         ...claimSpeechProgress(
           identity,
@@ -88,7 +89,7 @@ export async function saveSpeechSnapshot(
         locator.chapterIndex,
       ]);
       if (!chapter || !sameLocator(clampLocator(chapter, locator), locator))
-        throw new Error('听书位置与正文不一致，请重新准备。');
+        throw new Error(t('听书位置与正文不一致，请重新准备。'));
       const current = (await database.progress.get(book.id)) ?? null;
       const result = reconcileSpeechProgress(lease, snapshot, current, {
         bookId: book.id,

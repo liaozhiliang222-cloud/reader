@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import {
   getChapterSummaries,
@@ -174,7 +175,7 @@ export function ReaderView({
       await removeBookmark(book.id, id);
       await refreshBookmarks();
     } catch {
-      setError('书签未能移除，请重试。');
+      setError(t('书签未能移除，请重试。'));
     }
   };
   const toggleBookmark = async () => {
@@ -189,7 +190,7 @@ export function ReaderView({
       }
       await refreshBookmarks();
     } catch {
-      setError('书签未能保存，请检查本地存储。');
+      setError(t('书签未能保存，请检查本地存储。'));
     } finally {
       setBookmarkBusy(false);
     }
@@ -229,7 +230,7 @@ export function ReaderView({
   const changeReading = (patch: Partial<ReadingSettings>) => {
     setReading((current) => ({ ...current, ...themePatch(patch, current) }));
     void saveBookSettings(book.id, patch).catch(() =>
-      setError('排版未能保存，请检查本地存储。'),
+      setError(t('排版未能保存，请检查本地存储。')),
     );
   };
   useEffect(() => {
@@ -242,7 +243,7 @@ export function ReaderView({
         if (!cancelled) setBookmarks(items);
       })
       .catch(() => {
-        if (!cancelled) setError('无法读取书签。');
+        if (!cancelled) setError(t('无法读取书签。'));
       });
     // 新书已随 Book 读入摘要；旧书才需要事务回填目录，避免重复
     // 读取及其写锁延迟紧接着的返回书架操作。
@@ -252,7 +253,7 @@ export function ReaderView({
           if (!cancelled) setChapters(value);
         })
         .catch(() => {
-          if (!cancelled) setError('无法读取目录。');
+          if (!cancelled) setError(t('无法读取目录。'));
         });
     return () => {
       cancelled = true;
@@ -271,7 +272,7 @@ export function ReaderView({
         const value = latest;
         latest = undefined;
         await saveProgress(value, book.contentRevision ?? 0).catch(() => {
-          if (!disposed) setError('进度未能保存，请检查浏览器存储空间。');
+          if (!disposed) setError(t('进度未能保存，请检查浏览器存储空间。'));
         });
       }
     };
@@ -497,7 +498,7 @@ export function ReaderView({
         try {
           anchor = decodeURIComponent(address.slice(1));
         } catch {
-          setError('链接中的标题地址无效。');
+          setError(t('链接中的标题地址无效。'));
           return;
         }
         const entry = book.toc?.find((t) => t.anchor === anchor);
@@ -507,7 +508,7 @@ export function ReaderView({
             paragraphIndex: entry.paragraphIndex,
             charOffset: 0,
           });
-        else setError('未找到链接指向的标题。');
+        else setError(t('未找到链接指向的标题。'));
       } else {
         setLinkStatus('');
         setLinkAddress(address);
@@ -571,11 +572,11 @@ export function ReaderView({
         />
       )}
       {linkAddress && (
-        <Modal title="链接地址" onDismiss={() => setLinkAddress('')}>
-          <h2>链接地址</h2>
-          <p>可复制到浏览器打开。</p>
+        <Modal title={t('链接地址')} onDismiss={() => setLinkAddress('')}>
+          <h2>{t('链接地址')}</h2>
+          <p>{t('可复制到浏览器打开。')}</p>
           <label class="rename-label">
-            地址
+            {t('地址')}
             <input
               readOnly
               value={linkAddress}
@@ -583,20 +584,20 @@ export function ReaderView({
             />
           </label>
           <div class="panel-actions">
-            <button onClick={() => setLinkAddress('')}>关闭</button>
+            <button onClick={() => setLinkAddress('')}>{t('关闭')}</button>
             <button
               onClick={() => {
                 if (!navigator.clipboard?.writeText) {
-                  setLinkStatus('请长按地址复制。');
+                  setLinkStatus(t('请长按地址复制。'));
                   return;
                 }
                 void navigator.clipboard
                   .writeText(linkAddress)
-                  .then(() => setLinkStatus('地址已复制。'))
-                  .catch(() => setLinkStatus('请长按地址复制。'));
+                  .then(() => setLinkStatus(t('地址已复制。')))
+                  .catch(() => setLinkStatus(t('请长按地址复制。')));
               }}
             >
-              复制地址
+              {t('复制地址')}
             </button>
           </div>
           {linkStatus && <p role="status">{linkStatus}</p>}
@@ -617,7 +618,7 @@ export function ReaderView({
         <QuietHint enabled={reading.quietHint} />
       )}
       {!!currentBookmarks.length && (
-        <span class="reader-bookmark-corner" aria-label="本页有书签">
+        <span class="reader-bookmark-corner" aria-label={t('本页有书签')}>
           ▰
         </span>
       )}
@@ -628,12 +629,12 @@ export function ReaderView({
       >
         {info.title}
       </div>
-      <div ref={viewport} class="reader-viewport" aria-label="阅读正文">
+      <div ref={viewport} class="reader-viewport" aria-label={t('阅读正文')}>
         <div ref={content} class="reader-chapters" />
         {reading.tapMode === 'oneHand' && (
           <button
             class="reader-previous-corner"
-            aria-label="单手模式：上一页"
+            aria-label={t('单手模式：上一页')}
             disabled={!!annotations.target || !!annotations.editor}
             onClick={() => {
               if (
@@ -671,7 +672,7 @@ export function ReaderView({
       )}
       <button
         class="reader-menu-toggle"
-        aria-label="阅读菜单"
+        aria-label={t('阅读菜单')}
         aria-expanded={menu}
         onClick={() => {
           annotations.close();
@@ -708,22 +709,24 @@ export function ReaderView({
           <div class="reader-menu-top">
             <button
               class="menu-back"
-              aria-label="返回书架"
+              aria-label={t('返回书架')}
               onClick={() =>
                 leave(() => {
                   void stopSpeech()
                     .then(onBack)
-                    .catch(() => setError('听书位置未能保存，请重试。'));
+                    .catch(() => setError(t('听书位置未能保存，请重试。')));
                 })
               }
             >
               <Icon name="back" />
-              <span>书架</span>
+              <span>{t('书架')}</span>
             </button>
             <span class="menu-title">{book.title}</span>
             <button
               class="icon-button"
-              aria-label={currentBookmarks.length ? '移除书签' : '添加书签'}
+              aria-label={
+                currentBookmarks.length ? t('移除书签') : t('添加书签')
+              }
               aria-pressed={!!currentBookmarks.length}
               disabled={bookmarkBusy}
               onClick={() => void toggleBookmark()}
@@ -733,7 +736,7 @@ export function ReaderView({
           </div>
           <div class="reader-menu-bottom">
             {panel === 'typography' && (
-              <section class="typography-panel" aria-label="排版与主题">
+              <section class="typography-panel" aria-label={t('排版与主题')}>
                 <ReadingControls
                   value={reading}
                   onChange={changeReading}
@@ -744,23 +747,25 @@ export function ReaderView({
                     void saveSettings({ reading })
                       .then((value) => {
                         settings.value = value;
-                        setError('已应用为全局默认');
+                        setError(t('已应用为全局默认'));
                       })
-                      .catch(() => setError('全局排版保存失败'))
+                      .catch(() => setError(t('全局排版保存失败')))
                   }
                 >
-                  应用为全局默认
+                  {t('应用为全局默认')}
                 </button>
-                <p>调整自动保存为本书排版。</p>
+                <p>{t('调整自动保存为本书排版。')}</p>
               </section>
             )}
             {panel === 'more' && (
-              <section class="more-panel" aria-label="更多">
+              <section class="more-panel" aria-label={t('更多')}>
                 {hasNativeSpeech && (
-                  <button onClick={() => void quickSpeech()}>听书</button>
+                  <button onClick={() => void quickSpeech()}>
+                    {t('听书')}
+                  </button>
                 )}
                 <label class="check-row">
-                  安静提示
+                  {t('安静提示')}
                   <input
                     type="checkbox"
                     checked={reading.quietHint}
@@ -777,7 +782,7 @@ export function ReaderView({
                       void stopSpeech().then(() => setEncodingOpen(true));
                     }}
                   >
-                    切换编码
+                    {t('切换编码')}
                   </button>
                 )}
                 {wakeStatus && (
@@ -791,7 +796,7 @@ export function ReaderView({
               <div class="menu-progress">
                 <button
                   class="icon-button"
-                  aria-label="上一页"
+                  aria-label={t('上一页')}
                   onClick={() => engineRef.current?.turn(-1)}
                 >
                   <Icon name="previous" />
@@ -806,7 +811,7 @@ export function ReaderView({
                 />
                 <button
                   class="icon-button"
-                  aria-label="下一页"
+                  aria-label={t('下一页')}
                   onClick={() => engineRef.current?.turn(1)}
                 >
                   <Icon name="next" />
@@ -821,49 +826,49 @@ export function ReaderView({
                   setReturnPoint(undefined);
                 }}
               >
-                回到跳转前
+                {t('回到跳转前')}
               </button>
             )}
-            <nav class="menu-actions" aria-label="阅读操作">
+            <nav class="menu-actions" aria-label={t('阅读操作')}>
               <button onClick={() => setDrawer(true)}>
                 <Icon name="contents" />
-                <span>目录</span>
+                <span>{t('目录')}</span>
               </button>
               <button
-                aria-label="排版与主题"
+                aria-label={t('排版与主题')}
                 aria-expanded={panel === 'typography'}
                 onClick={() =>
                   setPanel(panel === 'typography' ? undefined : 'typography')
                 }
               >
                 <Icon name="type" />
-                <span>排版</span>
+                <span>{t('排版')}</span>
               </button>
               <button
-                aria-label={fullscreen ? '退出全屏' : '全屏阅读'}
+                aria-label={fullscreen ? t('退出全屏') : t('全屏阅读')}
                 onClick={() =>
                   void toggleFullscreen().catch((cause) =>
                     setError(
                       cause instanceof Error
                         ? cause.message
-                        : '全屏请求未被允许。',
+                        : t('全屏请求未被允许。'),
                     ),
                   )
                 }
               >
                 <Icon name={fullscreen ? 'exitFullscreen' : 'fullscreen'} />
-                <span>{fullscreen ? '退出' : '全屏'}</span>
+                <span>{fullscreen ? t('退出') : t('全屏')}</span>
               </button>
               <button
                 aria-expanded={panel === 'more'}
                 onClick={() => setPanel(panel === 'more' ? undefined : 'more')}
               >
                 <Icon name="more" />
-                <span>更多</span>
+                <span>{t('更多')}</span>
               </button>
               <button onClick={() => setMenu(false)}>
                 <Icon name="done" />
-                <span>继续阅读</span>
+                <span>{t('继续阅读')}</span>
               </button>
             </nav>
           </div>

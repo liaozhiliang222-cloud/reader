@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { cleanParagraphs } from './txt/clean';
 import { splitChapters, type TextChapter } from './txt/chapters';
 import { parseMarkdown, type DraftFormat } from './markdown';
@@ -51,10 +52,10 @@ export async function parseDraft(
   format: DraftFormat = 'plain',
   markdownVersion = 2,
 ) {
-  if (!text.trim()) throw new Error('请先粘贴正文。');
+  if (!text.trim()) throw new Error(t('请先粘贴正文。'));
   const bytes = new TextEncoder().encode(text);
   if (bytes.byteLength > 50 * 1024 * 1024)
-    throw new Error('文稿超过 50 MB，请拆分后导入。');
+    throw new Error(t('文稿超过 50 MB，请拆分后导入。'));
   if (format === 'markdown')
     return {
       ...parseMarkdown(text, markdownVersion),

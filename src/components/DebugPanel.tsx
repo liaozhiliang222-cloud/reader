@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { signal } from '@preact/signals';
 import { appendBounded, formatDebugValue } from './debug';
 
@@ -24,13 +25,15 @@ export function installDebugConsole() {
 export function DebugPanel() {
   return (
     <details class="debug-panel">
-      <summary>开发日志 · {entries.value.length}</summary>
+      <summary>
+        {t('开发日志 ·')} {entries.value.length}
+      </summary>
       <button
         onClick={() => {
           entries.value = [];
         }}
       >
-        清空日志
+        {t('清空日志')}
       </button>
       <pre>{entries.value.join('\n')}</pre>
     </details>

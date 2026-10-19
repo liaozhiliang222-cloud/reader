@@ -105,7 +105,7 @@ test('LONG-EPUB：跨块图片注音完整、跨段选区重排重载与备份�
   evidence,
 }, info) => {
   const leading = '前'.repeat(11999),
-    ruby = '微光阅读jìngyè',
+    ruby = '静页jìngyè',
     end = '块首正文尾段。',
     next = '跨段后续😀文本。';
   const firstText = leading + ruby + end;

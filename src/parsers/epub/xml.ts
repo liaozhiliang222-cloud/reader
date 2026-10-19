@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { DOMParser, type Document, type Element } from '@xmldom/xmldom';
 export type XmlElement = Element;
 export function decodeXml(bytes: Uint8Array) {
@@ -12,13 +13,13 @@ export function decodeXml(bytes: Uint8Array) {
   try {
     return new TextDecoder(encoding, { fatal: true }).decode(bytes);
   } catch (cause) {
-    throw new Error('章节XML编码无效，请重新导出EPUB。', { cause });
+    throw new Error(t('章节XML编码无效，请重新导出EPUB。'), { cause });
   }
 }
 export function parseXml(source: string): Document {
   // 禁止实体声明；普通 EPUB 公共 DOCTYPE 不会被加载。
   if (/<!ENTITY/i.test(source))
-    throw new Error('文件包含不支持的 XML 实体声明。');
+    throw new Error(t('文件包含不支持的 XML 实体声明。'));
   return new DOMParser({
     onError: (level, message) => {
       if (level !== 'warning') throw new Error(message);
@@ -42,7 +43,7 @@ export function resolvePath(
   href: string,
 ): { path: string; fragment?: string } {
   if (/^(?:[a-z][a-z\d+.-]*:|\/|\\)/i.test(href) || href.includes('\\'))
-    throw new Error('书籍包含不支持的资源路径。');
+    throw new Error(t('书籍包含不支持的资源路径。'));
   const [part = '', fragment] = href.split('#');
   const decoded = decodeURIComponent(part);
   if (
@@ -52,7 +53,7 @@ export function resolvePath(
     decoded.startsWith('/') ||
     /^[a-z][a-z\d+.-]*:/i.test(decoded)
   )
-    throw new Error('资源路径无效。');
+    throw new Error(t('资源路径无效。'));
   const segments = part ? base.split('/').slice(0, -1) : [];
   if (!part)
     return {
@@ -62,7 +63,7 @@ export function resolvePath(
   for (const segment of decoded.split('/')) {
     if (!segment || segment === '.') continue;
     if (segment === '..') {
-      if (!segments.length) throw new Error('资源路径越出书籍目录。');
+      if (!segments.length) throw new Error(t('资源路径越出书籍目录。'));
       segments.pop();
     } else segments.push(segment);
   }

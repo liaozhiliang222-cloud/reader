@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { Lexer, type MarkedToken, type Token } from 'marked';
 import { DOMParser } from '@xmldom/xmldom';
 import { textOf, type SafeElement, type SafeNode } from './epub/sanitize';
@@ -47,8 +48,8 @@ export function parseMarkdown(
   imagePath = '',
 ) {
   if (version !== 1 && version !== 2)
-    throw new Error('Markdown 段落结构版本不受支持。');
-  if (!source.trim()) throw new Error('没有可阅读的 Markdown 内容。');
+    throw new Error(t('Markdown 段落结构版本不受支持。'));
+  if (!source.trim()) throw new Error(t('没有可阅读的 Markdown 内容。'));
   const chapters: MarkdownChapter[] = [];
   const toc: TocEntry[] = [];
   const slugs = new Set<string>();
@@ -86,7 +87,7 @@ export function parseMarkdown(
   }
   function check(depth: number) {
     if (++visited > 200_000 || depth > 64)
-      throw new Error('Markdown 结构过于复杂，请拆分后导入。');
+      throw new Error(t('Markdown 结构过于复杂，请拆分后导入。'));
   }
   // This Lexer has no extensions: its output is exclusively built-in MarkedToken.
   function inline(tokens: Token[], depth: number): SafeNode[] {
@@ -414,7 +415,8 @@ export function parseMarkdown(
         check(depth);
         if (token.type === 'mdNoteDefinition') {
           const label = String(token.label);
-          if (notes.has(label)) throw new Error('脚注名称重复，请修改后导入。');
+          if (notes.has(label))
+            throw new Error(t('脚注名称重复，请修改后导入。'));
           notes.set(label, token.tokens as Token[]);
         } else if ('tokens' in token && Array.isArray(token.tokens))
           collectNotes(token.tokens, depth + 1);
@@ -449,10 +451,10 @@ export function parseMarkdown(
     finish();
   } catch (cause) {
     if (cause instanceof RangeError)
-      throw new Error('Markdown 嵌套过深，请拆分后导入。', { cause });
+      throw new Error(t('Markdown 嵌套过深，请拆分后导入。'), { cause });
     throw cause;
   }
-  if (!chapters.length) throw new Error('没有可阅读的 Markdown 内容。');
+  if (!chapters.length) throw new Error(t('没有可阅读的 Markdown 内容。'));
   return {
     chapters,
     toc,

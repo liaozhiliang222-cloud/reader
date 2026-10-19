@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 export interface PrecacheEntry {
   url: string;
   revision?: string | null;
@@ -24,7 +25,7 @@ export function createOffline(
   for (const entry of entries) {
     const url = new URL(entry.url, scope);
     if (url.origin !== scope.origin || !url.pathname.startsWith(scope.pathname))
-      throw new Error('离线清单只能包含应用同源资源。');
+      throw new Error(t('离线清单只能包含应用同源资源。'));
     url.hash = '';
     assets.set(url.href, entry);
   }
@@ -62,7 +63,7 @@ export function createOffline(
               response.type === 'opaque' ||
               response.redirected
             )
-              throw new Error('离线资源下载失败。');
+              throw new Error(t('离线资源下载失败。'));
             await cache.put(url, response);
           }),
         );

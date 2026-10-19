@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { signal } from '@preact/signals';
 import { listenMedia, mediaState, type MediaState } from './media';
 import { isNativeApp } from './platform';
@@ -55,7 +56,7 @@ export function createInstallController(
   const complete = () => {
     confirmed = true;
     deferred = undefined;
-    message = '浏览器已确认安装，可从主屏幕打开。';
+    message = t('浏览器已确认安装，可从主屏幕打开。');
     publish();
   };
   const displayChanged = () => {
@@ -81,11 +82,11 @@ export function createInstallController(
         if (!installed())
           message =
             choice.outcome === 'accepted'
-              ? '已提交安装，请按浏览器提示完成。'
-              : '已取消安装，仍可在浏览器中阅读。';
+              ? t('已提交安装，请按浏览器提示完成。')
+              : t('已取消安装，仍可在浏览器中阅读。');
       } catch {
         if (!installed())
-          message = '当前无法弹出安装窗口，请使用浏览器菜单添加到主屏幕。';
+          message = t('当前无法弹出安装窗口，请使用浏览器菜单添加到主屏幕。');
       } finally {
         pending = false;
         publish();

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { db } from '@/db';
 import type { PreparedBook } from './types';
 
@@ -17,14 +18,14 @@ export function createRestoreStage(
   const ids: string[] = [];
   let disposed = false;
   const active = () => {
-    if (disposed) throw new DOMException('恢复已取消。', 'AbortError');
+    if (disposed) throw new DOMException(t('恢复已取消。'), 'AbortError');
   };
   return {
     ids,
     async put(value: PreparedBook) {
       active();
       if (ids.includes(value.book.id))
-        throw new Error('恢复内容包含重复书籍。');
+        throw new Error(t('恢复内容包含重复书籍。'));
       // The WebKit restore regression lost Blob access after staging cleanup;
       // the minimal native probe did not reproduce the full failure. Store owned
       // bytes and rebuild independent Blobs without async reads in the transaction.
@@ -48,10 +49,10 @@ export function createRestoreStage(
       active();
       const record = await database.blobs.get(prefix + id);
       if (!record || !('prepared' in record))
-        throw new Error('恢复暂存已丢失，请重新选择备份。');
+        throw new Error(t('恢复暂存已丢失，请重新选择备份。'));
       // Only this operation writes this random namespace; values are structured clones.
       const value = record.prepared as StagedBook;
-      if (value.book.id !== id) throw new Error('恢复暂存与书籍不一致。');
+      if (value.book.id !== id) throw new Error(t('恢复暂存与书籍不一致。'));
       return {
         ...value,
         blobs: value.blobs.map((blob) => ({

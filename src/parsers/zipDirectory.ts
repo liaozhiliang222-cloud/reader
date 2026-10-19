@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { ZipLimits } from './zip';
 
 export interface ZipRecord {
@@ -10,13 +11,14 @@ export interface ZipRecord {
   dataStart: number;
   dataEnd: number;
 }
-const corrupt = () => new Error('文件无法解析：ZIP 目录结构不支持或已损坏。');
+const corrupt = () =>
+  new Error(t('文件无法解析：ZIP 目录结构不支持或已损坏。'));
 const utf8 = new TextDecoder('utf-8', { fatal: true });
 export function decodeZipName(bytes: Uint8Array) {
   try {
     return utf8.decode(bytes);
   } catch {
-    throw new Error('ZIP 资源名称不是 UTF-8，请重新打包。');
+    throw new Error(t('ZIP 资源名称不是 UTF-8，请重新打包。'));
   }
 }
 const crcTable = Uint32Array.from({ length: 256 }, (_, value) => {
@@ -82,7 +84,7 @@ function pathName(
     ) ||
     parts.some((part) => !part || part === '..' || part === '.')
   )
-    throw new Error('压缩包包含无效资源路径。');
+    throw new Error(t('压缩包包含无效资源路径。'));
   return name;
 }
 export const zipSourceSize = (source: ArrayBuffer | Blob) =>
@@ -98,7 +100,7 @@ async function slice(source: ArrayBuffer | Blob, start: number, end: number) {
  * Blob input reads only metadata here, never the whole archive. */
 export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
   const size = zipSourceSize(source);
-  if (size > limits.input) throw new Error('压缩包文件过大，请拆分后导入。');
+  if (size > limits.input) throw new Error(t('压缩包文件过大，请拆分后导入。'));
   if (size < 22) throw corrupt();
   const tailStart = Math.max(0, size - 65557);
   const tail = new DataView(await slice(source, tailStart, size));
@@ -113,7 +115,7 @@ export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
     }
   if (end < 0) throw corrupt();
   if (tail.getUint16(end + 4, true) || tail.getUint16(end + 6, true))
-    throw new Error('不支持分卷 ZIP，请合并后导入。');
+    throw new Error(t('不支持分卷 ZIP，请合并后导入。'));
   let count = tail.getUint16(end + 10, true),
     directorySize = tail.getUint32(end + 12, true),
     directoryStart = tail.getUint32(end + 16, true),
@@ -151,10 +153,10 @@ export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
     directoryEnd = at;
   }
   if (count > limits.entries)
-    throw new Error('压缩包文件数量过多，请拆分后导入。');
+    throw new Error(t('压缩包文件数量过多，请拆分后导入。'));
   // Name/comment/extra metadata cannot grow without a separate bound.
   if (directorySize > 32 * 1024 * 1024)
-    throw new Error('ZIP 目录信息过大，请重新打包。');
+    throw new Error(t('ZIP 目录信息过大，请重新打包。'));
   if (
     directoryStart + directorySize !== directoryEnd ||
     count * 46 > directorySize
@@ -185,11 +187,11 @@ export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
     const next = offset + 46 + nameLength + extraLength + commentLength;
     if (next > bytes.length) throw corrupt();
     if (flags & (1 | 0x40 | 0x2000))
-      throw new Error('不支持加密 ZIP，请先解密文件。');
+      throw new Error(t('不支持加密 ZIP，请先解密文件。'));
     if (flags & ~(0x800 | 8 | 6) || (method !== 0 && method !== 8))
-      throw new Error('ZIP 压缩方式不受支持，请使用 STORE 或 DEFLATE。');
+      throw new Error(t('ZIP 压缩方式不受支持，请使用 STORE 或 DEFLATE。'));
     if (((attributes >>> 16) & 0xf000) === 0xa000)
-      throw new Error('ZIP 不支持符号链接资源。');
+      throw new Error(t('ZIP 不支持符号链接资源。'));
     const rawName = bytes.subarray(offset + 46, offset + 46 + nameLength),
       extra = extraFields(
         bytes.subarray(
@@ -199,7 +201,7 @@ export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
       ),
       name = pathName(rawName, flags, extra),
       key = name.replace(/\/$/, '');
-    if (names.has(key)) throw new Error('ZIP 包含重复资源路径。');
+    if (names.has(key)) throw new Error(t('ZIP 包含重复资源路径。'));
     names.add(key);
     let uncompressed = view.getUint32(offset + 24, true),
       compressed = view.getUint32(offset + 20, true),
@@ -224,12 +226,12 @@ export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
       if (!zip64 || extraAt + 4 > zip64.byteLength) throw corrupt();
       disk = zip64.getUint32(extraAt, true);
     }
-    if (disk) throw new Error('不支持分卷 ZIP，请合并后导入。');
+    if (disk) throw new Error(t('不支持分卷 ZIP，请合并后导入。'));
     total += uncompressed;
     if (uncompressed > limits.entry || total > limits.total)
-      throw new Error('解压后的文件过大，请拆分后导入。');
+      throw new Error(t('解压后的文件过大，请拆分后导入。'));
     if (compressed > limits.entry + Math.ceil(limits.entry / 1000) + 65536)
-      throw new Error('ZIP 单条压缩数据过大，请拆分后导入。');
+      throw new Error(t('ZIP 单条压缩数据过大，请拆分后导入。'));
     if (method === 0 && compressed !== uncompressed) throw corrupt();
     if (localAt + 30 > directoryStart) throw corrupt();
     const local = new DataView(await slice(source, localAt, localAt + 30));
@@ -317,6 +319,6 @@ export async function scanZip(source: ArrayBuffer | Blob, limits: ZipLimits) {
   ranges.sort((a, b) => a.start - b.start);
   for (let index = 1; index < ranges.length; index++)
     if (ranges[index]!.start < ranges[index - 1]!.end)
-      throw new Error('ZIP 资源数据区重叠。');
+      throw new Error(t('ZIP 资源数据区重叠。'));
   return records;
 }

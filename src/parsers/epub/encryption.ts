@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { elements, parseXml, resolvePath, type XmlElement } from './xml';
 
 /** 阅读器使用自己的字体；合法字体混淆只需忽略，不解密或使用包内字体。 */
@@ -5,9 +6,9 @@ export function obfuscatedFonts(source: string) {
   const doc = parseXml(source),
     records = elements(doc, 'encrypteddata');
   if (elements(doc, 'encryptedkey').length)
-    throw new Error('该书受版权保护，暂不支持。');
+    throw new Error(t('该书受版权保护，暂不支持。'));
   if (!records.length)
-    throw new Error('书籍加密信息不完整，无法确认是否可读取。');
+    throw new Error(t('书籍加密信息不完整，无法确认是否可读取。'));
   return records.map((record) => {
     const methods = elements(record, 'encryptionmethod'),
       references = elements(record, 'cipherreference');
@@ -17,9 +18,9 @@ export function obfuscatedFonts(source: string) {
       methods[0]!.getAttribute('Algorithm') !==
         'http://www.idpf.org/2008/embedding'
     )
-      throw new Error('该书受版权保护或使用不支持的加密方式，暂不支持。');
+      throw new Error(t('该书受版权保护或使用不支持的加密方式，暂不支持。'));
     const uri = references[0]!.getAttribute('URI') ?? '';
-    if (!uri || uri.includes('#')) throw new Error('字体混淆资源路径无效。');
+    if (!uri || uri.includes('#')) throw new Error(t('字体混淆资源路径无效。'));
     return resolvePath('', uri).path;
   });
 }
@@ -50,5 +51,5 @@ export function validateObfuscatedFonts(
       path === opfPath ||
       !exists(path)
     )
-      throw new Error('字体混淆信息指向了非字体或缺失资源，无法读取。');
+      throw new Error(t('字体混淆信息指向了非字体或缺失资源，无法读取。'));
 }

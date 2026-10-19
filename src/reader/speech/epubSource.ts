@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { XMLSerializer } from '@xmldom/xmldom';
 import { BoundedZip } from '@/parsers/zip';
 import { sanitizeChapter, type SafeNode } from '@/parsers/epub/sanitize';
@@ -44,7 +45,7 @@ export function speechChapterFromXhtml(
       break;
     }
   }
-  if (!marker) throw new Error('本章结构无法安全映射为听书文本。');
+  if (!marker) throw new Error(t('本章结构无法安全映射为听书文本。'));
   const svg = (element: XmlElement): SafeNode[] =>
     sanitizeSvg(element)
       ? [{ tag: 'img', children: [], imageId: 'speech-inline-image' }]
@@ -54,7 +55,7 @@ export function speechChapterFromXhtml(
     original.paragraphs.length !== stored.paragraphs.length ||
     original.paragraphs.some((p, index) => p !== stored.paragraphs[index])
   )
-    throw new Error('书籍原文与阅读位置不一致，听书准备已停止。');
+    throw new Error(t('书籍原文与阅读位置不一致，听书准备已停止。'));
   const document = parseXml(source);
   const mask = (element: XmlElement, excluded = false) => {
     const skip = excluded || excludedTags.has(localName(element));
@@ -75,12 +76,12 @@ export function speechChapterFromXhtml(
     svg,
   );
   if (masked.paragraphs.length !== stored.paragraphs.length)
-    throw new Error('本章结构无法安全映射为听书文本。');
+    throw new Error(t('本章结构无法安全映射为听书文本。'));
   const nodes: SafeNode[] = stored.paragraphs.map(
     (paragraph, paragraphIndex) => {
       const filtered = masked.paragraphs[paragraphIndex]!;
       if (filtered.length !== paragraph.length)
-        throw new Error('本章结构无法安全映射为听书文本。');
+        throw new Error(t('本章结构无法安全映射为听书文本。'));
       const children: SafeNode[] = [];
       let start = 0;
       while (start < paragraph.length) {
@@ -90,7 +91,7 @@ export function speechChapterFromXhtml(
           end++;
         const value = paragraph.slice(start, end);
         if (!skip && filtered.slice(start, end) !== value)
-          throw new Error('本章结构无法安全映射为听书文本。');
+          throw new Error(t('本章结构无法安全映射为听书文本。'));
         children.push(
           skip ? { tag: 'span', speechSkip: true, children: [value] } : value,
         );
@@ -126,7 +127,7 @@ export async function openEpubSpeechSource(
   };
   const container = parseXml(await read('META-INF/container.xml'));
   const root = elements(container, 'rootfile')[0]?.getAttribute('full-path');
-  if (!root) throw new Error('书籍原件缺少章节清单，无法准备听书。');
+  if (!root) throw new Error(t('书籍原件缺少章节清单，无法准备听书。'));
   const opfPath = resolvePath('', root).path;
   const opf = parseXml(await read(opfPath));
   const manifest = new Map(
@@ -134,7 +135,7 @@ export async function openEpubSpeechSource(
   );
   const paths = elements(opf, 'itemref').map((ref) => {
     const item = manifest.get(ref.getAttribute('idref') ?? '');
-    if (!item) throw new Error('书籍章节清单不完整，无法准备听书。');
+    if (!item) throw new Error(t('书籍章节清单不完整，无法准备听书。'));
     return resolvePath(opfPath, item.getAttribute('href') ?? '').path;
   });
   const images = new Map<string, string>();
@@ -157,7 +158,7 @@ export async function openEpubSpeechSource(
   }
   return async (stored: StoredChapter) => {
     const path = paths[stored.index];
-    if (!path) throw new Error('书籍原件缺少对应章节，无法准备听书。');
+    if (!path) throw new Error(t('书籍原件缺少对应章节，无法准备听书。'));
     return speechChapterFromXhtml(
       await read(path),
       path,

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { BoundedZip } from './zip';
 const limits = {
   input: 50 * 1024 * 1024,
@@ -8,7 +9,7 @@ const limits = {
 export async function archiveList(source: Blob) {
   const zip = await BoundedZip.load(source, limits);
   if (zip.has('META-INF/container.xml') || zip.has('mimetype'))
-    throw new Error('这是 EPUB 容器，请使用 .epub 扩展名导入。');
+    throw new Error(t('这是 EPUB 容器，请使用 .epub 扩展名导入。'));
   return zip
     .paths()
     .filter(
@@ -20,6 +21,6 @@ export async function archiveList(source: Blob) {
 }
 export async function archiveRead(source: Blob, path: string) {
   if (!(await archiveList(source)).some((entry) => entry.path === path))
-    throw new Error('请选择压缩包内支持的书籍，暂不递归解包。');
+    throw new Error(t('请选择压缩包内支持的书籍，暂不递归解包。'));
   return (await BoundedZip.load(source, limits)).read(path);
 }

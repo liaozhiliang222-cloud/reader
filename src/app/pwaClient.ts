@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 export interface PwaState {
   available: boolean;
   offlineReady: boolean;
@@ -49,8 +50,8 @@ export function createPwaClient(
     } else if (worker.state === 'redundant') {
       publish({
         error: container.controller
-          ? '新版本资源尚未下载完整，稍后会再检查。'
-          : '离线资源下载未完成，请联网重新打开微光阅读。',
+          ? t('新版本资源尚未下载完整，稍后会再检查。')
+          : t('离线资源下载未完成，请联网重新打开微光阅读。'),
       });
     }
   };
@@ -67,7 +68,7 @@ export function createPwaClient(
       clearTimeout(activationTimer);
       publish({ applying: false, available: false });
       if (environment.shelf()) environment.reload();
-      else publish({ error: '新版本已启用，下次打开应用即可使用。' });
+      else publish({ error: t('新版本已启用，下次打开应用即可使用。') });
     } else {
       // A different tab can activate a version without interrupting this tab.
       publish({ offlineReady: true, available: false });
@@ -88,7 +89,7 @@ export function createPwaClient(
       await registration.update();
       if (registration.waiting) publish({ available: true });
     } catch {
-      publish({ error: '暂时无法检查更新，已下载的应用仍可离线使用。' });
+      publish({ error: t('暂时无法检查更新，已下载的应用仍可离线使用。') });
     } finally {
       publish({ checking: false });
     }
@@ -117,7 +118,7 @@ export function createPwaClient(
         })
         .catch(() => {
           starting = undefined;
-          publish({ error: '离线资源尚未就绪，请联网重新打开微光阅读。' });
+          publish({ error: t('离线资源尚未就绪，请联网重新打开微光阅读。') });
         });
       await starting;
     },
@@ -127,7 +128,7 @@ export function createPwaClient(
         return;
       publish({ applying: true, error: '' });
       activationTimer = setTimeout(() => {
-        publish({ applying: false, error: '更新暂未完成，请稍后再试。' });
+        publish({ applying: false, error: t('更新暂未完成，请稍后再试。') });
       }, 15_000);
       registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     },

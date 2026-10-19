@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { ArchivePicker } from '@/components/ArchivePicker';
 import { useEffect, useState } from 'preact/hooks';
 import { incomingStore, incomingChanged } from '@/app/incoming';
@@ -15,11 +16,11 @@ export function IncomingPage({ id }: { id?: string }) {
   const [busy, setBusy] = useState(!!id && validIncomingId(id));
   const [error, setError] = useState(
     id === 'error-size'
-      ? '这次分享超过大小限制，请分批分享；单本书最多 50 MB。'
+      ? t('这次分享超过大小限制，请分批分享；单本书最多 50 MB。')
       : id === 'error-storage'
-        ? '无法暂存分享，请先打开微光阅读并检查本地存储，再重新分享。'
+        ? t('无法暂存分享，请先打开微光阅读并检查本地存储，再重新分享。')
         : id?.startsWith('error')
-          ? '没有收到可用文件或文字，请重新分享，或从书架选择文件导入。'
+          ? t('没有收到可用文件或文字，请重新分享，或从书架选择文件导入。')
           : '',
   );
   const [attempt, setAttempt] = useState(0);
@@ -50,7 +51,7 @@ export function IncomingPage({ id }: { id?: string }) {
           setError(
             cause instanceof Error
               ? cause.message
-              : '无法读取分享，请重新导入。',
+              : t('无法读取分享，请重新导入。'),
           );
       })
       .finally(() => {
@@ -70,7 +71,7 @@ export function IncomingPage({ id }: { id?: string }) {
       }
       navigate('#/');
     } catch {
-      setError('无法清理分享暂存，请稍后重试。');
+      setError(t('无法清理分享暂存，请稍后重试。'));
     }
   };
   if (archive)
@@ -87,26 +88,36 @@ export function IncomingPage({ id }: { id?: string }) {
   return (
     <main class="paste-page">
       <header class="panel-heading">
-        <h1>接收分享</h1>
+        <h1>{t('接收分享')}</h1>
         <button disabled={busy} onClick={() => navigate('#/')}>
-          返回书架
+          {t('返回书架')}
         </button>
       </header>
       {busy ? (
         <BookLoading
-          title="正在导入书籍"
+          title={t('正在导入书籍')}
           fileName={items.find((item) => item.status === 'parsing')?.name}
           detail={
             items.length
-              ? `正在解析 · 第 ${Math.min(items.filter((item) => item.status !== 'waiting' && item.status !== 'parsing').length + 1, items.length)} / ${items.length} 本`
-              : '正在准备分享文件…'
+              ? t(
+                  '正在解析 · 第 {0} / {1} 本',
+                  Math.min(
+                    items.filter(
+                      (item) =>
+                        item.status !== 'waiting' && item.status !== 'parsing',
+                    ).length + 1,
+                    items.length,
+                  ),
+                  items.length,
+                )
+              : t('正在准备分享文件…')
           }
         />
       ) : (
         <p role="status">
           {!id
-            ? '等待系统发送文件，也可以从书架选择文件导入。'
-            : '分享内容只在本机处理。'}
+            ? t('等待系统发送文件，也可以从书架选择文件导入。')
+            : t('分享内容只在本机处理。')}
         </p>
       )}
       {data?.files
@@ -117,7 +128,7 @@ export function IncomingPage({ id }: { id?: string }) {
         )
         .map((file) => (
           <button key={file.name} onClick={() => setArchive(file)}>
-            选择 {file.name} 中的书籍
+            {t('选择 {0} 中的书籍', file.name)}
           </button>
         ))}
       {!!items.length && (
@@ -127,12 +138,12 @@ export function IncomingPage({ id }: { id?: string }) {
               <strong>{item.name}</strong>
               <span>
                 {item.status === 'success'
-                  ? '导入成功'
+                  ? t('导入成功')
                   : item.status === 'duplicate'
-                    ? '已在书架，原进度已保留'
+                    ? t('已在书架，原进度已保留')
                     : item.status === 'error'
-                      ? '导入失败'
-                      : '正在导入'}
+                      ? t('导入失败')
+                      : t('正在导入')}
               </span>
               {item.error && <p role="alert">{item.error}</p>}
               {item.book && !busy && (
@@ -141,7 +152,7 @@ export function IncomingPage({ id }: { id?: string }) {
                     navigate('#/read/' + encodeURIComponent(item.book!.id))
                   }
                 >
-                  阅读《{item.book.title}》
+                  {t('阅读《{0}》', item.book.title)}
                 </button>
               )}
             </li>
@@ -153,15 +164,15 @@ export function IncomingPage({ id }: { id?: string }) {
       ))}
       {data?.text && !busy && (
         <button onClick={() => navigate('#/paste-share/' + id)}>
-          检查分享文字
+          {t('检查分享文字')}
         </button>
       )}
       {!!data?.files.length && !busy && (
-        <p>未导入文件已留在本机，返回书架后可重新处理。</p>
+        <p>{t('未导入文件已留在本机，返回书架后可重新处理。')}</p>
       )}
       {!!data?.files.length && !busy && (
         <button onClick={() => setAttempt((value) => value + 1)}>
-          重试未导入文件
+          {t('重试未导入文件')}
         </button>
       )}
       {id &&
@@ -169,7 +180,9 @@ export function IncomingPage({ id }: { id?: string }) {
         !busy &&
         (!!(data?.files.length || data?.text || data?.errors.length) ||
           error) && (
-          <button onClick={() => void discard()}>放弃这份待导入分享</button>
+          <button onClick={() => void discard()}>
+            {t('放弃这份待导入分享')}
+          </button>
         )}
       {error && <p role="alert">{error}</p>}
     </main>

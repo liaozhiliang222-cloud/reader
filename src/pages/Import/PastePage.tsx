@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useState } from 'preact/hooks';
 import { getBook, getDraft, countAnnotations } from '@/db/repository';
 import { importDraft } from '@/parsers/importDraft';
@@ -34,13 +35,13 @@ export function PastePage({
           if (!cancelled) {
             setText(data.text);
             setTitle(data.title);
-            setHint('已收到分享文字，请检查正文。链接只作为文字保留。');
+            setHint(t('已收到分享文字，请检查正文。链接只作为文字保留。'));
           }
         })
         .catch((cause) => {
           if (!cancelled)
             setError(
-              cause instanceof Error ? cause.message : '无法读取分享文字。',
+              cause instanceof Error ? cause.message : t('无法读取分享文字。'),
             );
         })
         .finally(() => {
@@ -51,7 +52,7 @@ export function PastePage({
       void (async () => {
         const book = await getBook(bookId);
         if (!book || book.type !== 'paste')
-          throw new Error('这本文稿已不存在。');
+          throw new Error(t('这本文稿已不存在。'));
         const [source, annotations] = await Promise.all([
           getDraft(book),
           countAnnotations(bookId),
@@ -67,7 +68,9 @@ export function PastePage({
       })()
         .catch((cause) => {
           if (!cancelled)
-            setError(cause instanceof Error ? cause.message : '无法读取文稿。');
+            setError(
+              cause instanceof Error ? cause.message : t('无法读取文稿。'),
+            );
         })
         .finally(() => {
           if (!cancelled) setLoading(false);
@@ -82,10 +85,10 @@ export function PastePage({
       const value = await navigator.clipboard.readText();
       if (value) {
         setText(value);
-        setHint('已读取剪贴板，请检查正文。');
-      } else setHint('剪贴板为空，请在正文框中长按粘贴。');
+        setHint(t('已读取剪贴板，请检查正文。'));
+      } else setHint(t('剪贴板为空，请在正文框中长按粘贴。'));
     } catch {
-      setHint('无法读取剪贴板，请在正文框中长按粘贴，或按 Ctrl / ⌘ + V。');
+      setHint(t('无法读取剪贴板，请在正文框中长按粘贴，或按 Ctrl / ⌘ + V。'));
     }
   };
   const save = async () => {
@@ -104,16 +107,16 @@ export function PastePage({
           else await store.remove(incomingId);
           incomingChanged();
         } catch {
-          setHint('文稿已保存，分享暂存未能清理，可在书架继续处理。');
+          setHint(t('文稿已保存，分享暂存未能清理，可在书架继续处理。'));
         }
       }
       if (result.duplicate) {
         setDuplicate(result.book.id);
-        setHint('相同正文的文稿已在书架，原有阅读进度已保留。');
+        setHint(t('相同正文的文稿已在书架，原有阅读进度已保留。'));
       } else navigate('#/read/' + encodeURIComponent(result.book.id));
     } catch (cause) {
       setError(
-        cause instanceof Error ? cause.message : '文稿保存失败，请重试。',
+        cause instanceof Error ? cause.message : t('文稿保存失败，请重试。'),
       );
     } finally {
       setBusy(false);
@@ -133,12 +136,12 @@ export function PastePage({
     <main class="paste-page">
       <header class="panel-heading">
         <button disabled={busy} onClick={() => navigate('#/')}>
-          返回书架
+          {t('返回书架')}
         </button>
-        <h1>{bookId ? '编辑文稿' : '粘贴长文'}</h1>
+        <h1>{bookId ? t('编辑文稿') : t('粘贴长文')}</h1>
       </header>
       {loading ? (
-        <p role="status">正在读取文稿…</p>
+        <p role="status">{t('正在读取文稿…')}</p>
       ) : (
         <form
           onSubmit={(event) => {
@@ -147,17 +150,17 @@ export function PastePage({
           }}
         >
           <label>
-            标题（选填）
+            {t('标题（选填）')}
             <input
               value={title}
               maxLength={200}
               onInput={(event) => setTitle(event.currentTarget.value)}
               disabled={busy}
-              placeholder="留空时使用正文第一行"
+              placeholder={t('留空时使用正文第一行')}
             />
           </label>
           <fieldset class="segmented" disabled={busy}>
-            <legend>正文格式</legend>
+            <legend>{t('正文格式')}</legend>
             <div class="segmented-options">
               <label>
                 <input
@@ -167,7 +170,7 @@ export function PastePage({
                   checked={format === 'plain'}
                   onChange={() => setFormat('plain')}
                 />
-                纯文本
+                {t('纯文本')}
               </label>
               <label>
                 <input
@@ -182,13 +185,13 @@ export function PastePage({
             </div>
           </fieldset>
           <div class="panel-heading">
-            <label for="draft-text">正文</label>
+            <label for="draft-text">{t('正文')}</label>
             <button
               type="button"
               disabled={busy}
               onClick={() => void readClipboard()}
             >
-              从剪贴板读取
+              {t('从剪贴板读取')}
             </button>
           </div>
           <textarea
@@ -201,24 +204,24 @@ export function PastePage({
             }}
             disabled={busy}
             required
-            placeholder="在这里粘贴正文。使用 # 标题可划分章节。"
+            placeholder={t('在这里粘贴正文。使用 # 标题可划分章节。')}
             spellcheck={false}
           />
           <p class="muted">
-            原文只保存在本机。
+            {t('原文只保存在本机。')}
             {format === 'markdown'
-              ? '支持标题、列表、表格和代码；图片显示说明，公式保留源码。'
+              ? t('支持标题、列表、表格和代码；图片显示说明，公式保留源码。')
               : ''}
             {bookId
-              ? '修改正文后会从文稿开头重新阅读。'
-              : '留空标题自动取首行，# 标题转为章节。'}
+              ? t('修改正文后会从文稿开头重新阅读。')
+              : t('留空标题自动取首行，# 标题转为章节。')}
           </p>
           <button
             class="primary-action"
             disabled={busy || !text.trim()}
             type="submit"
           >
-            {busy ? '正在保存…' : bookId ? '保存并阅读' : '开始阅读'}
+            {busy ? t('正在保存…') : bookId ? t('保存并阅读') : t('开始阅读')}
           </button>
         </form>
       )}
@@ -227,29 +230,31 @@ export function PastePage({
         <button
           onClick={() => navigate('#/read/' + encodeURIComponent(duplicate))}
         >
-          继续阅读已有文稿
+          {t('继续阅读已有文稿')}
         </button>
       )}
       {error && <p role="alert">{error}</p>}
       {confirm && (
         <Modal
-          title="确认修改文稿"
+          title={t('确认修改文稿')}
           onDismiss={() => {
             if (!busy) setConfirm(false);
           }}
         >
-          <h2>修改正文</h2>
+          <h2>{t('修改正文')}</h2>
           <p>
-            正文位置会变化，保存后将重置阅读进度，并移除这本文稿的{' '}
-            {counts.bookmarks} 个书签和 {counts.highlights}{' '}
-            条划线笔记。取消可保留原文稿及标注。
+            {t(
+              '正文位置会变化，保存后将重置阅读进度，并移除这本文稿的 {0} 个书签和 {1} 条划线笔记。取消可保留原文稿及标注。',
+              counts.bookmarks,
+              counts.highlights,
+            )}
           </p>
           <div class="panel-actions">
             <button disabled={busy} onClick={() => setConfirm(false)}>
-              取消
+              {t('取消')}
             </button>
             <button disabled={busy} onClick={() => void save()}>
-              确认保存
+              {t('确认保存')}
             </button>
           </div>
         </Modal>

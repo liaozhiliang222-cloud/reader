@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { incomingData, incomingLimit } from '../app/incomingData';
 import { createIncomingStore } from '../db/incoming';
 
@@ -43,15 +44,15 @@ export async function readSharedForm(
       .startsWith('multipart/form-data') ||
     !request.body
   )
-    throw new TypeError('分享格式无效。');
+    throw new TypeError(t('分享格式无效。'));
   if (Number(request.headers.get('Content-Length')) > limit)
-    throw new RangeError('分享内容过大。');
+    throw new RangeError(t('分享内容过大。'));
   let size = 0;
   const body = request.body.pipeThrough(
     new TransformStream<Uint8Array, Uint8Array>({
       transform(chunk, controller) {
         size += chunk.byteLength;
-        if (size > limit) throw new RangeError('分享内容过大。');
+        if (size > limit) throw new RangeError(t('分享内容过大。'));
         controller.enqueue(chunk);
       },
     }),

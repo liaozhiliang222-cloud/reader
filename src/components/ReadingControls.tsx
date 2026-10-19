@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useId } from 'preact/hooks';
 import type { ReadingSettings } from '@/types';
 import { lightTheme } from '@/app/themePreference';
@@ -64,22 +65,22 @@ export function ReadingControls({
     onChange({ fontSize: Math.max(sizes.min, Math.min(sizes.max, size)) });
   return (
     <div class="reading-controls">
-      <div class="font-size-row" role="group" aria-label="字号">
-        <span class="control-label">字号</span>
+      <div class="font-size-row" role="group" aria-label={t('字号')}>
+        <span class="control-label">{t('字号')}</span>
         <button
           class="stepper"
-          aria-label="减小字号"
+          aria-label={t('减小字号')}
           disabled={value.fontSize <= sizes.min}
           onClick={() => setSize(value.fontSize - 1)}
         >
           A−
         </button>
-        <output aria-live="polite" aria-label="当前字号">
+        <output aria-live="polite" aria-label={t('当前字号')}>
           {value.fontSize}
         </output>
         <button
           class="stepper stepper-large"
-          aria-label="增大字号"
+          aria-label={t('增大字号')}
           disabled={value.fontSize >= sizes.max}
           onClick={() => setSize(value.fontSize + 1)}
         >
@@ -87,7 +88,7 @@ export function ReadingControls({
         </button>
       </div>
       <fieldset class="theme-swatches">
-        <legend>{followSystemTheme ? '浅色主题' : '主题'}</legend>
+        <legend>{followSystemTheme ? t('浅色主题') : t('主题')}</legend>
         <div class="segmented-options">
           {themes
             .filter((theme) => !followSystemTheme || theme.value !== 'night')
@@ -101,31 +102,35 @@ export function ReadingControls({
                   onChange={() => onChange({ theme: theme.value })}
                 />
                 <span class="swatch" aria-hidden="true" />
-                <span>{theme.label}</span>
+                <span>{t(theme.label)}</span>
               </label>
             ))}
         </div>
       </fieldset>
       {followSystemTheme && (
-        <p class="tap-mode-help">已跟随系统深色；系统浅色时使用所选纸张。</p>
+        <p class="tap-mode-help">
+          {t('已跟随系统深色；系统浅色时使用所选纸张。')}
+        </p>
       )}
       <Segmented
-        legend="字体"
+        legend={t('字体')}
         value={value.fontFamily}
         onChange={(fontFamily) => onChange({ fontFamily })}
         options={[
-          { value: 'serif', label: '衬线' },
-          { value: 'sans', label: '无衬线' },
+          { value: 'serif', label: t('衬线') },
+          { value: 'sans', label: t('无衬线') },
           {
             value: 'wenkai',
             label:
-              fontState.value.phase === 'ready' ? '文楷' : '文楷（需下载）',
+              fontState.value.phase === 'ready'
+                ? t('文楷')
+                : t('文楷（需下载）'),
             disabled: fontState.value.phase !== 'ready',
           },
         ]}
       />
       <Segmented
-        legend="行距"
+        legend={t('行距')}
         value={value.lineHeight}
         onChange={(lineHeight) => onChange({ lineHeight })}
         options={[1.4, 1.6, 1.8, 2, 2.2].map((n) => ({
@@ -134,87 +139,91 @@ export function ReadingControls({
         }))}
       />
       <Segmented
-        legend="段距"
+        legend={t('段距')}
         value={value.paragraphSpacing}
         onChange={(paragraphSpacing) => onChange({ paragraphSpacing })}
         options={[
-          { value: 0, label: '无' },
-          { value: 0.5, label: '小' },
-          { value: 1, label: '大' },
+          { value: 0, label: t('无') },
+          { value: 0.5, label: t('小') },
+          { value: 1, label: t('大') },
         ]}
       />
       <Segmented
-        legend="页边距"
+        legend={t('页边距')}
         value={value.margin}
         onChange={(margin) => onChange({ margin })}
         options={[
-          { value: 'narrow', label: '窄' },
-          { value: 'medium', label: '中' },
-          { value: 'wide', label: '宽' },
+          { value: 'narrow', label: t('窄') },
+          { value: 'medium', label: t('中') },
+          { value: 'wide', label: t('宽') },
         ]}
       />
       <Segmented
-        legend="对齐"
+        legend={t('对齐')}
         value={value.align}
         onChange={(align) => onChange({ align })}
         options={[
-          { value: 'justify', label: '两端对齐' },
-          { value: 'left', label: '左对齐' },
+          { value: 'justify', label: t('两端对齐') },
+          { value: 'left', label: t('左对齐') },
         ]}
       />
       <Segmented
-        legend="翻页动效"
+        legend={t('翻页动效')}
         value={value.pageAnimation}
         onChange={(pageAnimation) => onChange({ pageAnimation })}
         options={[
-          { value: 'none', label: '无' },
-          { value: 'fade', label: '淡入' },
-          { value: 'slide', label: '平移' },
+          { value: 'none', label: t('无') },
+          { value: 'fade', label: t('淡入') },
+          { value: 'slide', label: t('平移') },
         ]}
       />
       <Segmented
-        legend="点按模式"
+        legend={t('点按模式')}
         value={value.tapMode}
         onChange={(tapMode) => onChange({ tapMode })}
         options={[
-          { value: 'normal', label: '左右翻页' },
-          { value: 'oneHand', label: '单手模式' },
+          { value: 'normal', label: t('左右翻页') },
+          { value: 'oneHand', label: t('单手模式') },
         ]}
       />
       {value.tapMode === 'oneHand' && (
         <p class="tap-mode-help">
-          两侧点按下一页，左上角返回上一页，中间打开菜单；滑动方向保持不变。
+          {t(
+            '两侧点按下一页，左上角返回上一页，中间打开菜单；滑动方向保持不变。',
+          )}
         </p>
       )}
       {isAndroidApp && (
         <Segmented
-          legend="音量键翻页"
+          legend={t('音量键翻页')}
           value={value.volumeKeys ? 'on' : 'off'}
           onChange={(v) => onChange({ volumeKeys: v === 'on' })}
           options={[
-            { value: 'off', label: '关' },
-            { value: 'on', label: '开' },
+            { value: 'off', label: t('关') },
+            { value: 'on', label: t('开') },
           ]}
         />
       )}
       {isAndroidApp && value.volumeKeys && (
         <p class="tap-mode-help">
-          阅读页中音量下键下一页、上键上一页；菜单和浮层打开时音量键照常调节音量。
+          {t(
+            '阅读页中音量下键下一页、上键上一页；菜单和浮层打开时音量键照常调节音量。',
+          )}
         </p>
       )}
       <Segmented
-        legend="阅读时常亮"
+        legend={t('阅读时常亮')}
         value={value.wakeLock}
         onChange={(wakeLock) => onChange({ wakeLock })}
         options={[
-          { value: 'off', label: '关' },
-          { value: 'idle5m', label: '5 分钟无操作' },
-          { value: 'always', label: '始终' },
+          { value: 'off', label: t('关') },
+          { value: 'idle5m', label: t('5 分钟无操作') },
+          { value: 'always', label: t('始终') },
         ]}
       />
       <div class="toggle-rows">
         <label>
-          首行缩进
+          {t('首行缩进')}
           <input
             type="checkbox"
             checked={value.indent}
@@ -222,7 +231,7 @@ export function ReadingControls({
           />
         </label>
         <label>
-          页眉与页码
+          {t('页眉与页码')}
           <input
             type="checkbox"
             checked={value.showHeaderFooter}
@@ -232,7 +241,7 @@ export function ReadingControls({
           />
         </label>
         <label>
-          纸张纹理
+          {t('纸张纹理')}
           <input
             type="checkbox"
             checked={value.texture}

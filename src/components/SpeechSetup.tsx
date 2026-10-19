@@ -1,3 +1,4 @@
+import { t, uiLanguage } from '@/i18n';
 import { canUsePro } from '@/app/pro';
 import { ProPanel } from './ProPanel';
 import { isIosApp } from '@/app/platform';
@@ -26,12 +27,16 @@ export function SpeechSetup({
       setList(value);
       setVoice(
         value.voices.find((v) => v.id === value.savedVoice)?.id ??
-          value.voices.find((v) => v.language.startsWith('zh'))?.id ??
+          value.voices.find((v) =>
+            v.language
+              .toLowerCase()
+              .startsWith(uiLanguage.peek() === 'en' ? 'en' : 'zh'),
+          )?.id ??
           value.voices[0]?.id ??
           '',
       );
     } catch {
-      setError('无法读取系统语音，请检查离线语音数据后重试。');
+      setError(t('无法读取系统语音，请检查离线语音数据后重试。'));
     } finally {
       setBusy(false);
     }
@@ -41,21 +46,25 @@ export function SpeechSetup({
   }, []);
   if (isIosApp && !canUsePro()) return <ProPanel onClose={onClose} />;
   return (
-    <Modal title="本地听书" onDismiss={onClose}>
-      <h2>本地听书</h2>
+    <Modal title={t('本地听书')} onDismiss={onClose}>
+      <h2>{t('本地听书')}</h2>
       <p>
         {isIosApp
-          ? '请先在系统设置中下载声音，并关闭网络试读，确认所选声音可离线使用。'
-          : '正文交给系统语音引擎处理。只使用已安装、标记为无需联网的语音；引擎是独立应用，可能拥有联网权限。'}
+          ? t(
+              '请先在系统设置中下载声音，并关闭网络试读，确认所选声音可离线使用。',
+            )
+          : t(
+              '正文交给系统语音引擎处理。只使用已安装、标记为无需联网的语音；引擎是独立应用，可能拥有联网权限。',
+            )}
       </p>
       {busy ? (
-        <BookLoading title="正在检查离线语音" />
+        <BookLoading title={t('正在检查离线语音')} />
       ) : (
         <>
           {list && (
             <>
               <label class="speech-field">
-                语音引擎
+                {t('语音引擎')}
                 <select
                   value={list.engine}
                   onChange={(e) => void load(e.currentTarget.value)}
@@ -68,7 +77,7 @@ export function SpeechSetup({
                 </select>
               </label>
               <label class="speech-field">
-                离线语音
+                {t('离线语音')}
                 <select
                   value={voice}
                   disabled={!list.voices.length}
@@ -83,7 +92,9 @@ export function SpeechSetup({
               </label>
               {!list.voices.length && (
                 <p role="status">
-                  此引擎没有已安装的离线语音。可切换引擎，或在系统设置中安装语音数据。
+                  {t(
+                    '此引擎没有已安装的离线语音。可切换引擎，或在系统设置中安装语音数据。',
+                  )}
                 </p>
               )}
             </>
@@ -93,20 +104,22 @@ export function SpeechSetup({
             <button
               onClick={() =>
                 void openSpeechSettings().catch(() =>
-                  setError('请手动打开系统设置中的文字转语音。'),
+                  setError(t('请手动打开系统设置中的文字转语音。')),
                 )
               }
             >
-              系统语音设置
+              {t('系统语音设置')}
             </button>
-            <button onClick={() => void load(list?.engine)}>重新检查</button>
+            <button onClick={() => void load(list?.engine)}>
+              {t('重新检查')}
+            </button>
             <button
               disabled={!list || !voice}
               onClick={() => {
                 if (list) onStart(list.engine, voice);
               }}
             >
-              从本页听
+              {t('从本页听')}
             </button>
           </div>
         </>

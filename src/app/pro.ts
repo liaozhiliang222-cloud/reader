@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { signal } from '@preact/signals';
 import { registerPlugin } from '@capacitor/core';
 import { isIosApp } from './platform';
@@ -18,7 +19,7 @@ export function readProState(value: unknown): ProState {
     Reflect.get(value, 'protocolVersion') !== 1 ||
     Reflect.get(value, 'productId') !== PRO_PRODUCT_ID
   )
-    throw new Error('购买状态无效，请重试。');
+    throw new Error(t('购买状态无效，请重试。'));
   const status: unknown = Reflect.get(value, 'status');
   const isPro: unknown = Reflect.get(value, 'isPro');
   const price: unknown = Reflect.get(value, 'price');
@@ -37,7 +38,7 @@ export function readProState(value: unknown): ProState {
     (price !== undefined && typeof price !== 'string') ||
     typeof message !== 'string'
   )
-    throw new Error('购买状态无效，请重试。');
+    throw new Error(t('购买状态无效，请重试。'));
   return { status: status as ProStatus, isPro, price, message };
 }
 interface Bridge {
@@ -65,7 +66,7 @@ export async function proRequest(
   } catch (error) {
     proState.value = {
       ...proState.value,
-      message: error instanceof Error ? error.message : '购买服务暂不可用。',
+      message: error instanceof Error ? error.message : t('购买服务暂不可用。'),
     };
   }
 }

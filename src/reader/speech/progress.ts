@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import type { Progress } from '@/types';
 import {
   validIdentity,
@@ -46,7 +47,7 @@ export function claimSpeechProgress(
     !/^[a-zA-Z0-9_-]{1,96}$/.test(leaseId) ||
     (baseline !== null && baseline.bookId !== identity.bookId)
   )
-    throw new Error('听书进度会话无效。');
+    throw new Error(t('听书进度会话无效。'));
   return {
     leaseId,
     sessionId: identity.sessionId,

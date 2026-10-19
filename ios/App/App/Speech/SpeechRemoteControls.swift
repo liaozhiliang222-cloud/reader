@@ -9,7 +9,7 @@ final class SpeechRemoteControls {
         case play, pause, stop, previous, next
     }
 
-    var title = "微光阅读听书"
+    var title = ReaderLanguage.text("微光阅读听书", "LumiRead Audio")
     private var tokens: [(MPRemoteCommand, Any)] = []
     private var registered = false
     var onCommand: ((Command) -> Void)?

@@ -64,15 +64,15 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func speech(_ call: CAPPluginCall) {
         guard let action = call.getString("action"), let args = call.getObject("args") else {
-            call.reject("听书参数无效"); return
+            call.reject(ReaderLanguage.text("听书参数无效", "Invalid listening parameters")); return
         }
         if ["start", "control"].contains(action), (action == "start" || args["action"] as? String == "resume"), !ProStore.shared.hasVerifiedEntitlement {
-            call.reject("请先解锁 Pro 本地听书。"); return
+            call.reject(ReaderLanguage.text("请先解锁 Pro 本地听书。", "Unlock Pro to use local listening.")); return
         }
         if ["voices", "state"].contains(action) {
             controller.run({
                 if action == "voices" {
-                    call.resolve(["engine": "ios", "engines": [["id": "ios", "label": "iOS 系统语音"]],
+                    call.resolve(["engine": "ios", "engines": [["id": "ios", "label": ReaderLanguage.text("iOS 系统语音", "iOS system voices")]],
                                   "voices": self.controller.voiceList(), "engineInternetPermission": false,
                                   "savedVoice": UserDefaults.standard.string(forKey: "jingye.speech.voice") ?? NSNull()])
                 } else { call.resolve(["snapshot": (self.pending as Any?) ?? NSNull(), "active": self.active]) }
@@ -101,7 +101,7 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
                       lease.range(of: "^[a-zA-Z0-9_-]{1,96}$", options: .regularExpression) != nil,
                       let voice = args["voice"] as? String else { throw SpeechQueueStore.StoreError.malformed }
                 self.leaseId = lease
-                self.controller.setTitle(args["title"] as? String ?? "微光阅读")
+                self.controller.setTitle(args["title"] as? String ?? ReaderLanguage.text("微光阅读", "LumiRead"))
                 try self.controller.setVoice(voice)
                 UserDefaults.standard.set(voice, forKey: "jingye.speech.voice")
                 try self.controller.setRate(args["rate"] as? Double ?? 1)

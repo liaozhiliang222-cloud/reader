@@ -7,8 +7,10 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLSchemes</key><array><string>jingye</string></array></dict></array>
+	<key>CFBundleLocalizations</key>
+    <array><string>en</string><string>zh-Hans</string></array>
 	<key>CFBundleDisplayName</key>
-        <string>微光阅读</string>
+        <string>LumiRead</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -77,7 +79,7 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>电子书</string>
+			<string>E-book</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>

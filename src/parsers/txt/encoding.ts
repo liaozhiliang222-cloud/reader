@@ -47,7 +47,7 @@ export function decodeText(buffer: ArrayBuffer): DecodedText {
   // UTF-32LE 的标记以 UTF-16LE 开头，必须先排除。
   if (startsWith(0xff, 0xfe, 0, 0) || startsWith(0, 0, 0xfe, 0xff)) {
     throw new TextDecodingError(
-      '暂不支持 UTF-32，请将文件转换为 UTF-8 后导入。',
+      t('暂不支持 UTF-32，请将文件转换为 UTF-8 后导入。'),
     );
   }
 
@@ -65,7 +65,7 @@ export function decodeText(buffer: ArrayBuffer): DecodedText {
     } catch {
       // 有明确标记却损坏时不能换编码掩盖错误。
       throw new TextDecodingError(
-        `文件标记为 ${bomEncoding}，但内容损坏或不完整。`,
+        t('文件标记为 {0}，但内容损坏或不完整。', bomEncoding),
       );
     }
   }
@@ -87,6 +87,7 @@ export function decodeText(buffer: ArrayBuffer): DecodedText {
     }
   }
   throw new TextDecodingError(
-    '无法识别文本编码，文件可能损坏，请转换为 UTF-8 后重试。',
+    t('无法识别文本编码，文件可能损坏，请转换为 UTF-8 后重试。'),
   );
 }
+import { t } from '@/i18n';

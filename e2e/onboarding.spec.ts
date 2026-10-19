@@ -262,7 +262,10 @@ test('GUIDE-03：受控安装事件仅可信点击触发，取消与确认状态
     });
     window.dispatchEvent(event);
   });
-  const install = page.getByRole('button', { name: '安装微光阅读', exact: true });
+  const install = page.getByRole('button', {
+    name: '安装微光阅读',
+    exact: true,
+  });
   await expect(install).toBeVisible();
   expect(
     await page.evaluate(() => Reflect.get(window, 'installTestCalls')),

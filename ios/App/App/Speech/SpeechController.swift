@@ -14,11 +14,11 @@ final class SpeechController: NSObject {
 
         var errorDescription: String? {
             switch self {
-            case .noSession: return "听书会话不存在"
-            case .notReady: return "听书文本尚未准备完成"
-            case .voiceUnavailable: return "所选语音不可用，请重新选择"
-            case .badIndex: return "听书位置超出范围"
-            case .duplicateCommand: return "重复的听书命令"
+            case .noSession: return ReaderLanguage.text("听书会话不存在", "The listening session does not exist")
+            case .notReady: return ReaderLanguage.text("听书文本尚未准备完成", "Listening text is not ready")
+            case .voiceUnavailable: return ReaderLanguage.text("所选语音不可用，请重新选择", "The selected voice is unavailable. Choose another voice")
+            case .badIndex: return ReaderLanguage.text("听书位置超出范围", "Listening position is out of range")
+            case .duplicateCommand: return ReaderLanguage.text("重复的听书命令", "Duplicate listening command")
             }
         }
     }

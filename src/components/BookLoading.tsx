@@ -1,6 +1,7 @@
+import { t } from '@/i18n';
 export function BookLoading({
   title,
-  detail = '文字只在本机处理。',
+  detail = t('文字只在本机处理。'),
   fileName,
 }: {
   title: string;

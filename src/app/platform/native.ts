@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { registerPlugin } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { navigate, parseRoute, noteLinkRoute } from '@/app/router';
@@ -8,6 +9,7 @@ import { incomingData, incomingForm, incomingLimit } from '@/app/incomingData';
 import type { ScreenLock } from '@/reader/WakeLock';
 
 interface JyNativePlugin {
+  setLanguage(options: { language: 'zh-Hans' | 'en' }): Promise<void>;
   pickFiles(): Promise<IncomingPayload>;
   releaseImport(options: { uri: string }): Promise<void>;
   pickSaveTarget(options: {
@@ -67,6 +69,8 @@ type ImportProgress = (progress: NativeImportProgress | undefined) => void;
 
 const Jy = registerPlugin<JyNativePlugin>('JyNative');
 const FileBridge = isIosApp ? registerPlugin<JyNativePlugin>('JyReader') : Jy;
+export const setLanguage = (language: 'zh-Hans' | 'en') =>
+  isIosApp ? FileBridge.setLanguage({ language }) : Promise.resolve();
 export async function pickIncoming() {
   return payloadToIncoming(await FileBridge.pickFiles());
 }
@@ -105,7 +109,7 @@ function blobToBase64(blob: Blob): Promise<string> {
     const reader = new FileReader();
     reader.onload = () =>
       resolve(String(reader.result).replace(/^data:[^,]*,/, ''));
-    reader.onerror = () => reject(reader.error ?? new Error('读取数据失败'));
+    reader.onerror = () => reject(reader.error ?? new Error(t('读取数据失败')));
     reader.readAsDataURL(blob);
   });
 }
@@ -274,8 +278,8 @@ async function readUriFile(
     // 每块有独立的 Base64 padding，必须分别解码，再组合原始字节。
     const binary = atob(chunk.data);
     if (binary.length > CHUNK || offset + binary.length > limit)
-      throw new RangeError('文件超过导入大小限制');
-    if (!binary.length && !chunk.eof) throw new Error('文件读取未前进');
+      throw new RangeError(t('文件超过导入大小限制'));
+    if (!binary.length && !chunk.eof) throw new Error(t('文件读取未前进'));
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     parts.push(bytes);
@@ -303,13 +307,13 @@ async function payloadToIncoming(
   const errors: string[] = [];
   const text = payload.text?.trim() ?? '';
   let used = new Blob([text]).size;
-  if (used > 50 * 1024 * 1024) throw new RangeError('分享文字超过 50 MB');
+  if (used > 50 * 1024 * 1024) throw new RangeError(t('分享文字超过 50 MB'));
   const items = payload.items ?? [];
   for (const [index, item] of items.entries()) {
     try {
       const update = (bytes: number) =>
         progress?.({
-          fileName: item.name || '导入文件',
+          fileName: item.name || t('导入文件'),
           index: index + 1,
           total: items.length,
           bytes,
@@ -317,7 +321,7 @@ async function payloadToIncoming(
       update(0);
       const file = await readUriFile(
         item.uri,
-        item.name || '导入文件',
+        item.name || t('导入文件'),
         Math.min(50 * 1024 * 1024, incomingLimit - used),
         update,
       );
@@ -326,7 +330,13 @@ async function payloadToIncoming(
       used += file.size;
     } catch (cause) {
       errors.push(
-        `「${item.name || '导入文件'}」读取失败${cause instanceof RangeError ? '：文件超过 50 MB 或本次分享超过 100 MB' : ''}`,
+        t(
+          '「{0}」读取失败{1}',
+          item.name || t('导入文件'),
+          cause instanceof RangeError
+            ? t('：文件超过 50 MB 或本次分享超过 100 MB')
+            : '',
+        ),
       );
     }
   }

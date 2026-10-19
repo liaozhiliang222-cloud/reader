@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { signal } from '@preact/signals';
 import { createPwaClient, initialPwaState } from './pwaClient';
 import { parseRoute } from './router';
@@ -12,7 +13,7 @@ export function startPwa(checkUpdates: boolean) {
   if (!('serviceWorker' in navigator)) {
     pwaState.value = {
       ...pwaState.value,
-      error: '当前环境不支持离线安装，请使用系统浏览器和 HTTPS 地址。',
+      error: t('当前环境不支持离线安装，请使用系统浏览器和 HTTPS 地址。'),
     };
     return;
   }

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { getBook } from '@/db/repository';
 import { useRoute, navigate, parseRoute } from '@/app/router';
@@ -61,7 +62,7 @@ export function App() {
         navigate('#/incoming/' + id, current.page === 'incoming');
     };
     installFileConsumer(window as Window & LaunchHost, deliver, () =>
-      setError('未能接收系统打开的文件，请从书架重新选择。'),
+      setError(t('未能接收系统打开的文件，请从书架重新选择。')),
     );
     if (!isNativeApp) return;
     // App：接管返回键、处理冷启动/热启动传入的文件。
@@ -69,7 +70,7 @@ export function App() {
     let disposeSpeechOpen: (() => void) | undefined;
     let cancelled = false;
     const fail = () => {
-      if (!cancelled) setError('未能接收系统打开的文件，请从书架重新选择。');
+      if (!cancelled) setError(t('未能接收系统打开的文件，请从书架重新选择。'));
     };
     const progress = (value: NativeImportProgress | undefined) => {
       if (!cancelled) setReceiving(value);
@@ -114,7 +115,7 @@ export function App() {
       .catch(() => {
         if (cancelled) return;
         setReady(true);
-        setError('无法读取启动数据，请检查本地存储。');
+        setError(t('无法读取启动数据，请检查本地存储。'));
       });
     return () => {
       cancelled = true;
@@ -136,7 +137,9 @@ export function App() {
           if (cancelled) return;
           if (!book || book.missingFile) {
             setError(
-              book ? '这本书待补充原文件，请重新导入。' : '这本书已不存在。',
+              book
+                ? t('这本书待补充原文件，请重新导入。')
+                : t('这本书已不存在。'),
             );
             navigate('#/', true);
             return;
@@ -146,11 +149,11 @@ export function App() {
             .then((value) => {
               settings.value = value;
             })
-            .catch(() => setError('无法保存续读设置。'));
+            .catch(() => setError(t('无法保存续读设置。')));
         })
         .catch(() => {
           if (!cancelled) {
-            setError('无法打开书籍。');
+            setError(t('无法打开书籍。'));
             navigate('#/', true);
           }
         });
@@ -167,9 +170,14 @@ export function App() {
   }, [globalReading, followSystemTheme, route.page, guide]);
   const receiveLoading = receiving && (
     <BookLoading
-      title="正在读取书籍"
+      title={t('正在读取书籍')}
       fileName={receiving.fileName}
-      detail={`第 ${receiving.index} / ${receiving.total} 本 · 已读取 ${(receiving.bytes / (1024 * 1024)).toFixed(1)} MB`}
+      detail={t(
+        '第 {0} / {1} 本 · 已读取 {2} MB',
+        receiving.index,
+        receiving.total,
+        (receiving.bytes / (1024 * 1024)).toFixed(1),
+      )}
     />
   );
   if (!ready || nativeLaunching)
@@ -177,7 +185,10 @@ export function App() {
       <main class="welcome">
         <section class="welcome-body">
           {receiveLoading || (
-            <BookLoading title="正在打开微光阅读" detail="留一点时间，给阅读。" />
+            <BookLoading
+              title={t('正在打开微光阅读')}
+              detail={t('留一点时间，给阅读。')}
+            />
           )}
         </section>
       </main>
@@ -207,7 +218,7 @@ export function App() {
       return (
         <main class="welcome">
           <section class="welcome-body">
-            <BookLoading title="正在打开书籍" />
+            <BookLoading title={t('正在打开书籍')} />
           </section>
         </main>
       );
@@ -233,7 +244,7 @@ export function App() {
     <>
       {content()}
       {receiveLoading && (
-        <Modal title="正在读取书籍" onDismiss={() => {}}>
+        <Modal title={t('正在读取书籍')} onDismiss={() => {}}>
           {receiveLoading}
         </Modal>
       )}

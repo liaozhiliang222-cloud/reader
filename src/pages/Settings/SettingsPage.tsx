@@ -1,3 +1,5 @@
+import { t, uiLanguage, resetLanguagePreference } from '@/i18n';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { ProPanel } from '@/components/ProPanel';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
@@ -31,7 +33,7 @@ export function SettingsPage({
   }, [initialSection]);
   const [message, setMessage] = useState('');
   const [pro, setPro] = useState(false);
-  const [storage, setStorage] = useState('正在读取存储信息…');
+  const [storage, setStorage] = useState(t('正在读取存储信息…'));
   const [persisted, setPersisted] = useState<boolean>();
   const [busy, setBusy] = useState(false);
   const [guide, setGuide] = useState(false);
@@ -49,13 +51,13 @@ export function SettingsPage({
       .then(({ usage, quota, persisted }) => {
         setPersisted(persisted);
         setStorage(
-          `${usage === undefined ? '用量不可用' : `已用 ${(usage / 1024 / 1024).toFixed(1)} MB`}${quota === undefined ? '' : ` / 可用配额 ${(quota / 1024 / 1024).toFixed(1)} MB`} · ${isNativeApp ? '应用私有存储' : persisted === undefined ? '持久化状态不可用' : persisted ? '已持久化' : '未持久化'}`,
+          `${usage === undefined ? t('用量不可用') : t('已用 {0} MB', (usage / 1024 / 1024).toFixed(1))}${quota === undefined ? '' : t(' / 可用配额 {0} MB', (quota / 1024 / 1024).toFixed(1))} · ${isNativeApp ? t('应用私有存储') : persisted === undefined ? t('持久化状态不可用') : persisted ? t('已持久化') : t('未持久化')}`,
         );
       })
-      .catch(() => setStorage('当前浏览器无法提供存储信息'));
+      .catch(() => setStorage(t('当前浏览器无法提供存储信息')));
   useEffect(() => {
     refreshStorage();
-  }, [resetKey]);
+  }, [resetKey, uiLanguage.value]);
   const save = async (
     patch: Partial<Omit<AppSettings, 'reading'>> & {
       reading?: Partial<ReadingSettings>;
@@ -72,28 +74,37 @@ export function SettingsPage({
     <main class="settings-page">
       <header>
         <button disabled={busy} onClick={() => navigate('#/')}>
-          返回书架
+          {t('返回书架')}
         </button>
-        <h1>设置</h1>
+        <h1>{t('设置')}</h1>
       </header>
       <EnvironmentNotice />
+      <section>
+        <h2>{t('界面语言')}</h2>
+        <LanguageSelector disabled={busy} />
+        <p>{t('语言只影响界面和导出说明，不会翻译或修改书籍与笔记。')}</p>
+      </section>
       {isIosApp && (
         <section>
-          <h2>微光阅读 Pro</h2>
-          <button onClick={() => setPro(true)}>购买与恢复购买</button>
+          <h2>{t('微光阅读 Pro')}</h2>
+          <button onClick={() => setPro(true)}>{t('购买与恢复购买')}</button>
         </section>
       )}
       {pro && <ProPanel onClose={() => setPro(false)} />}
       {hasNativeSpeech && (
         <section class="settings-group">
-          <h2>听书</h2>
+          <h2>{t('听书')}</h2>
           <p>
             {isIosApp
-              ? '请在系统设置中下载声音，关闭网络试读，确认所选声音可离线使用。'
-              : '只使用系统中已安装的离线语音。系统语音引擎是独立应用，正文由它处理；它可能拥有联网权限。'}
+              ? t(
+                  '请在系统设置中下载声音，关闭网络试读，确认所选声音可离线使用。',
+                )
+              : t(
+                  '只使用系统中已安装的离线语音。系统语音引擎是独立应用，正文由它处理；它可能拥有联网权限。',
+                )}
           </p>
           <label class="speech-field">
-            默认语速
+            {t('默认语速')}
             <input
               type="number"
               min="0.75"
@@ -123,13 +134,13 @@ export function SettingsPage({
               )
             }
           >
-            系统语音设置
+            {t('系统语音设置')}
           </button>
         </section>
       )}
       {guide && (
         <Modal
-          title="微光阅读使用引导"
+          title={t('微光阅读使用引导')}
           className="guide-modal"
           onDismiss={() => setGuide(false)}
         >
@@ -137,10 +148,10 @@ export function SettingsPage({
         </Modal>
       )}
       <div class="settings-group">
-        <h2>阅读</h2>
+        <h2>{t('阅读')}</h2>
         <section>
-          <h3>默认排版</h3>
-          <p>新书使用这些设置。已有单本排版的书籍保留自己的设置。</p>
+          <h3>{t('默认排版')}</h3>
+          <p>{t('新书使用这些设置。已有单本排版的书籍保留自己的设置。')}</p>
           <fieldset disabled={busy} class="settings-fields">
             <ReadingControls
               value={settings.value.reading}
@@ -155,12 +166,12 @@ export function SettingsPage({
                   void save({ followSystemTheme: event.currentTarget.checked })
                 }
               />
-              跟随系统深色
+              {t('跟随系统深色')}
             </label>
           </fieldset>
         </section>
         <section>
-          <h3>阅读习惯</h3>
+          <h3>{t('阅读习惯')}</h3>
           <label class="check-row">
             <input
               disabled={busy}
@@ -170,7 +181,7 @@ export function SettingsPage({
                 void save({ autoResume: e.currentTarget.checked })
               }
             />
-            启动时继续上次阅读
+            {t('启动时继续上次阅读')}
           </label>
           <label class="check-row">
             <input
@@ -181,15 +192,15 @@ export function SettingsPage({
                 void save({ reading: { quietHint: e.currentTarget.checked } })
               }
             />
-            进入阅读时显示安静提示
+            {t('进入阅读时显示安静提示')}
           </label>
         </section>
         <OptionalFontPanel />
       </div>
       <div class="settings-group">
-        <h2>数据</h2>
+        <h2>{t('数据')}</h2>
         <section>
-          <h3>本地存储</h3>
+          <h3>{t('本地存储')}</h3>
           <p>{storage}</p>
           {persisted !== true && !isNativeApp && (
             <button
@@ -207,16 +218,20 @@ export function SettingsPage({
                 })
               }
             >
-              申请持久化存储
+              {t('申请持久化存储')}
             </button>
           )}
           <p>
             {isNativeApp
-              ? '书籍和进度仅存于应用私有存储，卸载应用会删除它们。请定期导出备份。'
-              : '书籍和进度仅存于本机，清除浏览器数据会删除它们。持久化也不能替代备份。'}
+              ? t(
+                  '书籍和进度仅存于应用私有存储，卸载应用会删除它们。请定期导出备份。',
+                )
+              : t(
+                  '书籍和进度仅存于本机，清除浏览器数据会删除它们。持久化也不能替代备份。',
+                )}
           </p>
         </section>
-        <section ref={backupSection} tabIndex={-1} aria-label="备份与恢复">
+        <section ref={backupSection} tabIndex={-1} aria-label={t('备份与恢复')}>
           <BackupPanel
             key={resetKey}
             onBusy={(working) => {
@@ -226,10 +241,12 @@ export function SettingsPage({
           />
         </section>
         <section>
-          <h3>清空数据</h3>
+          <h3>{t('清空数据')}</h3>
           <p>
-            删除{isNativeApp ? '应用内' : '这台浏览器中'}
-            的书架、原文、进度、书签、划线笔记和设置。
+            {t(
+              '删除{0}的书架、原文、进度、书签、划线笔记和设置。',
+              isNativeApp ? t('应用内') : t('这台浏览器中'),
+            )}
           </p>
           <button
             disabled={busy}
@@ -243,26 +260,28 @@ export function SettingsPage({
                 .catch(() => setMessage('无法读取本机数据。'))
             }
           >
-            清空所有数据
+            {t('清空所有数据')}
           </button>
         </section>
       </div>
       <div class="settings-group">
-        <h2>应用</h2>
+        <h2>{t('应用')}</h2>
         <section>
-          <h3>离线与更新</h3>
+          <h3>{t('离线与更新')}</h3>
           {isNativeApp ? (
             <p>
-              应用资源已内置在安装包中，可随时离线阅读。新版本通过应用更新提供。
+              {t(
+                '应用资源已内置在安装包中，可随时离线阅读。新版本通过应用更新提供。',
+              )}
             </p>
           ) : (
             <>
               <p>
                 {import.meta.env.DEV
-                  ? '开发预览不启用离线缓存。安装与离线功能请使用正式构建。'
+                  ? t('开发预览不启用离线缓存。安装与离线功能请使用正式构建。')
                   : pwaState.value.offlineReady
-                    ? '应用资源已就绪，可离线打开。'
-                    : '正在准备离线资源，请保持联网。'}
+                    ? t('应用资源已就绪，可离线打开。')
+                    : t('正在准备离线资源，请保持联网。')}
               </p>
               <label class="check-row">
                 <input
@@ -273,10 +292,12 @@ export function SettingsPage({
                     void save({ checkUpdates: e.currentTarget.checked })
                   }
                 />
-                自动检查应用更新
+                {t('自动检查应用更新')}
               </label>
               <p>
-                发现新版本后只在书架提示，点击更新才重新打开。关闭后微光阅读不主动定时检查，浏览器仍可能检查应用资源。
+                {t(
+                  '发现新版本后只在书架提示，点击更新才重新打开。关闭后微光阅读不主动定时检查，浏览器仍可能检查应用资源。',
+                )}
               </p>
               <button
                 disabled={
@@ -284,19 +305,19 @@ export function SettingsPage({
                 }
                 onClick={() => void checkPwaUpdate()}
               >
-                {pwaState.value.checking ? '正在检查…' : '检查更新'}
+                {pwaState.value.checking ? t('正在检查…') : t('检查更新')}
               </button>
               {pwaState.value.error && (
                 <p role="status">{pwaState.value.error}</p>
               )}
               {pwaState.value.available && (
-                <p>新版本已下载，返回书架即可更新。</p>
+                <p>{t('新版本已下载，返回书架即可更新。')}</p>
               )}
             </>
           )}
         </section>
         <section>
-          <h3>使用引导</h3>
+          <h3>{t('使用引导')}</h3>
           <button
             disabled={busy}
             onClick={(event) => {
@@ -306,29 +327,34 @@ export function SettingsPage({
               setGuide(true);
             }}
           >
-            查看使用引导与安装方法
+            {t('查看使用引导与安装方法')}
           </button>
         </section>
         <section>
-          <h3>关于</h3>
-          <button onClick={() => navigate('#/about')}>关于微光阅读与隐私</button>
+          <h3>{t('关于')}</h3>
+          <button onClick={() => navigate('#/about')}>
+            {t('关于微光阅读与隐私')}
+          </button>
         </section>
       </div>
       {clearDialog && (
         <Modal
-          title="确认清空全部本地数据"
+          title={t('确认清空全部本地数据')}
           onDismiss={() => {
             if (!busy) setClearDialog(false);
           }}
         >
-          <h2>清空本地数据</h2>
+          <h2>{t('清空本地数据')}</h2>
           <p>
-            将删除 {counts.books} 本书、{counts.bookmarks} 个书签、
-            {counts.highlights}{' '}
-            条划线笔记及全部设置。请先确认备份已保存在浏览器之外。
+            {t(
+              '将删除 {0} 本书、{1} 个书签、{2} 条划线笔记及全部设置。请先确认备份已保存在浏览器之外。',
+              counts.books,
+              counts.bookmarks,
+              counts.highlights,
+            )}
           </p>
           <label class="clear-confirm">
-            请输入“清空”确认
+            {t('请输入“清空”确认')}
             <input
               value={confirmText}
               disabled={busy}
@@ -338,16 +364,17 @@ export function SettingsPage({
           </label>
           <div class="data-actions">
             <button disabled={busy} onClick={() => setClearDialog(false)}>
-              取消
+              {t('取消')}
             </button>
             <button
-              disabled={busy || confirmText !== '清空'}
+              disabled={busy || confirmText !== t('清空')}
               onClick={() => {
-                if (confirmText !== '清空' || busy) return;
+                if (confirmText !== t('清空') || busy) return;
                 setBusy(true);
                 void resetSpeechData(true)
                   .then(() => clearAllData())
                   .then(() => {
+                    resetLanguagePreference();
                     settings.value = initialSettings();
                     setClearDialog(false);
                     setResetKey((key) => key + 1);
@@ -357,12 +384,12 @@ export function SettingsPage({
                   .finally(() => setBusy(false));
               }}
             >
-              {busy ? '清空中…' : '确认清空'}
+              {busy ? t('清空中…') : t('确认清空')}
             </button>
           </div>
         </Modal>
       )}
-      <p role="status">{message}</p>
+      <p role="status">{t(message)}</p>
     </main>
   );
 }

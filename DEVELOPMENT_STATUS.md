@@ -1,6 +1,17 @@
 # 开发进度
 
-更新日期：2026-10-14。
+更新日期：2026-10-19。
+
+## iOS 中英文源码候选（2026-10-19，Mac 原生待验）
+
+- 以 Devin 已改名的 `b28ec9c` 为基线，在隔离工作区 `.review/ios-english`、分支 `codex/ios-english` 继续；原工作区安卓 R3/R4 未提交改动保留。用户指定英文名 **LumiRead**，中文名保留“微光阅读”，应用与 Pro 商品 ID 不变。
+- 已接系统语言/手动选择、共享界面与错误、Worker、Markdown/PNG 导出、原生提示与桌面名称、本地 StoreKit 中英文文案；无新增依赖或运行时联网。原书、笔记正文、定位和备份内容不随界面语言改写。
+- LumiRead 更名后的 lint、105 文件 / 455 单测、网页构建、938 条英文目录 / 1042 个翻译调用检查、73 个 Xcode 对象检查通过。中英文及 iOS 门控双浏览器专项 14/14 通过，覆盖手动/系统语言、离线切换、数据保留、英文 Worker 错误、Markdown 与真实 PNG 保存、购买门控。浏览器不支持文件分享时，PNG 可本地下载；用户取消系统分享不会触发下载。
+- 完整历史浏览器最终一轮为 **119 通过 / 1 已知 Windows WebKit 离线跳过 / 1 WebKit 动效计时失败**，报告 `artifacts/i18n-full-browser-pre-motion-fix.json`。动效失败是跨进程媒体指令到达时 220ms 动画已结束；测试改为暂停真实动画于中途，再验证系统减弱动态会取消它，原时长/缓动/运行帧断言保留。修正后两个浏览器专项 **2/2 通过**，报告 `artifacts/i18n-motion-browser.json`；没有把原完整整轮改记为全绿，最终整轮由 CI 再跑。
+- 首轮还发现旧导出断言仍按备份 v4、上游改名让固定原创段落/注音预期与像素基线不一致，以及本轮刷新清除了清空成功消息；均已修复，对应功能与严格像素回归在上述整轮通过。保留测试正文“静页”是固定原文，不是产品名称回退；未放宽截图容差或更新截图基线。
+- 生产安全、离线资源检查通过。无新增依赖；同一依赖下全部 JS/CSS（含解析 Worker 与 SW）gzip 从基线 1769.50 KB 到 1863.50 KB，增量 94.00 KB；仍超过既有 150 KB 参考目标。语言目录离线内置，旧书规范正文与自动占位文本不重解析。本机语言偏好不进入备份。
+- `pnpm build:ios` 的网页构建和 Capacitor 同步通过；这一步没有执行 Swift 编译、Xcode 测试、签名或 IPA 打包。
+- 交付分支沿用 [codex/ios-r0-r2](https://github.com/liaozhiliang222-cloud/reader/tree/codex/ios-r0-r2)，草稿 [PR #5](https://github.com/liaozhiliang222-cloud/reader/pull/5)；远端 SHA 以实际推送结果和 Git 记录为准。Mac 的 Swift 构建、8 XCTest（原 6 + 语言/资源 2）、签名、真机语音与 StoreKit 沙盒仍按 IOS_MAC_HANDOFF.md 接续。此前 Devin 的原生验证不代表本轮新增代码通过；不合并 main 或发布。
 
 ## iOS R0–R2 源码候选收尾（2026-10-14，Mac 原生待验）
 

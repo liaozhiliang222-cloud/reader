@@ -4,6 +4,10 @@ import viteConfig from './vite.config.ts';
 export default mergeConfig(
   viteConfig({ command: 'serve', mode: 'test' }),
   defineConfig({
-    test: { environment: 'node', include: ['src/**/*.test.ts'] },
+    test: {
+      environment: 'node',
+      include: ['src/**/*.test.ts'],
+      setupFiles: ['./src/testSetup.ts'],
+    },
   }),
 );

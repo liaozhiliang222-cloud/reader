@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 export function detectEnvironment(userAgent: string, maxTouchPoints = 0) {
   const ios =
     /iPhone|iPad|iPod/.test(userAgent) ||
@@ -11,7 +12,7 @@ export function detectEnvironment(userAgent: string, maxTouchPoints = 0) {
   return {
     ios,
     inApp: /MicroMessenger/i.test(userAgent)
-      ? '微信'
+      ? t('微信')
       : /\bQQ\/[\d.]+/i.test(userAgent)
         ? 'QQ'
         : undefined,

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { registerPlugin } from '@capacitor/core';
 import type { SpeechBackend } from './SpeechBackend';
 
@@ -20,7 +21,9 @@ export const iosSpeech: SpeechBackend = {
   openSettings: () =>
     Promise.reject(
       new Error(
-        '请打开“设置 → 辅助功能 → 朗读内容 → 声音”，下载所需语音后断网试读。',
+        t(
+          '请打开“设置 → 辅助功能 → 朗读内容 → 声音”，下载所需语音后断网试读。',
+        ),
       ),
     ),
 };

@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { wrap, transfer, releaseProxy } from 'comlink';
 import type { parseFile } from '@/workers/parse.worker';
 import { saveBook, getBook } from '@/db/repository';
@@ -12,7 +13,7 @@ export async function importText(file: File): Promise<ImportResult> {
     !/\.(md|markdown)\.zip$/i.test(file.name)
   )
     throw new Error(
-      '请选择 TXT、EPUB 或 Markdown 文件（图片附件使用 .md.zip 图文包）。',
+      t('请选择 TXT、EPUB 或 Markdown 文件（图片附件使用 .md.zip 图文包）。'),
     );
   const type = /\.epub$/i.test(file.name)
     ? 'epub'
@@ -20,7 +21,7 @@ export async function importText(file: File): Promise<ImportResult> {
       ? 'md'
       : 'txt';
   if (file.size > 50 * 1024 * 1024)
-    throw new Error('文件超过 50 MB，请拆分后导入。');
+    throw new Error(t('文件超过 50 MB，请拆分后导入。'));
   const buffer = await file.arrayBuffer();
   // Read the version before parsing: a v1 document may use syntax rejected by
   // v2. Its original bytes already provide the exact stored identity.

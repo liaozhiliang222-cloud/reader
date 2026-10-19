@@ -1,4 +1,5 @@
 import XCTest
+import Foundation
 import StoreKit
 import StoreKitTest
 @testable import App
@@ -39,5 +40,25 @@ final class ProStoreTests: XCTestCase {
         let snapshot = ProStore.shared.snapshot()
         XCTAssertEqual(snapshot["isPro"] as? Bool, true)
         XCTAssertEqual(snapshot["status"] as? String, "owned")
+    }
+}
+
+/// Language/resource checks do not grant or change purchase entitlements.
+final class ReaderLanguageTests: XCTestCase {
+    func testSystemLanguageFallback() {
+        XCTAssertEqual(ReaderLanguage.resolve(["en-GB", "zh-CN"]), "en")
+        XCTAssertEqual(ReaderLanguage.resolve(["zh-Hans-CN"]), "zh-Hans")
+        XCTAssertEqual(ReaderLanguage.resolve(["zh-Hant-TW"]), "zh-Hans")
+        XCTAssertEqual(ReaderLanguage.resolve(["fr-FR"]), "en")
+        XCTAssertEqual(ReaderLanguage.resolve([]), "en")
+    }
+
+    func testLocalizedDisplayNamesAreBundled() throws {
+        for (language, expected) in [("en", "LumiRead"), ("zh-Hans", "微光阅读")] {
+            let path = try XCTUnwrap(Bundle.main.path(forResource: "InfoPlist", ofType: "strings", inDirectory: nil, forLocalization: language))
+            let data = try Data(contentsOf: URL(fileURLWithPath: path))
+            let values = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: String]
+            XCTAssertEqual(values?["CFBundleDisplayName"], expected)
+        }
     }
 }

@@ -1,3 +1,4 @@
+import { t, uiLocale } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { createSnapshot } from '@/backup/snapshot';
 import {
@@ -62,13 +63,13 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
       await action();
     } catch (cause) {
       if (live.current && cause instanceof Error && cause.name === 'AbortError')
-        setMessage('操作已取消。');
+        setMessage(t('操作已取消。'));
       if (
         live.current &&
         !(cause instanceof Error && cause.name === 'AbortError')
       )
         setMessage(
-          cause instanceof Error ? cause.message : '备份处理失败，请重试。',
+          cause instanceof Error ? cause.message : t('备份处理失败，请重试。'),
         );
     } finally {
       working.current = false;
@@ -83,7 +84,7 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
     void run(async () => {
       setGenerated(undefined);
       setPreview(undefined);
-      report({ percent: 0, message: '正在读取本机数据…' });
+      report({ percent: 0, message: t('正在读取本机数据…') });
       if (isNativeApp && speechView.value.status === 'speaking')
         await speechControl('pause');
       if (isNativeApp) await refreshSpeech();
@@ -114,7 +115,7 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
     void run(async () => {
       setGenerated(undefined);
       setPreview(undefined);
-      report({ percent: 0, message: '正在读取备份…' });
+      report({ percent: 0, message: t('正在读取备份…') });
       const payload = await inspectBackup(
         file,
         report,
@@ -136,8 +137,8 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
         settings.value = value;
         setMessage(
           isNativeApp
-            ? '备份已保存到所选位置。'
-            : '已交给浏览器保存，请确认备份文件已保存。',
+            ? t('备份已保存到所选位置。')
+            : t('已交给浏览器保存，请确认备份文件已保存。'),
         );
       }
     });
@@ -145,7 +146,7 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
     void run(async () => {
       if (!preview || (mode === 'overwrite' && !confirmed)) return;
       await resetSpeechData();
-      report({ percent: 0, message: '正在验证原文与位置…' });
+      report({ percent: 0, message: t('正在验证原文与位置…') });
       const result = await restoreFromBackup(
         preview,
         mode,
@@ -156,25 +157,31 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
         settings.value = result.settings;
         setPreview(undefined);
         setMessage(
-          `恢复完成。书架共 ${result.books} 本${result.missing ? `，${result.missing} 本待补充原文件` : ''}。`,
+          t(
+            '恢复完成。书架共 {0} 本{1}。',
+            result.books,
+            result.missing ? t('，{0} 本待补充原文件', result.missing) : '',
+          ),
         );
       }
     });
   return (
     <>
-      <h3>备份与恢复</h3>
+      <h3>{t('备份与恢复')}</h3>
       <p>
-        轻量备份保存书架、进度、书签、笔记与设置；完整备份还包含书籍和文稿原文。请将备份保存在此浏览器之外。
+        {t(
+          '轻量备份保存书架、进度、书签、笔记与设置；完整备份还包含书籍和文稿原文。请将备份保存在此浏览器之外。',
+        )}
       </p>
       <div class="data-actions">
         <button disabled={busy} onClick={() => generate('light')}>
-          生成轻量备份
+          {t('生成轻量备份')}
         </button>
         <button disabled={busy} onClick={() => generate('full')}>
-          生成完整备份
+          {t('生成完整备份')}
         </button>
         <button disabled={busy} onClick={() => input.current?.click()}>
-          从备份恢复
+          {t('从备份恢复')}
         </button>
       </div>
       <input
@@ -198,21 +205,23 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
         <div class="backup-ready">
           <p>
             {generated.name} · {(generated.blob.size / 1024 / 1024).toFixed(2)}{' '}
-            MB，已生成。
+            {t('MB，已生成。')}
           </p>
           {!!generated.missing && (
             <p role="alert">
               {generated.missing}{' '}
-              本书的原文件不可用。此次备份仍保留它们的进度与笔记，恢复后需要补充原文件。
+              {t(
+                '本书的原文件不可用。此次备份仍保留它们的进度与笔记，恢复后需要补充原文件。',
+              )}
             </p>
           )}
           <div class="data-actions">
             <button disabled={busy} onClick={() => saveFile(false)}>
-              下载备份
+              {t('下载备份')}
             </button>
             {(typeof navigator.share === 'function' || isNativeApp) && (
               <button disabled={busy} onClick={() => saveFile(true)}>
-                分享备份
+                {t('分享备份')}
               </button>
             )}
           </div>
@@ -221,27 +230,29 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
       <p role="status">{message}</p>
       {preview && (
         <Modal
-          title="预览备份并恢复"
+          title={t('预览备份并恢复')}
           onDismiss={() => {
             if (!busy) setPreview(undefined);
           }}
         >
-          <h2>恢复备份</h2>
+          <h2>{t('恢复备份')}</h2>
           <p>
-            备份时间：
-            {new Date(preview.backup.exportedAt).toLocaleString('zh-CN')}
+            {t('备份时间：')}
+            {new Date(preview.backup.exportedAt).toLocaleString(uiLocale.value)}
           </p>
           <p>
-            {preview.backup.books.length} 本书 ·{' '}
-            {preview.backup.bookmarks.length} 个书签 ·{' '}
-            {preview.backup.highlights.length} 条划线笔记 ·{' '}
-            {preview.backup.files.length} 份原文
+            {preview.backup.books.length} {t('本书 ·')}{' '}
+            {preview.backup.bookmarks.length} {t('个书签 ·')}{' '}
+            {preview.backup.highlights.length} {t('条划线笔记 ·')}{' '}
+            {preview.backup.files.length} {t('份原文')}
           </p>
           <p>
-            未包含原文的书可使用本机已有的同一文件；其余书恢复后显示“待补充文件”，重新导入原文件即可挂接进度与笔记。文稿可重新粘贴相同正文。
+            {t(
+              '未包含原文的书可使用本机已有的同一文件；其余书恢复后显示“待补充文件”，重新导入原文件即可挂接进度与笔记。文稿可重新粘贴相同正文。',
+            )}
           </p>
           <fieldset disabled={busy} class="restore-choices">
-            <legend>恢复方式</legend>
+            <legend>{t('恢复方式')}</legend>
             <label>
               <input
                 type="radio"
@@ -252,10 +263,12 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
                   setConfirmed(false);
                 }}
               />
-              合并（推荐）
+              {t('合并（推荐）')}
             </label>
             <p>
-              保留本机已有书名、排版与默认设置；进度与同ID笔记采用较新记录。新设备使用备份中的设置。
+              {t(
+                '保留本机已有书名、排版与默认设置；进度与同ID笔记采用较新记录。新设备使用备份中的设置。',
+              )}
             </p>
             <label>
               <input
@@ -264,10 +277,12 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
                 checked={mode === 'overwrite'}
                 onChange={() => setMode('overwrite')}
               />
-              覆盖
+              {t('覆盖')}
             </label>
             <p>
-              将书架、书签、笔记和设置替换为此备份。备份未包含的本机书籍会删除。
+              {t(
+                '将书架、书签、笔记和设置替换为此备份。备份未包含的本机书籍会删除。',
+              )}
             </p>
             {mode === 'overwrite' && (
               <label>
@@ -278,7 +293,7 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
                     setConfirmed(event.currentTarget.checked)
                   }
                 />
-                我确认按此备份覆盖本机数据
+                {t('我确认按此备份覆盖本机数据')}
               </label>
             )}
           </fieldset>
@@ -289,17 +304,21 @@ export function BackupPanel({ onBusy }: { onBusy: (busy: boolean) => void }) {
               onClick={() => {
                 if (busy) {
                   controller.current?.abort();
-                  setMessage('正在取消恢复…');
+                  setMessage(t('正在取消恢复…'));
                 } else setPreview(undefined);
               }}
             >
-              {busy ? '取消恢复' : '取消'}
+              {busy ? t('取消恢复') : t('取消')}
             </button>
             <button
               disabled={busy || (mode === 'overwrite' && !confirmed)}
               onClick={restore}
             >
-              {busy ? '恢复中…' : mode === 'merge' ? '合并恢复' : '覆盖恢复'}
+              {busy
+                ? t('恢复中…')
+                : mode === 'merge'
+                  ? t('合并恢复')
+                  : t('覆盖恢复')}
             </button>
           </div>
         </Modal>

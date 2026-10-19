@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { sourceFingerprint } from './identity';
 import { db } from './index';
 import { contentRevision } from './revision';
@@ -34,13 +35,13 @@ export async function saveBook(
         existing?.type === 'md' &&
         existing.markdownVersion !== book.markdownVersion
       )
-        throw new Error('Markdown 段落结构版本不同，未修改现有笔记。');
+        throw new Error(t('Markdown 段落结构版本不同，未修改现有笔记。'));
       if (
         existing?.type === 'epub' &&
         (existing.parserVersion ?? 1) !== (book.parserVersion ?? 1)
       )
         throw new Error(
-          '补导期间书籍的段落结构发生变化，请重新导入，未修改现有笔记。',
+          t('补导期间书籍的段落结构发生变化，请重新导入，未修改现有笔记。'),
         );
       await db.books.put({
         ...book,
@@ -127,17 +128,19 @@ export async function saveDraft(
     async () => {
       const previous = editingId ? await db.books.get(editingId) : undefined;
       if (editingId && (!previous || previous.type !== 'paste'))
-        throw new Error('文稿已不存在，请返回书架重新打开。');
+        throw new Error(t('文稿已不存在，请返回书架重新打开。'));
       const existing = await db.books.get(book.id);
       if (
         existing?.draftFormat === 'markdown' &&
         existing.markdownVersion !== book.markdownVersion
       )
-        throw new Error('Markdown 段落结构版本不同，未修改现有笔记。');
+        throw new Error(t('Markdown 段落结构版本不同，未修改现有笔记。'));
       if (existing && !existing.missingFile) {
         if (!editingId) return { book: existing, duplicate: true };
         if (editingId !== book.id)
-          throw new Error('相同正文的文稿已在书架中，请使用该文稿或修改正文。');
+          throw new Error(
+            t('相同正文的文稿已在书架中，请使用该文稿或修改正文。'),
+          );
         await db.books.update(book.id, { title: book.title });
         return { book: { ...existing, title: book.title }, duplicate: false };
       }
@@ -190,9 +193,9 @@ export async function saveDraft(
 
 export const getDraft = async (book: Book) => {
   if (book.type !== 'paste' || !book.draftBlobId)
-    throw new Error('这本文稿没有可编辑的正文。');
+    throw new Error(t('这本文稿没有可编辑的正文。'));
   const blob = await db.blobs.get(book.draftBlobId);
-  if (!blob) throw new Error('文稿正文已不存在，请从备份恢复。');
+  if (!blob) throw new Error(t('文稿正文已不存在，请从备份恢复。'));
   return blob.data.text();
 };
 export async function countAnnotations(bookId: string) {
@@ -240,9 +243,9 @@ export async function listShelf() {
 export async function renameBook(id: string, title: string) {
   const value = title.trim();
   if (!value || [...value].length > 200)
-    throw new Error('请输入 1 至 200 字的书名。');
+    throw new Error(t('请输入 1 至 200 字的书名。'));
   if (!(await db.books.update(id, { title: value })))
-    throw new Error('这本书已不存在。');
+    throw new Error(t('这本书已不存在。'));
 }
 export async function deleteBook(id: string, keepNotes = false) {
   await db.transaction(
@@ -270,7 +273,7 @@ export async function deleteBook(id: string, keepNotes = false) {
               chapterTitle:
                 book.chapterSummaries?.find(
                   (chapter) => chapter.index === item.chapterIndex,
-                )?.title ?? `第 ${item.chapterIndex + 1} 节`,
+                )?.title ?? t('第 {0} 节', item.chapterIndex + 1),
             };
             item.unanchored = true;
             item.updatedAt = Date.now();
@@ -291,7 +294,7 @@ export async function getChapterSummaries(
 ): Promise<ChapterSummary[]> {
   return db.transaction('rw', db.books, db.chapters, async () => {
     const book = await db.books.get(id);
-    if (!book) throw new Error('书籍不存在。');
+    if (!book) throw new Error(t('书籍不存在。'));
     if (book.chapterSummaries) return book.chapterSummaries;
     const summaries: ChapterSummary[] = [];
     // 兼容旧记录：逐章读取，只保留摘要，避免聚集整本正文。

@@ -18,11 +18,11 @@ final class SpeechQueueStore {
         var errorDescription: String? {
             switch self {
             case .sessionOversized: return "queue_too_large"
-            case .batchOversized: return "听书批次超出大小限制"
-            case .batchConflict: return "听书批次内容冲突"
-            case .notCommitted: return "听书文本尚未准备完成"
-            case .sessionMissing: return "听书会话不存在"
-            default: return "听书队列不完整或格式无效"
+            case .batchOversized: return ReaderLanguage.text("听书批次超出大小限制", "The listening batch exceeds the size limit")
+            case .batchConflict: return ReaderLanguage.text("听书批次内容冲突", "Conflicting listening batch content")
+            case .notCommitted: return ReaderLanguage.text("听书文本尚未准备完成", "Listening text is not ready")
+            case .sessionMissing: return ReaderLanguage.text("听书会话不存在", "The listening session does not exist")
+            default: return ReaderLanguage.text("听书队列不完整或格式无效", "The listening queue is incomplete or invalid")
             }
         }
     }

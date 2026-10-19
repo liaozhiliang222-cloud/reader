@@ -332,7 +332,32 @@ test('M2-04-MOTION：原生平移/淡入/无动效、实时减弱动态取消与
   await tap(page, 0.85, 4);
   expect((await interactionEvidence(page)).animations).toHaveLength(2);
   await animationMode(page, 'slide');
+  // Hold a real native animation halfway through so a slow cross-process
+  // emulateMedia call cannot arrive after its 220 ms natural finish.
+  // Durations, easing and running frames were verified above without pausing.
+  await page.evaluate(() => {
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function (keyframes, options) {
+      const animation = animate.call(this, keyframes, options);
+      if (this.matches('.reader-content')) {
+        Element.prototype.animate = animate;
+        animation.pause();
+        animation.currentTime = 110;
+      }
+      return animation;
+    };
+  });
   await page.keyboard.press('ArrowRight');
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document
+          .querySelector('.reader-content:not([aria-hidden="true"])')
+          ?.getAnimations()
+          .some((animation) => animation.playState === 'paused'),
+      ),
+    )
+    .toBe(true);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect
     .poll(

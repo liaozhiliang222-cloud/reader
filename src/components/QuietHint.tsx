@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useEffect, useState } from 'preact/hooks';
 
 export function QuietHint({ enabled }: { enabled: boolean }) {
@@ -10,7 +11,7 @@ export function QuietHint({ enabled }: { enabled: boolean }) {
   }, [enabled]);
   return enabled && visible ? (
     <p class="quiet-hint" role="status">
-      已进入安静阅读
+      {t('已进入安静阅读')}
     </p>
   ) : null;
 }
