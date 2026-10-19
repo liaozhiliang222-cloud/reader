@@ -825,3 +825,11 @@ GitHub 已上传：源码合并提交 `1ea55448ccb97fafb208c0b4f814f98818ab14b0`
 - 不新增第三方依赖（框架 MediaSession / Notification.MediaStyle）；仍不申请 INTERNET，新增权限限于前台服务、mediaPlayback、WAKE_LOCK 与 TTS 引擎 `<queries>`。隐私边界如实写明：TTS 引擎为独立 App，只选 `isNetworkConnectionRequired()==false` 的语音并显示引擎名称。
 - 阶段：T0 真机探针 2 项、T1 安卓 MVP 8 项、T2 打磨与 1.1.0 发布 5 项、T3 网页降级 2 项、T4 神经语音可选 1 项。6 项待用户决策见第 9 节。未写产品代码；手机本轮未连接，引擎与语音清单留待 TTS-01。
 - R0–R2 Mac 验证补记（2026-10-18，codex/ios-r0-r2）：修 Swift 编译两处（pluginMethods 类型标注、size 重名）后 Xcode 构建+6 XCTest 全过（队列 4 + StoreKit 本地购买 2）。Debug 构建 JY_SK_TEST=1 环境变量 + bundle 内 storekit 配置可在模拟器解锁 Pro（Release 不携带）。模拟器回归：覆盖升级/导入/ZIP/划线摘录/批量导出/Pro 门控全过；修复致命冷启动崩溃（last-snapshot.json 存在时 exclusivity 冲突闪退）。遗留：测试权益 storekitd 残留、PNG 固定米色样式、多页摘录模拟器不可达、两导出共用文件名。真机待验：离线声音、锁屏媒体键、打断、沙盒购买。
+
+## TestFlight 准备（2026-10-19，Devin，codex/ios-r0-r2，d88f0dd）
+
+- 修复遗留：批量导出按模板区分文件名（`静页_回顾笔记.md` / `静页_摘录.md`）；听书不再每次弹语音设置 —— iOS 原生持久化 `jingye.speech.voice`（UserDefaults）并在 voices 响应返回 savedVoice，已存语音时点「听书」直接开始，无已存语音或查询失败才弹设置面板。
+- TestFlight 基线：MARKETING_VERSION 1.2.0、CURRENT_PROJECT_VERSION 3（首次归档构建号）；Bundle ID `dev.jingye.reader`、商品 `dev.jingye.reader.pro` 不变。
+- Release 验证（Release-iphonesimulator 构建）：包内无 JingyePro.storekit，二进制零 SKTestSession/JY_SK_TEST 字符串 —— 模拟购买与测试解锁在归档构建中不生效；SKTestSession 代码整体在 `#if DEBUG` 内，storekit 配置仅 Debug 脚本拷贝。
+- 待用户：App Store Connect 建 App 记录（dev.jingye.reader）+ 内购商品（dev.jingye.reader.pro，非消耗型，送审元数据）+ Xcode 登录开发者账号授权签名；然后 Release 归档上传。
+- 真机验收清单：TestFlight 安装、沙盒购买/恢复、离线语音、锁屏媒体键、来电/拔耳机打断、段尾续播平滑。
