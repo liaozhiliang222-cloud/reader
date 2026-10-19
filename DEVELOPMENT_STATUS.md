@@ -2,6 +2,18 @@
 
 更新日期：2026-10-19。
 
+## Mac 原生验证与 TestFlight 准备（2026-10-19，codex/ios-r0-r2-acceptance-fixes）
+
+- 实际 SHA：`6d54db6`（验收基线）；本笔提交为验证增量：`ios/App/AppTests/ProStoreScenarioTests.swift`（新增 6 个 StoreKit 场景 XCTest）、`project.pbxproj`（接入该文件）与本记录。
+- 命令结果：`pnpm install --frozen-lockfile`、`pnpm lint`、`pnpm test`（457/457）、`pnpm check:i18n`、`pnpm build:ios`、`pnpm check:ios` 全部通过；`pnpm test:ios` 共 14 项 XCTest（基线 8 + 场景 6），13 项通过、询问后购买用例在无人值守下因购买请求框未人工确认超时失败、交互重跑通过。
+- xcresult：非交互套件存于 `artifacts/ios-suite-noninteractive.xcresult`；全量 14 项复跑存于 `artifacts/ios-1792391263502.xcresult`（13 通过，询问后购买在无人值守下因购买请求框未确认而失败）；交互重跑存于 `artifacts/ios-interactive-askbuy.xcresult`（通过）、`artifacts/ios-interactive-cancel.xcresult`。
+- StoreKit 场景（SKTestSession，模拟器 iPhone 17 / iOS 27.0）：购买→授予权益通过；取消购买→保持免费通过；询问后购买→Purchase→Ask Permission→OK 生成待批准交易→批准后授予权益通过（须人工确认弹窗，无人值守时该用例超时失败，交互复跑通过）；恢复购买通过；退款/撤销→权益移除通过；断网重开→权益保留通过；购买失败→不授予通过。
+- 中英文界面：中文界面走完整购买路径（查看价格 ¥1.00→Purchase→You're all set→「Pro 已解锁」）；英文界面确认 "Pro unlocked" 权益跨语言生效；交互 XCTest 流在英文界面下运行。
+- 最小修复（不改断言/不放宽检查）：`resetToDefaultState()` 会把 `disableDialogs` 重置为 false，须在它之后再设 `disableDialogs = true`；`ProStore.shared` 单例权益标志跨用例残留，setUp 增加 `await ProStore.shared.refresh()` 重同步；询问后购买用例改用 `allTransactions()` 待批准交易做证据，不再断言会被 `refresh()` 覆盖的 `status=="pending"`。
+- Release 验证（iphoneos、未签名、不上传）：包内含 `PrivacyInfo.xcprivacy`、不含 `JingyePro.storekit`，二进制无 SKTestSession/JY_SK_TEST 痕迹；版本 1.2.0(4)，MARKETING_VERSION 与 CURRENT_PROJECT_VERSION 两套 Build Settings 一致。
+- 警告：Xcode 提示 `Copy StoreKit Config (Debug)` 脚本阶段无输出声明（仅 Debug 拷贝 storekit 用，无功能影响）；`pnpm build` 保留既有大分块提示。
+- 没做的部分：归档上传（等图标与签名 Team）；ITSAppUsesNonExemptEncryption（等确认）；App Store Connect 构建号检查（无账号访问）；模拟器 storekitd 会残留测试权益，真机无影响。
+
 ## iOS 中英文源码候选（2026-10-19，Mac 原生待验）
 
 - 以 Devin 已改名的 `b28ec9c` 为基线，在隔离工作区 `.review/ios-english`、分支 `codex/ios-english` 继续；原工作区安卓 R3/R4 未提交改动保留。用户指定英文名 **LumiRead**，中文名保留“微光阅读”，应用与 Pro 商品 ID 不变。
