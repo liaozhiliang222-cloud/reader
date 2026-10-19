@@ -916,6 +916,7 @@ export const en: Readonly<Record<string, string>> = {
   未找到本地附件或为外部图片: 'Local attachment missing or external image',
   '（链接：{0}）': '(Link: {0})',
   '第 {0} 列': 'Column {0}',
+  '{0}：': '{0}: ',
   '脚注名称重复，请修改后导入。':
     'Duplicate footnote name. Rename it before importing.',
   注释: 'Footnotes',

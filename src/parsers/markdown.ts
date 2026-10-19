@@ -57,11 +57,11 @@ export function parseMarkdown(
   const references = new Map<string, number>();
   let visited = 0,
     charStart = 0;
-  let chapter = makeChapter('正文', 0);
+  let chapter = makeChapter(t('正文'), 0);
   function makeChapter(title: string, level: number): MarkdownChapter {
     return {
       index: chapters.length,
-      title: title || '正文',
+      title: title || t('正文'),
       level,
       paragraphs: [],
       nodes: [],
@@ -174,7 +174,13 @@ export function parseMarkdown(
             tag: 'span',
             kind: 'image-placeholder',
             children: [
-              `[图片：${decodeEntities(token.text) || '无替代文字'}；${version === 1 ? '首版暂不加载' : '未找到本地附件或为外部图片'}]`,
+              t(
+                '[图片：{0}；{1}]',
+                decodeEntities(token.text) || t('无替代文字'),
+                version === 1
+                  ? t('首版暂不加载')
+                  : t('未找到本地附件或为外部图片'),
+              ),
             ],
           });
           break;
@@ -189,7 +195,7 @@ export function parseMarkdown(
               ? { tag: 'a', link: href, children }
               : {
                   tag: 'span',
-                  children: [...children, `（链接：${token.href}）`],
+                  children: [...children, t('（链接：{0}）', token.href)],
                 },
           );
           break;
@@ -385,7 +391,9 @@ export function parseMarkdown(
                   [
                     {
                       tag: 'strong',
-                      children: [`${headers[index] || `第 ${index + 1} 列`}：`],
+                      children: [
+                        t('{0}：', headers[index] || t('第 {0} 列', index + 1)),
+                      ],
                     },
                     ...inline(cell.tokens, depth + 1),
                   ],
@@ -432,11 +440,11 @@ export function parseMarkdown(
     }
     if (references.size) {
       finish();
-      chapter = makeChapter('注释', 0);
-      chapter.nodes.push(paragraph('h2', ['注释']));
+      chapter = makeChapter(t('注释'), 0);
+      chapter.nodes.push(paragraph('h2', [t('注释')]));
       for (const [label, number] of references) {
         toc.push({
-          title: `注释 ${number}`,
+          title: t('注释 {0}', number),
           level: 0,
           chapterIndex: chapter.index,
           paragraphIndex: chapter.paragraphs.length,
@@ -462,7 +470,7 @@ export function parseMarkdown(
     title: [
       ...(toc[0]?.title ||
         chapters[0]!.paragraphs.find((p) => p.trim()) ||
-        'Markdown 文稿'),
+        t('Markdown 文稿')),
     ]
       .slice(0, 30)
       .join(''),

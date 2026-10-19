@@ -14,7 +14,7 @@ export function splitDraft(text: string): DraftChapter[] {
   if (!lines.some((line) => heading.test(line)))
     return splitChapters(text).map((chapter) => ({ ...chapter, level: 0 }));
   const chapters: DraftChapter[] = [];
-  let title = '前言',
+  let title = t('前言'),
     level = 0,
     paragraphs: string[] = [],
     charStart = 0;

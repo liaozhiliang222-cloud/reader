@@ -28,6 +28,7 @@ B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B100000000000000000000
 C10000000000000000000001 = {isa = PBXBuildFile; fileRef = C10000000000000000000002; };
 C10000000000000000000003 = {isa = PBXBuildFile; fileRef = C10000000000000000000004; };
 D19000000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D19000000000000000000002 /* InfoPlist.strings */; };
+E19000000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E19000000000000000000002 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@ C10000000000000000000004 = {isa = PBXFileReference; lastKnownFileType = file.sto
 B10000000000000000000003 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 D19000000000000000000003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 D19000000000000000000004 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+E19000000000000000000002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@ B10000000000000000000003,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
+				E19000000000000000000002 /* PrivacyInfo.xcprivacy */,
 D19000000000000000000002 /* InfoPlist.strings */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
@@ -188,6 +191,7 @@ B1000000000000000000000a,
 			buildActionMask = 2147483647;
 			files = (
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
+				E19000000000000000000001 /* PrivacyInfo.xcprivacy in Resources */,
 D19000000000000000000001 /* InfoPlist.strings in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,

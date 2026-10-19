@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { cleanParagraphs } from './clean';
 
 export interface TextChapter {
@@ -10,7 +11,7 @@ export interface TextChapter {
 
 export function isChapterTitle(line: string): boolean {
   if (line.length > 60 || [...line].length > 30) return false;
-  return /^(?:第[零〇一二两三四五六七八九十百千万亿0-9０-９]+(?:[章节回卷集篇]|部(?:\s|[：:、.．·—-]|$))|chapter\s+\d+(?:\s|[.:：—-]|$)|(?:序章|楔子|前言|引子|后记|尾声|番外)(?:\s|[：:、·—-]|$))/iu.test(
+  return /^(?:第[零〇一二两三四五六七八九十百千万亿0-9０-９]+(?:[章节回卷集篇]|部(?:\s|[：:、.．·—-]|$))|(?:chapter|part)\s+(?:\d+|[ivxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)(?:\s|[.:：—-]|$)|(?:prologue|epilogue|preface|foreword|afterword)(?:\s|[.:：—-]|$)|(?:序章|楔子|前言|引子|后记|尾声|番外)(?:\s|[：:、·—-]|$))/iu.test(
     line,
   );
 }
@@ -38,18 +39,18 @@ export function splitChapters(text: string): TextChapter[] {
     let count = 0;
     for (const paragraph of paragraphs) {
       if (count >= 5000) {
-        append(`第 ${chapters.length + 1} 部分`, group);
+        append(t('第 {0} 部分', chapters.length + 1), group);
         group = [];
         count = 0;
       }
       group.push(paragraph);
       count += paragraph.length;
     }
-    if (group.length) append(`第 ${chapters.length + 1} 部分`, group);
+    if (group.length) append(t('第 {0} 部分', chapters.length + 1), group);
     return chapters;
   }
 
-  let title = '前言';
+  let title = t('前言');
   let body: string[] = [];
   let hasTitle = false;
   for (const paragraph of paragraphs) {

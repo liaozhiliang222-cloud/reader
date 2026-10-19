@@ -34,6 +34,12 @@ if (
   product.type !== 'NonConsumable'
 )
   throw new Error('StoreKit test product mismatch');
+if (!/PrivacyInfo\.xcprivacy in Resources/.test(project))
+  throw new Error('Privacy manifest is not in App resources');
+const manifest = readFileSync('ios/App/App/PrivacyInfo.xcprivacy', 'utf8');
+for (const category of ['UserDefaults', 'SystemBootTime', 'FileTimestamp'])
+  if (!manifest.includes(`NSPrivacyAccessedAPICategory${category}`))
+    throw new Error(`Privacy manifest lacks ${category}`);
 if (/JingyePro.storekit in Resources/.test(project))
   throw new Error('Test store must not ship in app resources');
 console.log(

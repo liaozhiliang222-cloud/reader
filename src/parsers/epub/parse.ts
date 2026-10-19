@@ -53,7 +53,8 @@ export async function parseEpub(
   if (!opfHref) throw new Error(t('文件无法解析：缺少 OPF 路径。'));
   const opfPath = resolvePath('', opfHref).path;
   const opf = await xml(opfPath);
-  const title = elements(opf, 'title')[0]?.textContent?.trim() || '未命名书籍';
+  const title =
+    elements(opf, 'title')[0]?.textContent?.trim() || t('未命名书籍');
   const author = elements(opf, 'creator')[0]?.textContent?.trim() || undefined;
   const manifest = new Map(
     elements(opf, 'item').map((el) => [el.getAttribute('id') ?? '', el]),
@@ -134,7 +135,7 @@ export async function parseEpub(
       ...sanitized,
       index,
       path,
-      title: `第 ${index + 1} 节`,
+      title: t('第 {0} 节', index + 1),
       charStart,
       charCount,
     });
@@ -159,7 +160,7 @@ export async function parseEpub(
         : 0,
       level,
     });
-    if (chapter.title === `第 ${index + 1} 节`)
+    if (chapter.title === t('第 {0} 节', index + 1))
       chapter.title = label.trim() || chapter.title;
   };
   const navItem = Array.from(manifest.values()).find((el) =>
