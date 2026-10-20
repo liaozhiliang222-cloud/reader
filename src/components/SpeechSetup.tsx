@@ -1,6 +1,4 @@
 import { t, uiLanguage } from '@/i18n';
-import { canUsePro } from '@/app/pro';
-import { ProPanel } from './ProPanel';
 import { isIosApp } from '@/app/platform';
 import { useEffect, useState } from 'preact/hooks';
 import { Modal } from './Modal';
@@ -44,7 +42,6 @@ export function SpeechSetup({
   useEffect(() => {
     void load();
   }, []);
-  if (isIosApp && !canUsePro()) return <ProPanel onClose={onClose} />;
   return (
     <Modal title={t('本地听书')} onDismiss={onClose}>
       <h2>{t('本地听书')}</h2>

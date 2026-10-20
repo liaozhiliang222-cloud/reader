@@ -9,7 +9,6 @@ import {
   releaseOrphanedSpeech,
   saveSpeechSnapshot,
 } from '@/db/speech';
-import { connectPro, canUsePro } from '@/app/pro';
 import { settings } from '@/app/settings';
 import { saveSettings } from '@/db/settings';
 import { hasNativeSpeech, isIosApp } from '@/app/platform';
@@ -209,13 +208,6 @@ export async function startSpeech(
   engine: string,
   voice: string,
 ) {
-  if (isIosApp) {
-    await connectPro();
-    if (!canUsePro()) {
-      showError(new Error(t('请先解锁 Pro 本地听书。')));
-      return;
-    }
-  }
   await connectSpeech();
   await stopSpeech();
   const controller = new AbortController();

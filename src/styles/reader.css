@@ -375,6 +375,10 @@
   background-color: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 .reader-content {
+  /* 保留系统选区和拖动手柄，操作由阅读器的标注菜单提供。 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: text;
+  user-select: text;
   position: absolute;
   top: 0;
   left: 0;

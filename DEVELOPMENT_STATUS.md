@@ -1,6 +1,15 @@
 # 开发进度
 
-更新日期：2026-10-19。
+更新日期：2026-10-20。
+
+## 第一版免费与阅读体验修正 — Mac 整合（2026-10-20，分支 codex/ios-free-v1）
+
+- 基线 codex/ios-r0-r2-acceptance-fixes@60d71a2，手工逐项整合 Windows `codex/ios-free-v1` 交接补丁（快照为改名前基线，故未直接套补丁）。保留 Mac 改动：微光阅读/LumiRead 命名、dev.weiguang.reader、双语 i18n、Swift 排他性修复、听书 savedVoice 持久化等。
+- 三项改动：① 正文 `.reader-content` 加 `-webkit-touch-callout:none` + `user-select:text`，reader-chapters 容器拦截 contextmenu（输入框不受影响）；② 纸张纹理改用本地 `src/styles/paper-texture.svg`（64px 平铺、4% 透明度，替代 WKWebView 不支持的 feTurbulence 滤镜噪声）；③ 全功能免费：删除 pro.ts/ProPanel/ProStore.swift/JingyePro.storekit 及全部引用，移除 Settings 购买区、NotesPage 标签/回顾/导出/摘录图门控、coordinator 购买检查、Swift 三处权益检查（start/resume/speak）、AppDelegate SKTestSession、pbxproj 的 ProStore/storekit/测试引用与 Debug 拷贝脚本，桥控制器不再注册 JyPro。check-ios.mjs 改为「免费首版不得含购买配置」校验并保留隐私清单检查。
+- e2e 同步：ios-r2.spec.ts 的购买门控用例替换为免费验收用例（无购买入口/关于页免费声明/笔记标签回顾/导出按钮/听书 start-pause-resume 且无 JyPro 调用）；新增 reader-fixes.spec.ts（纹理四主题像素对比、contextmenu 拦截与选区/复制/输入框菜单）；i18n.spec.ts 的英文购买用例替换为英文免费声明用例；speechBackend.ts 替身升级为支持 ios 平台与调用记录；testMatch 加入 reader-fixes.spec.ts。
+- en.ts：新增免费声明译文、更新 iOS 隐私段落（去 StoreKit）、删除购买相关死键。PRD/AGENTS/DEV_PLAN/IOS_ITERATION_PLAN/README/CHANGELOG/IOS_MAC_HANDOFF 均记录免费决策；新增 DEVIN_IOS_FREE_V1_HANDOFF.md。
+- 待办：build:ios、check:ios、Xcode 编译签名、三项验收与测试包（进行中，结果补记）。
+
 
 ## Mac 原生验证与 TestFlight 准备（2026-10-19，codex/ios-r0-r2-acceptance-fixes）
 

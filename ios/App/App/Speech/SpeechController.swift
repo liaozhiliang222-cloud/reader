@@ -236,7 +236,7 @@ final class SpeechController: NSObject {
     }
 
     private func resumeNow() {
-        guard state == "paused", ProStore.shared.hasVerifiedEntitlement else { return }
+        guard state == "paused" else { return }
         if let deadline = timerDeadline, ProcessInfo.processInfo.systemUptime >= deadline { finish(reason: "timer", ended: false); return }
         pauseRequested = false
         remote.publish(playing: true, chapterTitle: currentChapterTitle())
@@ -297,7 +297,6 @@ final class SpeechController: NSObject {
 
     private func speak(_ index: Int) {
         do {
-            guard ProStore.shared.hasVerifiedEntitlement else { finish(reason: "entitlement", ended: false); return }
             if let deadline = timerDeadline, ProcessInfo.processInfo.systemUptime >= deadline { finish(reason: "timer", ended: false); return }
             guard !pauseRequested else {
                 currentIndex = index

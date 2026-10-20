@@ -1,6 +1,6 @@
 # 静页
 
-iOS R0–R2 源码测试候选位于 `codex/ios-r0-r2`，包含原生完整听书队列、Files/ZIP 导入、笔记整理与 StoreKit 买断入口。Windows 共享检查和 Mac 原生验收分开记录；从 [Mac 构建与验收交接](./IOS_MAC_HANDOFF.md) 接续，完整任务范围见 [iOS 迭代计划](./IOS_ITERATION_PLAN.md)。当前未发布新 IPA，未合并 main。
+第一版所有已提供的功能免费开放，包含本地听书、笔记整理与摘录图片；Pro 入口和购买限制已移除。选区菜单与纸张纹理修正的本地候选位于 `codex/ios-free-v1`，尚未推送；交付位置、Mac 构建与 iPhone 验收见 [Devin 交接说明](./DEVIN_IOS_FREE_V1_HANDOFF.md)。Windows 自动检查和 Mac 原生验收分别记录，当前未发布新 IPA。
 
 纸感本地阅读器，产品需求见 [PRD.md](./PRD.md)，任务顺序见 [DEV_PLAN.md](./DEV_PLAN.md)。
 

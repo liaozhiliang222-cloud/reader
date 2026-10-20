@@ -66,9 +66,6 @@ public class JySpeechPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let action = call.getString("action"), let args = call.getObject("args") else {
             call.reject(ReaderLanguage.text("听书参数无效", "Invalid listening parameters")); return
         }
-        if ["start", "control"].contains(action), (action == "start" || args["action"] as? String == "resume"), !ProStore.shared.hasVerifiedEntitlement {
-            call.reject(ReaderLanguage.text("请先解锁 Pro 本地听书。", "Unlock Pro to use local listening.")); return
-        }
         if ["voices", "state"].contains(action) {
             controller.run({
                 if action == "voices" {

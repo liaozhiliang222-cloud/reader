@@ -1,6 +1,5 @@
 import { t, uiLanguage, resetLanguagePreference } from '@/i18n';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { ProPanel } from '@/components/ProPanel';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { settings } from '@/app/settings';
@@ -32,7 +31,6 @@ export function SettingsPage({
     }
   }, [initialSection]);
   const [message, setMessage] = useState('');
-  const [pro, setPro] = useState(false);
   const [storage, setStorage] = useState(t('正在读取存储信息…'));
   const [persisted, setPersisted] = useState<boolean>();
   const [busy, setBusy] = useState(false);
@@ -84,13 +82,6 @@ export function SettingsPage({
         <LanguageSelector disabled={busy} />
         <p>{t('语言只影响界面和导出说明，不会翻译或修改书籍与笔记。')}</p>
       </section>
-      {isIosApp && (
-        <section>
-          <h2>{t('微光阅读 Pro')}</h2>
-          <button onClick={() => setPro(true)}>{t('购买与恢复购买')}</button>
-        </section>
-      )}
-      {pro && <ProPanel onClose={() => setPro(false)} />}
       {hasNativeSpeech && (
         <section class="settings-group">
           <h2>{t('听书')}</h2>

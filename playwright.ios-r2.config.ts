@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './e2e',
   testMatch: [
     'ios-r2.spec.ts',
+    'reader-fixes.spec.ts',
     'speech.spec.ts',
     'reading.spec.ts',
     'sharing.spec.ts',

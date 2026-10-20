@@ -211,90 +211,24 @@ test('Parsing worker reports errors in English without modifying imported text',
   );
 });
 
-test('English iOS purchase UI uses native language and the same product identity', async ({
+test('English iOS build has no purchase entry and shows the free notice', async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    let loaded = false,
-      pending = false,
-      owned = false;
-    const calls: { method: string; options: object }[] = [];
-    Reflect.set(window, '__languageCalls', calls);
-    Reflect.set(window, 'CapacitorCustomPlatform', { name: 'ios' });
-    Reflect.set(window, 'Capacitor', {
-      PluginHeaders: ['JyReader', 'JySpeech', 'JyPro', 'App'].map((name) => ({
-        name,
-        methods: [
-          ...[
-            'setLanguage',
-            'request',
-            'speech',
-            'consumeLaunchFile',
-            'setImmersive',
-            'keepAwake',
-            'statusBar',
-            'getLaunchUrl',
-            'removeListener',
-          ].map((name) => ({ name, rtype: 'promise' })),
-          { name: 'addListener', rtype: 'callback' },
-        ],
-      })),
-      nativePromise: async (
-        plugin: string,
-        method: string,
-        options: { action?: string },
-      ) => {
-        calls.push({ method, options });
-        if (plugin === 'JyPro') {
-          if (options.action === 'product') loaded = true;
-          if (options.action === 'purchase') pending = true;
-          if (options.action === 'restore') {
-            owned = true;
-            pending = false;
-          }
-          return {
-            protocolVersion: 1,
-            productId: 'dev.jingye.reader.pro',
-            isPro: owned,
-            status: owned ? 'owned' : pending ? 'pending' : 'free',
-            price: loaded ? '$2.99' : undefined,
-            message: '',
-          };
-        }
-        if (method === 'consumeLaunchFile') return { items: [] };
-        return {};
-      },
-      nativeCallback: () => 'listener',
-    });
-  });
   await openShelf(page);
   await page
     .getByRole('button', { name: 'Settings and data', exact: true })
     .click();
+  await expect(
+    page.getByRole('button', { name: /Purchase|Restore/ }),
+  ).toHaveCount(0);
   await page
-    .getByRole('button', { name: 'Purchase and restore', exact: true })
+    .getByRole('button', { name: 'About LumiRead and privacy', exact: true })
     .click();
-  const panel = page.getByRole('dialog', {
-    name: 'LumiRead Pro',
-    exact: true,
-  });
-  await expect(panel).toContainText('Pro not unlocked');
-  await expect(panel).not.toContainText('acceptance tests');
-  await panel.getByRole('button', { name: 'View price', exact: true }).click();
-  await panel
-    .getByRole('button', { name: 'One-time purchase · $2.99', exact: true })
-    .click();
-  await expect(panel).toContainText('Waiting for purchase approval');
-  await panel
-    .getByRole('button', { name: 'Restore purchases', exact: true })
-    .click();
-  await expect(panel).toContainText('Pro unlocked');
-  expect(
-    await page.evaluate(() => Reflect.get(window, '__languageCalls')),
-  ).toContainEqual({ method: 'setLanguage', options: { language: 'en' } });
-  await page.setViewportSize({ width: 320, height: 740 });
+  await expect(
+    page.getByText('All features included in this first release are free.'),
+  ).toBeVisible();
   await noOverflow(page);
-  await page.screenshot({ path: 'artifacts/i18n-pro.png' });
+  await page.screenshot({ path: 'artifacts/i18n-free.png' });
 });
 
 test.describe('unsupported system language', () => {

@@ -19,7 +19,6 @@ import { installFileConsumer, type LaunchHost } from './fileLaunch';
 import { Onboarding } from '@/pages/Onboarding/Onboarding';
 import { restoreOptionalFont } from './optionalFont';
 import { NotesPage } from '@/pages/Notes/NotesPage';
-import { connectPro } from './pro';
 import { AboutPage } from '@/pages/About/AboutPage';
 import { isNativeApp, isAndroidApp, nativeApp } from './platform';
 import type { IncomingData } from './incomingData';
@@ -30,9 +29,6 @@ import { Modal } from '@/components/Modal';
 
 export function App() {
   const route = useRoute();
-  useEffect(() => {
-    void connectPro();
-  }, []);
   const [ready, setReady] = useState(false);
   const [nativeLaunching, setNativeLaunching] = useState(isNativeApp);
   const [receiving, setReceiving] = useState<NativeImportProgress>();

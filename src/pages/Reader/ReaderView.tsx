@@ -39,7 +39,6 @@ import {
   stopSpeech,
   manualSpeechNavigation,
 } from '@/app/speech/coordinator';
-import { canUsePro } from '@/app/pro';
 import type {
   Book,
   Bookmark,
@@ -108,10 +107,6 @@ export function ReaderView({
   }, []);
   const quickSpeech = async () => {
     setMenu(false);
-    if (!canUsePro()) {
-      setSpeechOpen(true);
-      return;
-    }
     try {
       const list = await speechVoices();
       const voice = list.voices.find((item) => item.id === list.savedVoice)?.id;
@@ -630,7 +625,11 @@ export function ReaderView({
         {info.title}
       </div>
       <div ref={viewport} class="reader-viewport" aria-label={t('阅读正文')}>
-        <div ref={content} class="reader-chapters" />
+        <div
+          ref={content}
+          class="reader-chapters"
+          onContextMenu={(event) => event.preventDefault()}
+        />
         {reading.tapMode === 'oneHand' && (
           <button
             class="reader-previous-corner"

@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures';
 import { openShelf, selectVisibleText, menu, openMore } from './helpers';
 import JSZip from 'jszip';
+import { installSpeechBackend } from './speechBackend';
 
 test('ZIP 选择导入与跨书笔记：原文回跳、标签、基础导出', async ({ page }) => {
   await openShelf(page);
@@ -61,123 +62,72 @@ test('ZIP 选择导入与跨书笔记：原文回跳、标签、基础导出', a
   expect(page.url()).toContain('?note=');
 });
 
-test('iOS 购买门控：商品显式加载、等待批准、恢复与撤销（系统服务替身）', async ({
+test('iOS 第一版无购买入口，笔记与听书直接可用（系统服务替身）', async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    let owned = false,
-      pending = false,
-      product = false;
-    const requests: string[] = [],
-      listeners = new Map<string, (event: object) => void>();
-    const state = () => ({
-      protocolVersion: 1,
-      productId: 'dev.jingye.reader.pro',
-      isPro: owned,
-      status: owned ? 'owned' : pending ? 'pending' : 'free',
-      price: product ? '¥1.00' : undefined,
-      message: '',
-    });
-    Reflect.set(window, 'CapacitorCustomPlatform', { name: 'ios' });
-    Reflect.set(window, 'Capacitor', {
-      PluginHeaders: ['JyReader', 'JySpeech', 'JyPro', 'App'].map((name) => ({
-        name,
-        methods: [
-          ...[
-            'speech',
-            'request',
-            'consumeLaunchFile',
-            'setImmersive',
-            'keepAwake',
-            'statusBar',
-            'getLaunchUrl',
-            'removeListener',
-          ].map((name) => ({ name, rtype: 'promise' })),
-          { name: 'addListener', rtype: 'callback' },
-        ],
-      })),
-      nativePromise: async (
-        plugin: string,
-        method: string,
-        options: { action?: string },
-      ) => {
-        if (plugin === 'JyPro' && method === 'request') {
-          requests.push(options.action ?? 'state');
-          if (options.action === 'product') product = true;
-          if (options.action === 'purchase') pending = true;
-          if (options.action === 'restore') {
-            owned = true;
-            pending = false;
-          }
-          return state();
-        }
-        if (method === 'speech') {
-          if (options.action === 'state')
-            return { snapshot: null, active: false };
-          if (options.action === 'voices')
-            return {
-              engine: 'ios',
-              engines: [{ id: 'ios', label: '系统语音替身' }],
-              voices: [{ id: 'zh', language: 'zh-CN' }],
-            };
-        }
-        if (method === 'consumeLaunchFile') return { items: [] };
-        return {};
-      },
-      nativeCallback: (
-        _plugin: string,
-        _method: string,
-        options: { eventName: string },
-        callback: (event: object) => void,
-      ) => {
-        const id = `${options.eventName}:${listeners.size}`;
-        listeners.set(id, callback);
-        return id;
-      },
-    });
-    Reflect.set(window, '__iosProDouble', {
-      inspect: () => requests,
-      revoke: () => {
-        owned = false;
-        for (const [event, listener] of listeners)
-          if (event.startsWith('proChanged:')) listener({});
-      },
-    });
-  });
+  test.setTimeout(120_000);
+  await installSpeechBackend(page, true, 'ios');
   await openShelf(page);
   await page.getByRole('button', { name: '设置与数据管理' }).click();
-  await page.getByRole('button', { name: '购买与恢复购买' }).click();
-  const panel = page.getByRole('dialog', { name: '微光阅读 Pro' });
-  await expect(panel).toContainText('尚未解锁 Pro');
-  const requests = await page.evaluate(() =>
-    (
-      Reflect.get(window, '__iosProDouble') as { inspect(): string[] }
-    ).inspect(),
-  );
-  expect(requests).not.toContain('product');
-  await panel.getByRole('button', { name: '查看购买价格' }).click();
-  await panel.getByRole('button', { name: '一次购买 · ¥1.00' }).click();
-  await expect(panel).toContainText('等待购买批准');
-  await panel.getByRole('button', { name: '恢复购买' }).click();
-  await expect(panel).toContainText('Pro 已解锁');
-  await panel.getByRole('button', { name: '关闭', exact: true }).click();
-  await page.getByRole('button', { name: '返回书架', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: /购买|恢复购买/ }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: '关于微光阅读与隐私' }).click();
+  await expect(
+    page.getByText('第一版所有已提供的功能均免费开放。'),
+  ).toBeVisible();
+  await expect(page.locator('main')).not.toContainText(/StoreKit|购买/);
   // Use paste so this test does not pretend to validate a physical Files picker.
   await page.goto('/#/paste');
+  await page.getByLabel('标题（选填）').fill('免费版验收');
   await page
     .getByLabel('正文', { exact: true })
-    .fill('这是原创听书测试。'.repeat(50));
+    .fill('窗外的风掠过树梢，让文字回到纸上。'.repeat(100));
   await page.getByRole('button', { name: '开始阅读', exact: true }).click();
+  const excerpt = await selectVisibleText(page);
+  await page
+    .getByLabel('文字选区操作')
+    .getByRole('button', { name: '笔记', exact: true })
+    .click();
+  const note = page.getByRole('dialog', { name: '编辑笔记' });
+  await note.getByLabel('写下此刻的想法').fill('免费版想法');
+  await note.getByRole('button', { name: '保存', exact: true }).click();
+  await menu(page);
+  await page.getByRole('button', { name: '返回书架', exact: true }).click();
+  await page.getByRole('button', { name: '笔记', exact: true }).click();
+  await expect(page.locator('.notes-list')).toContainText(excerpt);
+  await page.getByRole('button', { name: '编辑想法', exact: true }).click();
+  await page.getByLabel('标签（顿号分隔）').fill('免费、回顾');
+  await page.getByLabel('待回顾', { exact: true }).check();
+  await page.getByRole('button', { name: '保存想法', exact: true }).click();
+  await expect(page.locator('.notes-list')).toContainText('免费 · 回顾');
+  for (const name of [
+    '批量导出 Markdown',
+    '导出读后整理模板',
+    '随机回顾一条',
+    '摘录图片',
+  ]) {
+    await expect(page.getByRole('button', { name, exact: true })).toBeEnabled();
+  }
+  await page.getByRole('button', { name: '回到原文', exact: true }).click();
   await menu(page);
   await openMore(page);
   await page.getByRole('button', { name: '听书', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: '从本页听', exact: true }),
-  ).toBeEnabled();
-  await page.evaluate(() =>
-    (Reflect.get(window, '__iosProDouble') as { revoke(): void }).revoke(),
+  await page.getByRole('button', { name: '从本页听', exact: true }).click();
+  const bar = page.getByRole('complementary', { name: '听书控制' });
+  await expect(bar).toContainText('正在听书');
+  await bar.getByRole('button', { name: '暂停', exact: true }).click();
+  await expect(bar).toContainText('听书已暂停');
+  await bar.getByRole('button', { name: '继续听书', exact: true }).click();
+  await expect(bar).toContainText('正在听书');
+  const calls = await page.evaluate(() =>
+    (
+      Reflect.get(window, '__speechBackendDouble') as {
+        inspect(): { calls: { plugin: string; method: string }[] };
+      }
+    ).inspect(),
   );
-  await expect(
-    page.getByRole('dialog', { name: '微光阅读 Pro' }),
-  ).toContainText('尚未解锁 Pro');
+  expect(calls.calls.some((call) => call.plugin === 'JyPro')).toBe(false);
+  await expect(page.getByRole('dialog', { name: /Pro/ })).toHaveCount(0);
 });
+

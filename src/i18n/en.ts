@@ -13,7 +13,6 @@ export const en: Readonly<Record<string, string>> = {
   标签: 'Tags',
   笔记: 'Notes',
   关闭: 'Close',
-  '微光阅读 Pro': 'LumiRead Pro',
   章: 'chapters',
   取消: 'Cancel',
   系统语音设置: 'System voice settings',
@@ -35,8 +34,8 @@ export const en: Readonly<Record<string, string>> = {
   应用私有存储: 'private app storage',
   当前浏览器的本地存储: "this browser's local storage",
   '中，不上传服务器。': 'and are never uploaded to a server.',
-  '阅读资源与可选字体内置，书籍和笔记不上传。购买和恢复由 Apple StoreKit 按需联网，系统交易更新由系统处理；不提供应用云同步，设备的系统备份由你的设置决定。':
-    'Reading resources and the optional font are bundled. Books and notes are never uploaded. Purchases and restoration connect to Apple StoreKit when needed, and the system handles transaction updates. The app provides no cloud sync; system device backups depend on your settings.',
+  '阅读资源与可选字体内置，书籍和笔记不上传。不提供应用云同步，设备的系统备份由你的设置决定。系统声音须提前下载，并在断网时确认可用。':
+    'Reading resources and the optional font are bundled. Books and notes are never uploaded. The app provides no cloud sync; system device backups depend on your settings. Download system voices in advance and confirm they work offline.',
   '应用未申请联网权限，资源与可选字体均内置在安装包中；不参与系统云备份或自动换机传输。':
     'The app requests no internet permission. Resources and the optional font are bundled. App data is excluded from system cloud backups and automatic device migration.',
   '应用没有统计 SDK、广告、第三方 CDN 或在线字体服务。网络请求用于加载和更新应用资源，以及你主动下载的同源阅读字体；不下载字体时不会请求字体文件。':
@@ -590,18 +589,8 @@ export const en: Readonly<Record<string, string>> = {
   '当前浏览器无法保存网页字体，请继续使用系统字体。':
     'This browser cannot save web fonts. Continue with system fonts.',
   '查看字体许可（OFL 1.1）': 'View font license (OFL 1.1)',
-  '一次购买，解锁本版的本地听书、笔记整理与摘录图片。核心阅读、书签笔记、基础导出和备份继续免费。':
-    'One purchase unlocks local listening, note organization, and quote images in this version. Core reading, bookmarks, notes, basic exports, and backups remain free.',
-  '购买和恢复由 Apple 处理，需要联网；本机已验证的权益可离线使用。不收集阅读内容，不创建微光阅读账号。':
-    'Apple handles purchases and restoration online. Verified local entitlements work offline. No reading content is collected and no LumiRead account is created.',
-  '本版本仍需完成 iPhone 与 StoreKit 验收。测试配置中的价格仅用于本地测试。':
-    'iPhone and StoreKit acceptance tests are still pending. Prices in the local test configuration are for testing only.',
-  'Pro 已解锁': 'Pro unlocked',
-  等待购买批准: 'Waiting for purchase approval',
-  '尚未解锁 Pro': 'Pro not unlocked',
-  '一次购买 ·': 'One-time purchase ·',
-  查看购买价格: 'View price',
-  恢复购买: 'Restore purchases',
+  '第一版所有已提供的功能均免费开放。':
+    'All features included in this first release are free.',
   已进入安静阅读: 'Quiet reading',
   米白纸: 'Paper',
   浅灰纸: 'E-ink',
@@ -750,8 +739,6 @@ export const en: Readonly<Record<string, string>> = {
   '「{0}」读取失败{1}': 'Could not read “{0}”{1}',
   '：文件超过 50 MB 或本次分享超过 100 MB':
     ': the file exceeds 50 MB or this share exceeds 100 MB',
-  '购买状态无效，请重试。': 'Invalid purchase state. Please try again.',
-  '购买服务暂不可用。': 'Purchase service is temporarily unavailable.',
   '当前环境不支持离线安装，请使用系统浏览器和 HTTPS 地址。':
     'Offline installation is unavailable here. Use your system browser with an HTTPS address.',
   '新版本资源尚未下载完整，稍后会再检查。':
@@ -779,7 +766,6 @@ export const en: Readonly<Record<string, string>> = {
   '无法读取系统语音。': 'Could not read system voices.',
   '系统语音信息不完整。': 'System voice information is incomplete.',
   '系统语音信息无效。': 'Invalid system voice information.',
-  '请先解锁 Pro 本地听书。': 'Unlock Pro to use local listening.',
   '书籍已不存在或原文缺失。':
     'The book no longer exists or its text is missing.',
   '书籍章节缺失。': 'Book chapters are missing.',

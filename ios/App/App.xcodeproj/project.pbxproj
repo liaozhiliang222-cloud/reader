@@ -23,11 +23,7 @@
 		9E5A10052C4E000000000001 /* SpeechAudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10052C4E000000000101 /* SpeechAudioSession.swift */; };
 		9E5A10062C4E000000000001 /* SpeechRemoteControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */; };
 		A00000000000000000000001 /* JyReaderPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* JyReaderPlugin.swift */; };
-		A00000000000000000000002 /* ProStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* ProStore.swift */; };
 B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
-C10000000000000000000001 = {isa = PBXBuildFile; fileRef = C10000000000000000000002; };
-	C10000000000000000000006 = {isa = PBXBuildFile; fileRef = C10000000000000000000007; };
-C10000000000000000000003 = {isa = PBXBuildFile; fileRef = C10000000000000000000004; };
 D19000000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D19000000000000000000002 /* InfoPlist.strings */; };
 E19000000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E19000000000000000000002 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -51,11 +47,7 @@ E19000000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBu
 		9E5A10052C4E000000000101 /* SpeechAudioSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAudioSession.swift; sourceTree = "<group>"; };
 		9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRemoteControls.swift; sourceTree = "<group>"; };
 		A00000000000000000000101 /* JyReaderPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JyReaderPlugin.swift; sourceTree = "<group>"; };
-		A00000000000000000000102 /* ProStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStore.swift; sourceTree = "<group>"; };
 B10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechQueueStoreTests.swift; sourceTree = "<group>"; };
-C10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStoreTests.swift; sourceTree = "<group>"; };
-	C10000000000000000000007 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProStoreScenarioTests.swift; sourceTree = "<group>"; };
-C10000000000000000000004 = {isa = PBXFileReference; lastKnownFileType = file.storekit; path = JingyePro.storekit; sourceTree = "<group>"; };
 B10000000000000000000003 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 D19000000000000000000003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 D19000000000000000000004 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -100,7 +92,6 @@ B10000000000000000000003,
 				9582B6822FE993A50072D4E8 /* SceneDelegate.swift */,
 				9E5A10012C4E000000000101 /* ReaderBridgeViewController.swift */,
 				9E5A10072C4E000000000002 /* Speech */,
-				A00000000000000000000102 /* ProStore.swift */,
 				A00000000000000000000101 /* JyReaderPlugin.swift */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
@@ -116,7 +107,7 @@ D19000000000000000000002 /* InfoPlist.strings */,
 			path = App;
 			sourceTree = "<group>";
 		};
-B10000000000000000000004 = {isa = PBXGroup; children = (B10000000000000000000002,C10000000000000000000002,C10000000000000000000007,); path = AppTests; sourceTree = "<group>"; };
+B10000000000000000000004 = {isa = PBXGroup; children = (B10000000000000000000002,); path = AppTests; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -127,7 +118,6 @@ B10000000000000000000004 = {isa = PBXGroup; children = (B10000000000000000000002
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
-				C10000000000000000000005 /* Copy StoreKit Config (Debug) */,
 			);
 			buildRules = (
 			);
@@ -203,7 +193,7 @@ D19000000000000000000001 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (C10000000000000000000003,); runOnlyForDeploymentPostprocessing = 0; };
+B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 		9E5A10072C4E000000000002 /* Speech */ = {
@@ -220,7 +210,6 @@ B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147
 		};
 /* End PBXGroup section */
 
-C10000000000000000000005 = {isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); name = "Copy StoreKit Config (Debug)"; outputPaths = (); runOnlyForDeploymentPostprocessing = 0; shellPath = /bin/sh; shellScript = "if [ \"$CONFIGURATION\" = \"Debug\" ]; then\n\tcp \"$SRCROOT/JingyePro.storekit\" \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/JingyePro.storekit\"\nfi\n"; };
 /* Begin PBXSourcesBuildPhase section */
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -230,7 +219,6 @@ C10000000000000000000005 = {isa = PBXShellScriptBuildPhase; buildActionMask = 21
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				9E5A10012C4E000000000001 /* ReaderBridgeViewController.swift in Sources */,
 				9E5A10022C4E000000000001 /* JySpeechPlugin.swift in Sources */,
-				A00000000000000000000002 /* ProStore.swift in Sources */,
 				A00000000000000000000001 /* JyReaderPlugin.swift in Sources */,
 				9E5A10032C4E000000000001 /* SpeechController.swift in Sources */,
 				9E5A10042C4E000000000001 /* SpeechQueueStore.swift in Sources */,
@@ -239,7 +227,7 @@ C10000000000000000000005 = {isa = PBXShellScriptBuildPhase; buildActionMask = 21
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-B10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B10000000000000000000001,C10000000000000000000001,C10000000000000000000006,); runOnlyForDeploymentPostprocessing = 0; };
+B10000000000000000000005 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (B10000000000000000000001,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
@@ -378,7 +366,7 @@ D19000000000000000000002 /* InfoPlist.strings */ = {isa = PBXVariantGroup; child
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -400,7 +388,7 @@ D19000000000000000000002 /* InfoPlist.strings */ = {isa = PBXVariantGroup; child
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (

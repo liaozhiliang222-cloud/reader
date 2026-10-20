@@ -11,8 +11,6 @@ import {
 import { quoteCards } from '@/reader/quoteCards';
 import { downloadBlob, shareBlob } from '@/app/files';
 import { isNativeApp } from '@/app/platform';
-import { canUsePro } from '@/app/pro';
-import { ProPanel } from '@/components/ProPanel';
 import { Modal } from '@/components/Modal';
 
 export function NotesPage() {
@@ -24,7 +22,6 @@ export function NotesPage() {
   const [pending, setPending] = useState(false),
     [order, setOrder] = useState<'recent' | 'oldest'>('recent');
   const [page, setPage] = useState(0),
-    [pro, setPro] = useState(false),
     [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(''),
     [editing, setEditing] = useState<ReviewNote>();
@@ -70,10 +67,6 @@ export function NotesPage() {
           : t('微光阅读_摘录.md'),
       ),
     );
-  const premium = (work: () => void) => {
-    if (canUsePro()) work();
-    else setPro(true);
-  };
   const edit = (row: ReviewNote) => {
     setEditing(row);
     setNote(row.item.note ?? '');
@@ -167,20 +160,20 @@ export function NotesPage() {
       <div class="panel-actions">
         <button
           disabled={busy || !rows.length}
-          onClick={() => premium(() => void exportRows(rows, 'quotes'))}
+          onClick={() => void exportRows(rows, 'quotes')}
         >
           {t('批量导出 Markdown')}
         </button>
         <button
           disabled={busy || !rows.length}
-          onClick={() => premium(() => void exportRows(rows, 'reading'))}
+          onClick={() => void exportRows(rows, 'reading')}
         >
           {t('导出读后整理模板')}
         </button>
         <button
           disabled={!rows.length}
           onClick={() =>
-            premium(() => edit(rows[Math.floor(Math.random() * rows.length)]!))
+            edit(rows[Math.floor(Math.random() * rows.length)]!)
           }
         >
           {t('随机回顾一条')}
@@ -225,25 +218,22 @@ export function NotesPage() {
               <button
                 disabled={busy}
                 onClick={() =>
-                  premium(
-                    () =>
-                      void action(async () => {
-                        const images = await quoteCards(row);
-                        for (const [index, image] of images.entries()) {
-                          const name = t('微光阅读_摘录_{0}.png', index + 1);
-                          const file = new File([image], name, {
-                            type: image.type,
-                          });
-                          if (
-                            !isNativeApp &&
-                            (!navigator.share ||
-                              !navigator.canShare?.({ files: [file] }))
-                          )
-                            await downloadBlob(image, name);
-                          else await shareBlob(image, name);
-                        }
-                      }),
-                  )
+                  void action(async () => {
+                    const images = await quoteCards(row);
+                    for (const [index, image] of images.entries()) {
+                      const name = t('微光阅读_摘录_{0}.png', index + 1);
+                      const file = new File([image], name, {
+                        type: image.type,
+                      });
+                      if (
+                        !isNativeApp &&
+                        (!navigator.share ||
+                          !navigator.canShare?.({ files: [file] }))
+                      )
+                        await downloadBlob(image, name);
+                      else await shareBlob(image, name);
+                    }
+                  })
                 }
               >
                 {t('摘录图片')}
@@ -290,14 +280,12 @@ export function NotesPage() {
               value={tags}
               maxLength={300}
               onInput={(e) => setTags(e.currentTarget.value)}
-              disabled={!canUsePro()}
             />
           </label>
           <label class="check-row">
             <input
               type="checkbox"
               checked={review}
-              disabled={!canUsePro()}
               onChange={(e) => setReview(e.currentTarget.checked)}
             />
             {t('待回顾')}
@@ -321,9 +309,8 @@ export function NotesPage() {
                     throw new Error(t('最多 12 个标签，每个不超过 30 字。'));
                   await db.highlights.update(item.id, {
                     note: note.trim() || undefined,
-                    ...(canUsePro()
-                      ? { tags: values, reviewPending: review }
-                      : {}),
+                    tags: values,
+                    reviewPending: review,
                     updatedAt: Date.now(),
                   });
                   await load();
@@ -339,7 +326,6 @@ export function NotesPage() {
           </div>
         </Modal>
       )}
-      {pro && <ProPanel onClose={() => setPro(false)} />}
     </main>
   );
 }

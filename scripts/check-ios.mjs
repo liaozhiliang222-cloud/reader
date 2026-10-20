@@ -12,7 +12,8 @@ if (
   throw new Error('Xcode object IDs are invalid or duplicated');
 for (const name of [
   'JyReaderPlugin.swift',
-  'ProStore.swift',
+  'ReaderBridgeViewController.swift',
+  'SpeechController.swift',
   'JySpeechPlugin.swift',
   'SpeechQueueStore.swift',
   'SpeechQueueStoreTests.swift',
@@ -27,21 +28,20 @@ const scheme = readFileSync(
 );
 if (!scheme.includes('AppTests.xctest'))
   throw new Error('Shared scheme does not run XCTest');
-const product = JSON.parse(readFileSync('ios/App/JingyePro.storekit', 'utf8'))
-  .products[0];
 if (
-  product.productID !== 'dev.weiguang.reader.pro' ||
-  product.type !== 'NonConsumable'
+  /ProStore|\.storekit|StoreKitConfigurationFileReference/.test(
+    project + scheme,
+  )
 )
-  throw new Error('StoreKit test product mismatch');
+  throw new Error(
+    'The free first release must not include purchase configuration',
+  );
 if (!/PrivacyInfo\.xcprivacy in Resources/.test(project))
   throw new Error('Privacy manifest is not in App resources');
 const manifest = readFileSync('ios/App/App/PrivacyInfo.xcprivacy', 'utf8');
 for (const category of ['UserDefaults', 'SystemBootTime', 'FileTimestamp'])
   if (!manifest.includes(`NSPrivacyAccessedAPICategory${category}`))
     throw new Error(`Privacy manifest lacks ${category}`);
-if (/JingyePro.storekit in Resources/.test(project))
-  throw new Error('Test store must not ship in app resources');
 console.log(
   `iOS source configuration checked (${objects.length} Xcode objects); Swift compilation and device behavior require macOS.`,
 );
