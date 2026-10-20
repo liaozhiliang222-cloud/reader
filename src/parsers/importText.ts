@@ -6,14 +6,18 @@ import type { Book } from '@/types';
 import { runWorkerTask } from '@/workers/runTask';
 import type { ImportResult } from './batch';
 import { bookIdForHash, sourceHash } from './identity';
+import { openNativePdf } from '@/app/platform/documents';
 
 export async function importText(file: File): Promise<ImportResult> {
+  if (/\.pdf$/i.test(file.name)) return importPdf(file);
   if (
     !/\.(txt|epub|md|markdown)$/i.test(file.name) &&
     !/\.(md|markdown)\.zip$/i.test(file.name)
   )
     throw new Error(
-      t('请选择 TXT、EPUB 或 Markdown 文件（图片附件使用 .md.zip 图文包）。'),
+      t(
+        '请选择 TXT、EPUB、Markdown 或 PDF 文件（图片附件使用 .md.zip 图文包）。',
+      ),
     );
   const type = /\.epub$/i.test(file.name)
     ? 'epub'
@@ -115,4 +119,42 @@ export async function importText(file: File): Promise<ImportResult> {
     api[releaseProxy]();
     worker.terminate();
   }
+}
+
+/** PDF 只保存原文件和页数；能否打开以系统渲染器为准，失败不写入书架。 */
+async function importPdf(file: File): Promise<ImportResult> {
+  if (file.size > 50 * 1024 * 1024)
+    throw new Error(t('文件超过 50 MB，请拆分后导入。'));
+  const buffer = await file.arrayBuffer();
+  if (!/^%PDF-/.test(new TextDecoder().decode(buffer.slice(0, 1024))))
+    throw new Error(t('不是有效的 PDF 文件。'));
+  const id = bookIdForHash({ type: 'pdf' }, await sourceHash(buffer));
+  const existing = await getBook(id);
+  if (existing && !existing.missingFile)
+    return { book: existing, duplicate: true };
+  const document = await openNativePdf(file);
+  const pageCount = document.pageCount;
+  await document.close();
+  const book: Book = {
+    id,
+    title: file.name.replace(/\.pdf$/i, '') || 'PDF',
+    type: 'pdf',
+    documentVersion: 1,
+    pageCount,
+    charCount: 0,
+    chapterCount: pageCount,
+    importedAt: Date.now(),
+    lastReadAt: Date.now(),
+    size: file.size,
+  };
+  const chapters = Array.from({ length: pageCount }, (_, index) => ({
+    bookId: id,
+    index,
+    title: t('第 {0} 页', index + 1),
+    paragraphs: [''],
+    charStart: 0,
+    charCount: 0,
+  }));
+  const inserted = await saveBook(book, chapters, file);
+  return { book: (await getBook(id)) ?? book, duplicate: !inserted };
 }

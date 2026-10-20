@@ -3,7 +3,7 @@ import { streamArchive, type ArchiveEntry } from './streamArchive';
 import { BoundedZip } from '@/parsers/zip';
 import { parseFile } from '@/parsers/file';
 import { parseDraft } from '@/parsers/paste';
-import { bookIdForHash } from '@/parsers/identity';
+import { bookIdForHash, sourceHash } from '@/parsers/identity';
 import { parseBackupJson, validateBackup } from './validate';
 import type {
   BackupPayload,
@@ -212,6 +212,7 @@ export async function prepareBook(
 ): Promise<PreparedBook> {
   if (source.bookId !== meta.id || source.data.size !== meta.size)
     throw new Error(t('原文件大小与备份信息不一致。'));
+  if (meta.type === 'pdf') return preparePdf(meta, source);
   const result =
     meta.type === 'paste'
       ? {
@@ -267,6 +268,41 @@ export async function prepareBook(
       ...result.assets,
       { id: book.fileBlobId ?? book.draftBlobId!, data: source.data },
     ],
+  };
+}
+async function preparePdf(
+  meta: BackupBook,
+  source: SourceFile,
+): Promise<PreparedBook> {
+  const id = bookIdForHash(
+    { type: 'pdf' },
+    await sourceHash(await source.data.arrayBuffer()),
+  );
+  if (id !== meta.id) throw new Error(t('原文件指纹不匹配：{0}。', meta.title));
+  const chapters = Array.from({ length: meta.chapterCount }, (_, index) => ({
+    bookId: meta.id,
+    index,
+    title: t('第 {0} 页', index + 1),
+    paragraphs: [''],
+    charStart: 0,
+    charCount: 0,
+  }));
+  return {
+    book: {
+      ...meta,
+      missingFile: false,
+      fileBlobId: meta.id,
+      chapterSummaries: chapters.map(
+        ({ index, title, charStart, charCount }) => ({
+          index,
+          title,
+          charStart,
+          charCount,
+        }),
+      ),
+    },
+    chapters,
+    blobs: [{ id: meta.id, data: source.data }],
   };
 }
 // Test/fixture helper; the production Worker exposes only the single-book operation.

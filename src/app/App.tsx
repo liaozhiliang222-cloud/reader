@@ -26,6 +26,7 @@ import { validIncomingId } from './incomingData';
 import type { NativeImportProgress } from './platform/native';
 import { installIosEditMenuGate } from './platform/native';
 import { BookLoading } from '@/components/BookLoading';
+import { PdfReaderView } from '@/pages/Reader/PdfReaderView';
 import { Modal } from '@/components/Modal';
 
 export function App() {
@@ -221,6 +222,14 @@ export function App() {
             <BookLoading title={t('正在打开书籍')} />
           </section>
         </main>
+      );
+    if (route.page === 'reader' && active?.type === 'pdf')
+      return (
+        <PdfReaderView
+          key={active.id}
+          book={active}
+          onBack={() => navigate('#/')}
+        />
       );
     if (route.page === 'reader' && active)
       return (

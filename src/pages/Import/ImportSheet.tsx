@@ -110,8 +110,15 @@ export function ImportSheet({
         </button>
       </header>
       <p class="muted">
-        {t('选择本机的 EPUB、TXT、Markdown 或 ZIP，也可粘贴长文。')}
+        {t('选择本机的 EPUB、TXT、Markdown、PDF 或 ZIP，也可粘贴长文。')}
       </p>
+      {isIosApp && (
+        <p class="muted">
+          {t(
+            'PDF 保留原页，支持翻页、缩放和进度续读；暂不支持原页划线、笔记、听书或文字识别。',
+          )}
+        </p>
+      )}
       <p class="muted">
         {t(
           '带图片的文章：把一个 Markdown 文件和图片文件夹一起压缩，命名为 .md.zip 后导入。',
@@ -122,7 +129,7 @@ export function ImportSheet({
         class="file-input"
         type="file"
         multiple
-        accept=".epub,.txt,.md,.markdown,.zip,text/plain,text/markdown,text/x-markdown,application/epub+zip,application/zip"
+        accept=".epub,.txt,.md,.markdown,.zip,.pdf,application/pdf,text/plain,text/markdown,text/x-markdown,application/epub+zip,application/zip"
         aria-label={t('选择书籍文件')}
         disabled={busy}
         onChange={(event) =>

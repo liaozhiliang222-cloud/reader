@@ -16,6 +16,7 @@ import type {
   Highlight,
   Locator,
   Progress,
+  ReadingLocation,
   ReadingSettings,
 } from '@/types';
 const error = (field: string): never => {
@@ -66,7 +67,7 @@ function array<T>(value: unknown, field: string, read: (item: unknown) => T) {
 }
 const fingerprint = (value: unknown) => {
   const id = string(value, t('书籍指纹'));
-  return /^(?:paste:|paste-md:|md:)?[a-f\d]{64}$/.test(id)
+  return /^(?:paste:|paste-md:|md:|pdf:)?[a-f\d]{64}$/.test(id)
     ? id
     : error(t('书籍指纹'));
 };
@@ -184,7 +185,11 @@ function readBook(value: unknown): BackupBook {
   const book: BackupBook = {
     id: fingerprint(data.id),
     title: string(data.title, t('书名')),
-    type: choice(data.type, ['txt', 'epub', 'paste', 'md'], t('书籍类型')),
+    type: choice(
+      data.type,
+      ['txt', 'epub', 'paste', 'md', 'pdf'],
+      t('书籍类型'),
+    ),
     author: optionalText(data.author, t('作者')),
     charCount: number(data.charCount, t('字数')),
     chapterCount: number(data.chapterCount, t('章节数')),
@@ -195,6 +200,14 @@ function readBook(value: unknown): BackupBook {
         ? number(data.importedAt, t('导入时间'))
         : number(data.lastReadAt, t('阅读时间')),
   };
+  if (book.type === 'pdf') {
+    if (data.documentVersion !== 1) error(t('文档解析版本'));
+    book.documentVersion = 1;
+    book.pageCount = number(data.pageCount, t('PDF页数'), 10000);
+    if (!book.pageCount || book.pageCount !== book.chapterCount)
+      error(t('PDF页数'));
+  } else if (data.pageCount !== undefined || data.documentVersion !== undefined)
+    error(t('文档解析版本'));
   if (data.identityVersion !== undefined && data.identityVersion !== 1)
     error(t('书籍身份版本'));
   if (data.identityVersion !== undefined) book.identityVersion = 1;
@@ -332,9 +345,25 @@ export function validateBackup(value: unknown): BackupFile {
         bookId = fingerprint(p.bookId),
         where = locator(p.locator);
       checkLocator(bookId, where);
+      let location: ReadingLocation | undefined;
+      if (p.location !== undefined) {
+        const at = record(p.location, t('PDF位置'));
+        if (at.kind !== 'pdf' || bookFor(bookId).type !== 'pdf')
+          error(t('PDF位置'));
+        location = {
+          kind: 'pdf',
+          pageIndex: number(at.pageIndex, t('PDF位置'), 9999),
+          x: number(at.x, t('PDF位置'), 1, false),
+          y: number(at.y, t('PDF位置'), 1, false),
+          scale: number(at.scale, t('PDF位置'), 4, false),
+        };
+        if (location.pageIndex >= bookFor(bookId).chapterCount)
+          error(t('PDF位置'));
+      }
       return {
         bookId,
         locator: where,
+        ...(location ? { location } : {}),
         percent: number(p.percent, t('百分比'), 100, false),
         updatedAt: number(p.updatedAt, t('进度时间')),
       };

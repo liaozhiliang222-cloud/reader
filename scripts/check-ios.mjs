@@ -17,6 +17,8 @@ for (const name of [
   'JySpeechPlugin.swift',
   'SpeechQueueStore.swift',
   'SpeechQueueStoreTests.swift',
+  'JyDocumentsPlugin.swift',
+  'PdfDocumentStoreTests.swift',
 ]) {
   if (!project.includes(name)) throw new Error(`Xcode is missing ${name}`);
 }

@@ -341,6 +341,7 @@ async function readUriFile(
 function guessType(name: string): string {
   const lower = name.toLowerCase();
   if (lower.endsWith('.epub')) return 'application/epub+zip';
+  if (lower.endsWith('.pdf')) return 'application/pdf';
   if (lower.endsWith('.md') || lower.endsWith('.markdown'))
     return 'text/markdown';
   return 'text/plain';

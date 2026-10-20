@@ -30,6 +30,9 @@ const result = spawnSync(
     '-resultBundlePath',
     `artifacts/ios-${Date.now()}.xcresult`,
     'CODE_SIGNING_ALLOWED=NO',
+    ...(process.argv.includes('--pdf')
+      ? ['-only-testing:AppTests/PdfDocumentStoreTests']
+      : []),
     'test',
   ],
   { stdio: 'inherit' },

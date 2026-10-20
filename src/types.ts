@@ -16,7 +16,9 @@ export interface Book {
   sourceFingerprint?: string;
   identityVersion?: 1;
   title: string;
-  type: 'txt' | 'epub' | 'paste' | 'md';
+  type: 'txt' | 'epub' | 'paste' | 'md' | 'pdf';
+  documentVersion?: 1;
+  pageCount?: number;
   draftFormat?: 'markdown';
   markdownVersion?: 1 | 2;
   encoding?: string;
@@ -108,6 +110,7 @@ export interface AppSettings {
 export interface Progress {
   bookId: string;
   locator: Locator;
+  location?: ReadingLocation;
   percent: number;
   updatedAt: number;
 }

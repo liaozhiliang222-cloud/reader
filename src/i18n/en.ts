@@ -1199,4 +1199,37 @@ export const en: Readonly<Record<string, string>> = {
     'We collect no reading data. Books, progress, bookmarks, highlights, notes, and settings stay in {0} and are never uploaded to a server.',
   '正文位置会变化，保存后将重置阅读进度，并移除这本文稿的 {0} 个书签和 {1} 条划线笔记。取消可保留原文稿及标注。':
     'Text positions will change. Saving resets reading progress and removes {0} bookmarks and {1} highlights and notes. Cancel to keep the original draft and annotations.',
+  'PDF 原页阅读需要 iOS App。':
+    'Original-page PDF reading requires the iOS app.',
+  '本机缺少 PDF 原文件，请重新导入。':
+    'The original PDF is missing on this device. Please import it again.',
+  'PDF 页数与保存记录不一致，请重新导入。':
+    'The PDF page count does not match the saved record. Please import it again.',
+  'PDF 无法打开。': 'The PDF could not be opened.',
+  'PDF 页面渲染失败。': 'Failed to render the PDF page.',
+  'PDF 进度未能保存。': 'PDF progress could not be saved.',
+  'PDF 进度未能保存，请重试返回。':
+    'PDF progress could not be saved. Please try going back again.',
+  页码: 'Page',
+  缩放: 'Zoom',
+  'PDF 页码': 'PDF page number',
+  'PDF 缩放': 'PDF zoom',
+  '正在渲染当前页…': 'Rendering this page…',
+  'PDF 第 {0} 页': 'PDF page {0}',
+  '第 {0} 页': 'Page {0}',
+  '原页阅读 · 支持翻页、缩放和进度续读；暂不支持原页划线、笔记、听书或文字识别。':
+    'Original-page reading · Page turning, zoom, and resume are supported; highlights, notes, read-aloud, and text recognition are not yet available for PDF pages.',
+  '请选择 TXT、EPUB、Markdown 或 PDF 文件（图片附件使用 .md.zip 图文包）。':
+    'Choose a TXT, EPUB, Markdown, or PDF file (use a .md.zip package for Markdown with images).',
+  '不是有效的 PDF 文件。': 'This is not a valid PDF file.',
+  '选择本机的 EPUB、TXT、Markdown、PDF 或 ZIP，也可粘贴长文。':
+    'Choose EPUB, TXT, Markdown, PDF, or ZIP files on this device, or paste long text.',
+  'PDF 保留原页，支持翻页、缩放和进度续读；暂不支持原页划线、笔记、听书或文字识别。':
+    'PDFs keep their original pages with page turning, zoom, and resume; highlights, notes, read-aloud, and text recognition are not yet available.',
+  '从书架点“导入书籍”，可选择 EPUB、TXT、Markdown 或 PDF。PDF 保留原页，支持翻页、缩放和进度续读，暂不支持原页划线、笔记或听书。':
+    'Tap “Import books” on the shelf to choose EPUB, TXT, Markdown, or PDF. PDFs keep their original pages with page turning, zoom, and resume; highlights, notes, and read-aloud are not yet available for PDF.',
+  文档解析版本: 'document parser version',
+  PDF页数: 'PDF page count',
+  PDF位置: 'PDF position',
+  '{0} 页': '{0} pages',
 };

@@ -27,6 +27,7 @@ export function incomingData(form: FormData): IncomingData {
     if (!name.includes('.')) {
       const mime = value.type.split(';')[0]?.trim();
       if (mime === 'application/epub+zip') name += '.epub';
+      else if (mime === 'application/pdf') name += '.pdf';
       else if (mime === 'text/plain') name += '.txt';
       else if (mime === 'text/markdown' || mime === 'text/x-markdown')
         name += '.md';

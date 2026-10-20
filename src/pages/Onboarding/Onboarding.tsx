@@ -2,7 +2,7 @@ import { t } from '@/i18n';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { environment } from '@/app/environment';
 import { installState, requestInstall } from '@/app/install';
-import { isNativeApp } from '@/app/platform';
+import { isIosApp, isNativeApp } from '@/app/platform';
 import { settings } from '@/app/settings';
 import { saveSettings } from '@/db/settings';
 import { EnvironmentNotice } from '@/components/EnvironmentNotice';
@@ -70,6 +70,13 @@ export function Onboarding({
           {isNativeApp ? (
             <>
               <p>{t('书籍、进度与笔记只保存在这台设备上，不需要注册。')}</p>
+              {isIosApp && (
+                <p>
+                  {t(
+                    '从书架点“导入书籍”，可选择 EPUB、TXT、Markdown 或 PDF。PDF 保留原页，支持翻页、缩放和进度续读，暂不支持原页划线、笔记或听书。',
+                  )}
+                </p>
+              )}
               <p>
                 {t('卸载应用会删除它们。请在“设置 → 备份与恢复”中定期导出。')}
               </p>

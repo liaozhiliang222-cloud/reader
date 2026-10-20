@@ -90,6 +90,7 @@
 				<string>public.plain-text</string>
 				<string>net.daringfireball.markdown</string>
 				<string>public.zip-archive</string>
+				<string>com.adobe.pdf</string>
 			</array>
 		</dict>
 	</array>

@@ -12,5 +12,6 @@ class ReaderBridgeViewController: CAPBridgeViewController {
         super.capacitorDidLoad()
         bridge?.registerPluginInstance(JySpeechPlugin())
         bridge?.registerPluginInstance(JyReaderPlugin())
+        bridge?.registerPluginInstance(JyDocumentsPlugin())
     }
 }

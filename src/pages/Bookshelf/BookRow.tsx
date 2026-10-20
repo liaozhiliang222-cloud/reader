@@ -81,7 +81,10 @@ export function BookRow({
                 ? t('Markdown 文稿')
                 : t('文稿')
               : book.type.toUpperCase()}{' '}
-            · {book.chapterCount} {t('章')}
+            ·{' '}
+            {book.type === 'pdf'
+              ? t('{0} 页', book.chapterCount)
+              : `${book.chapterCount} ${t('章')}`}
           </small>
           {!book.missingFile && !!progress && (
             <span

@@ -11,7 +11,9 @@ export function bookIdForHash(
         ? book.draftFormat === 'markdown'
           ? 'paste-md:'
           : 'paste:'
-        : '';
+        : book.type === 'pdf'
+          ? 'pdf:'
+          : '';
   return prefix + hash;
 }
 
