@@ -880,3 +880,12 @@ GitHub 已上传：源码合并提交 `1ea55448ccb97fafb208c0b4f814f98818ab14b0`
 - 三项验收（iPhone 17 / iOS 27.0 模拟器）：①长按/拖手柄仅应用菜单、复制/划线/笔记正常、输入框系统菜单+粘贴正常 ②四主题纹理开关有效、护眼绿+纹理冷启动保留 ③无 Pro 入口，听书开始/暂停/继续、笔记标签、批量导出、摘录 PNG 全部免费可用
 - 归档 artifacts/LumiRead-1.2.0-6.xcarchive，签名 IPA artifacts/LumiRead-1.2.0-6-appstore.ipa（Apple Distribution via API Key，dev.weiguang.reader / 1.2.0(6)），已上传 TestFlight（Processing）
 - 说明：EditMenuGate 使用私有 WKContentView 选择器，非公开 API；真机项（声音/锁屏控制/打断）未测
+
+## IOS-PDF Mac 整合与上传（2026-10-20）
+
+- 整合 ios-free-v1-pdf-handoff：Windows 快照与 Mac 分支差异过大（安卓 R3/R4、Mac 中英文等），未整体覆盖，按 iOS PDF 链路最小移植；不引入 pdf-lib/pdfjs，导入页数由原生 Core Graphics 校验
+- 原生修复：getDrawingTransform 不放大 → 显式缩放（修复页面未铺满/缩放无效）；pluginMethods、PDFDocumentWriteOption 类型推断编译错误
+- 检查：build:ios、check:ios（74 对象）、test:ios --pdf 3/3 通过（artifacts/ios-1792475969383.xcresult）、tsc、check:i18n、backup 定向 Vitest 63 项
+- 模拟器（iPhone 17 / iOS 27.0）：普通/扫描/旋转裁切 PDF 显示正确；翻页、页码输入、200% 缩放、页内位置在返回书架与冷启动后保留；损坏/加密 PDF 拒绝且不入书架；导入面板与新手引导说明 PDF 边界；覆盖安装旧书籍与进度保留
+- 1.2.0(7) Release 签名 IPA：artifacts/LumiRead-1.2.0-7-appstore.ipa（sha256 718a2584…），已上传 TestFlight（Processing）
+- 未测：真机、断网（模拟器共享主机网络；PDF 渲染为纯本机路径）
