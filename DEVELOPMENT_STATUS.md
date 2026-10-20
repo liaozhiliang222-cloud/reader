@@ -873,3 +873,10 @@ GitHub 已上传：源码合并提交 `1ea55448ccb97fafb208c0b4f814f98818ab14b0`
 - 导出产物 artifacts/LumiRead-1.2.0-4-appstore.ipa：Apple Distribution: Zhiliang Liao (7R5Z28YJZ9) 签名，App Store provisioning profile，get-task-allow=false
 - xcodebuild -exportArchive（app-store-connect / automatic signing / API Key N23VM7F87M）EXPORT SUCCEEDED + Uploaded App，Apple 端处理中（Processing）
 - 待办：ASC 下需为 dev.weiguang.reader 新建非消耗型商品 dev.weiguang.reader.pro；TestFlight 内部测试员配置；Processing 完成后可安装
+
+## IOS-FREE-V1 Mac 验收与上传（2026-10-19）
+
+- EditMenuGate.swift：WKContentView 编辑菜单门控（suppress/editable 双开关），修复长按双菜单、选区手柄拖拽残留菜单、final 类递归崩溃
+- 三项验收（iPhone 17 / iOS 27.0 模拟器）：①长按/拖手柄仅应用菜单、复制/划线/笔记正常、输入框系统菜单+粘贴正常 ②四主题纹理开关有效、护眼绿+纹理冷启动保留 ③无 Pro 入口，听书开始/暂停/继续、笔记标签、批量导出、摘录 PNG 全部免费可用
+- 归档 artifacts/LumiRead-1.2.0-6.xcarchive，签名 IPA artifacts/LumiRead-1.2.0-6-appstore.ipa（Apple Distribution via API Key，dev.weiguang.reader / 1.2.0(6)），已上传 TestFlight（Processing）
+- 说明：EditMenuGate 使用私有 WKContentView 选择器，非公开 API；真机项（声音/锁屏控制/打断）未测
