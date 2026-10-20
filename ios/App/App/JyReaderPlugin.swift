@@ -26,7 +26,12 @@ enum ReaderLanguage {
 public class JyReaderPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelegate {
     public let identifier = "JyReaderPlugin"
     public let jsName = "JyReader"
-    public let pluginMethods: [CAPPluginMethod] = ["pickFiles", "consumeLaunchFile", "readUriChunk", "releaseImport", "shareChunk", "shareCacheFile", "setImmersive", "keepAwake", "statusBar", "openUrl", "setLanguage"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
+    public let pluginMethods: [CAPPluginMethod] = ["pickFiles", "consumeLaunchFile", "readUriChunk", "releaseImport", "shareChunk", "shareCacheFile", "setImmersive", "keepAwake", "statusBar", "openUrl", "setLanguage", "setEditMenuGate"].map { CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise) }
+    @objc func setEditMenuGate(_ call: CAPPluginCall) {
+        EditMenuGate.suppressSelectionMenu = call.getBool("suppress") ?? false
+        EditMenuGate.editableFocused = call.getBool("editable") ?? false
+        call.resolve()
+    }
     @objc func setLanguage(_ call: CAPPluginCall) {
         guard let language = call.getString("language"), language == "en" || language == "zh-Hans" else {
             call.reject("invalid_language"); return
@@ -52,7 +57,10 @@ public class JyReaderPlugin: CAPPlugin, CAPBridgedPlugin, UIDocumentPickerDelega
         try target.setResourceValues(values)
         return root
     }
-    public override func load() { Self.current = self }
+    public override func load() {
+        Self.current = self
+        EditMenuGate.install()
+    }
     static func accept(urls: [URL]) {
         queue.async {
             for url in urls {

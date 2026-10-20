@@ -19,6 +19,7 @@ import { NoteEditor } from './NoteEditor';
 import { useAnnotations } from '@/reader/useAnnotations';
 import { toggleFullscreen, useImmersive } from '@/reader/useImmersive';
 import { isNativeApp, hasNativeSpeech, nativeApp } from '@/app/platform';
+import { setIosSelectionMenuSuppressed } from '@/app/platform/native';
 import { addBookmark, listBookmarks, removeBookmark } from '@/db/bookmarks';
 import { QuietHint } from '@/components/QuietHint';
 import { TapHint } from '@/components/TapHint';
@@ -104,6 +105,10 @@ export function ReaderView({
   const flushManual = useRef<() => Promise<void>>(async () => {});
   useEffect(() => {
     if (hasNativeSpeech) void connectSpeech();
+  }, []);
+  useEffect(() => {
+    setIosSelectionMenuSuppressed(true);
+    return () => setIosSelectionMenuSuppressed(false);
   }, []);
   const quickSpeech = async () => {
     setMenu(false);

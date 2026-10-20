@@ -23,6 +23,7 @@
 		9E5A10052C4E000000000001 /* SpeechAudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10052C4E000000000101 /* SpeechAudioSession.swift */; };
 		9E5A10062C4E000000000001 /* SpeechRemoteControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */; };
 		A00000000000000000000001 /* JyReaderPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* JyReaderPlugin.swift */; };
+		A00000000000000000000003 /* EditMenuGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* EditMenuGate.swift */; };
 B10000000000000000000001 = {isa = PBXBuildFile; fileRef = B10000000000000000000002; };
 D19000000000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D19000000000000000000002 /* InfoPlist.strings */; };
 E19000000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E19000000000000000000002 /* PrivacyInfo.xcprivacy */; };
@@ -47,6 +48,7 @@ E19000000000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBu
 		9E5A10052C4E000000000101 /* SpeechAudioSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAudioSession.swift; sourceTree = "<group>"; };
 		9E5A10062C4E000000000101 /* SpeechRemoteControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRemoteControls.swift; sourceTree = "<group>"; };
 		A00000000000000000000101 /* JyReaderPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JyReaderPlugin.swift; sourceTree = "<group>"; };
+		A00000000000000000000103 /* EditMenuGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMenuGate.swift; sourceTree = "<group>"; };
 B10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechQueueStoreTests.swift; sourceTree = "<group>"; };
 B10000000000000000000003 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 D19000000000000000000003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@ B10000000000000000000003,
 				9E5A10012C4E000000000101 /* ReaderBridgeViewController.swift */,
 				9E5A10072C4E000000000002 /* Speech */,
 				A00000000000000000000101 /* JyReaderPlugin.swift */,
+				A00000000000000000000103 /* EditMenuGate.swift */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -220,6 +223,7 @@ B10000000000000000000007 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147
 				9E5A10012C4E000000000001 /* ReaderBridgeViewController.swift in Sources */,
 				9E5A10022C4E000000000001 /* JySpeechPlugin.swift in Sources */,
 				A00000000000000000000001 /* JyReaderPlugin.swift in Sources */,
+				A00000000000000000000003 /* EditMenuGate.swift in Sources */,
 				9E5A10032C4E000000000001 /* SpeechController.swift in Sources */,
 				9E5A10042C4E000000000001 /* SpeechQueueStore.swift in Sources */,
 				9E5A10052C4E000000000001 /* SpeechAudioSession.swift in Sources */,

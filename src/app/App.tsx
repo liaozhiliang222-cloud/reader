@@ -24,6 +24,7 @@ import { isNativeApp, isAndroidApp, nativeApp } from './platform';
 import type { IncomingData } from './incomingData';
 import { validIncomingId } from './incomingData';
 import type { NativeImportProgress } from './platform/native';
+import { installIosEditMenuGate } from './platform/native';
 import { BookLoading } from '@/components/BookLoading';
 import { Modal } from '@/components/Modal';
 
@@ -42,6 +43,9 @@ export function App() {
   useEffect(() => {
     if (ready) startPwa(checkUpdates);
   }, [ready, checkUpdates]);
+  useEffect(() => {
+    installIosEditMenuGate();
+  }, []);
   useEffect(() => {
     if (!ready) return;
     const deliver = async (data: IncomingData) => {

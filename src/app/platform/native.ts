@@ -32,6 +32,10 @@ interface JyNativePlugin {
   openUrl(options: { uri: string }): Promise<void>;
   statusBar(options: { color?: string; dark?: boolean }): Promise<void>;
   setVolumeKeys(options: { enabled: boolean }): Promise<void>;
+  setEditMenuGate?(options: {
+    suppress: boolean;
+    editable: boolean;
+  }): Promise<void>;
   speechLaunch(): Promise<{ bookId: string | null }>;
   addListener(
     event: 'speechOpen',
@@ -71,6 +75,50 @@ const Jy = registerPlugin<JyNativePlugin>('JyNative');
 const FileBridge = isIosApp ? registerPlugin<JyNativePlugin>('JyReader') : Jy;
 export const setLanguage = (language: 'zh-Hans' | 'en') =>
   isIosApp ? FileBridge.setLanguage({ language }) : Promise.resolve();
+
+let iosMenuSuppress = false;
+let iosMenuEditable = false;
+function pushIosEditMenuGate() {
+  void FileBridge.setEditMenuGate?.({
+    suppress: iosMenuSuppress,
+    editable: iosMenuEditable,
+  }).catch(() => {});
+}
+/** iOS：阅读页抑制系统选区菜单，避免与应用标注菜单叠出两套菜单。 */
+export function setIosSelectionMenuSuppressed(suppress: boolean) {
+  if (!isIosApp || suppress === iosMenuSuppress) return;
+  iosMenuSuppress = suppress;
+  pushIosEditMenuGate();
+}
+/** iOS：DOM 输入框聚焦时放行系统编辑菜单，保证可粘贴。应用启动时调用一次。 */
+export function installIosEditMenuGate() {
+  if (!isIosApp) return;
+  document.addEventListener(
+    'focusin',
+    (event) => {
+      const target = event.target;
+      const editable =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (editable !== iosMenuEditable) {
+        iosMenuEditable = editable;
+        pushIosEditMenuGate();
+      }
+    },
+    true,
+  );
+  document.addEventListener(
+    'focusout',
+    () => {
+      if (iosMenuEditable) {
+        iosMenuEditable = false;
+        pushIosEditMenuGate();
+      }
+    },
+    true,
+  );
+}
 export async function pickIncoming() {
   return payloadToIncoming(await FileBridge.pickFiles());
 }
